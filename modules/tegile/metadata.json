@@ -1,0 +1,14 @@
+{
+  "name": "tegilesystems-tegile",
+  "version": "0.1.0",
+  "author": "Joseph",
+  "summary": "testing tegile-api with puppet",
+  "license": "??",
+  "source": "??",
+  "project_page": "??",
+  "issues_url": "??",
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+  ],
+  "data_provider": null
+}
