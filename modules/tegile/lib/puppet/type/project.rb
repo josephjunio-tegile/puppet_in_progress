@@ -68,16 +68,13 @@ Puppet::Type.newtype(:project) do
 
   newproperty(:lun_mapping, :array_matching => :all) do
     Puppet.info("##Inside type_property_lun_mapping")
-    #new_value = []
-    puts "@should is next"
-    puts @should.inspect
-    # munge do |value|
-    #   new_value << value
-    #   puts new_value.inspect
-    #   return new_value
-    #   #value.sort! {|a,b| a[0] <=> b[0]}
-    #   #value.sort! {|a,b| a[1] <=> b[1]}
-    # end
+    def insync?(is)
+      is_sorted1 = is.sort {|a,b| a[0] <=> b[0]}
+      is_sorted2= is_sorted1.sort {|a,b| a[1] <=> b[1]}
+      should_sorted1 = should.sort {|a,b| a[0] <=> b[0]}
+      should_sorted2 = should_sorted1.sort {|a,b| a[1] <=> b[1]}
+      return is_sorted2 == should_sorted2
+    end
   end
 
 end

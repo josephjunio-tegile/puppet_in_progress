@@ -1296,7 +1296,7 @@ class TegileApi
         clean_mapping[3] = sub_array.read_only
         clean_mappings_array << clean_mapping
       end
-      clean_mappings_array.each {|x| puts x.inspect}
+      #clean_mappings_array.each {|x| puts x.inspect}
       return clean_mappings_array
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
