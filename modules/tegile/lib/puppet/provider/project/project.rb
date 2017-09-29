@@ -114,7 +114,7 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def lun_mapping=(value)
     Puppet.info("##Inside provider_project_lun_mapping_set")
-    tegile_api_transport.project_lun_mapping_set(value)
+    tegile_api_transport.project_lun_mapping_set(value,resource[:pool_name],resource[:project_name])
   end
 
 end

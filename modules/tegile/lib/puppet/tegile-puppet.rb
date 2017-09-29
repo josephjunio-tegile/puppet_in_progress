@@ -515,7 +515,7 @@ class TegileApi
     end
   end
 
-  def project_mapping_create(pool_name,project_name,initiator_group_name,target_group_name)
+  def project_mapping_create__old(pool_name,project_name,initiator_group_name,target_group_name)
     api_instance = IFClient::SANApi.new
     create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
     create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -537,7 +537,7 @@ class TegileApi
     end
   end
 
-  def project_mapping_delete(pool_name,project_name,initiator_group_name,target_group_name)
+  def project_mapping_delete__old(pool_name,project_name,initiator_group_name,target_group_name)
     api_instance = IFClient::SANApi.new
     delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
     delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1276,6 +1276,48 @@ class TegileApi
     end
   end
 
+  def project_mapping_create(pool_name,project_name,initiator_group_name,target_group_name,read_only)
+    api_instance = IFClient::SANApi.new
+    create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
+    create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    create_mapping_for_project_param.arg1_initiator_group_name = initiator_group_name
+    create_mapping_for_project_param.arg2_target_group_name = target_group_name
+    create_mapping_for_project_param.arg3_read_only = read_only
+    begin
+      ##Create a project level default mapping
+      result = api_instance.create_mapping_for_project_post(create_mapping_for_project_param)
+      #puts result.inspect
+      if result.value == 0
+        puts "#{initiator_group_name}/#{target_group_name} mapping created"
+      else
+        puts "Error with project_mapping_create"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+    end 
+  end
+
+  def project_mapping_delete(pool_name,project_name,initiator_group_name,target_group_name)
+    api_instance = IFClient::SANApi.new
+    delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
+    delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    delete_mapping_from_project_param.arg1_initiator_group_name = initiator_group_name
+    delete_mapping_from_project_param.arg2_target_group_name = target_group_name
+    begin
+      ##Deletes the view (mapping) between the given project, initiator group, and target group.
+      result = api_instance.delete_mapping_from_project_post(delete_mapping_from_project_param)
+      #puts result.inspect
+      if result.value == 0
+        puts "#{initiator_group_name}/#{target_group_name} mapping removed"
+      else
+        puts "Error with project_mapping_delete"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+    end 
+  end
 
   def project_lun_mapping_get(pool_name,project_name)
     api_instance = IFClient::SANApi.new
@@ -1304,9 +1346,25 @@ class TegileApi
     end 
   end
 
-  def project_lun_mapping_set(value)
-    puts "tbd: project_lun_mapping_set"
-    value.each {|x| puts x.inspect}
+  def project_lun_mapping_set(value,pool_name,project_name)
+    is = project_lun_mapping_get(pool_name,project_name)
+    #puts value.inspect
+    #puts is.inspect
+    is_unique = is - value
+    should_unique = value - is
+    if should_unique.length != 0
+      should_unique.each do |sub_array|
+        project_mapping_create(pool_name,project_name,sub_array[0],sub_array[1],sub_array[3])
+        #puts "#{sub_array[0]} added"
+      end
+    elsif is_unique.length != 0
+      is_unique.each do |sub_array|
+        project_mapping_delete(pool_name,project_name,sub_array[0],sub_array[1])
+        #puts "#{sub_array[0]} removed"
+      end
+    else
+      puts "nothing to change"
+    end
   end
 
 

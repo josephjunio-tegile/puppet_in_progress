@@ -36,7 +36,7 @@ node 'tegile-3.7' {
    default_lun_block_size     => "64KB",
    default_share_block_size   => "64KB",
    default_thin_provisioning  => true,
-   lun_mapping                => [["initiator-group1", "iscsi-target-group1", -1, false], ["initiator-group2", "iscsi-target-group2", -1, false], ["initiator-group3", "iscsi-target-group3", -1, false], ["initiator-group4", "iscsi-target-group4", -1, false]],
+   lun_mapping                => [["initiator-group4", "iscsi-target-group4", -1, false],["initiator-group1", "iscsi-target-group4", -1, false]],
   }
 
   #iscsi_target { 'TestingResource3':
