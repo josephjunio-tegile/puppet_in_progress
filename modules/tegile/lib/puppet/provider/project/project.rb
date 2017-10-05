@@ -109,12 +109,91 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def lun_mapping
     Puppet.info("##Inside provider_project_lun_mapping_get")
-    tegile_api_transport.project_lun_mapping_get(resource[:pool_name],resource[:project_name])
+    ##Get current state of project mappings via api and then convert to sorted std_array
+    result = tegile_api_transport.project_lun_mapping_get(resource[:pool_name],resource[:project_name])
+    result_std_array = RubyMethods.it_view_v21_to_array(result)
+    result_std_array_sort1 = result_std_array.sort {|a,b| a[0] <=> b[0]}
+    result_std_array_sort2 = result_std_array_sort1.sort {|a,b| a[1] <=> b[1]}
   end
 
-  def lun_mapping=(value)
+  def lun_mapping=(should)
     Puppet.info("##Inside provider_project_lun_mapping_set")
-    tegile_api_transport.project_lun_mapping_set(value,resource[:pool_name],resource[:project_name])
+    ##Get current state of project mappings via api, convert to sorted std_array. This mimics the "lun_mapping" method, unsure if "is" value can be called from here
+    is = tegile_api_transport.project_lun_mapping_get(resource[:pool_name],resource[:project_name])
+    is_array = RubyMethods.it_view_v21_to_array(is)
+    is_array_sort1 = is_array.sort {|a,b| a[0] <=> b[0]}
+    is_array_sort2 = is_array_sort1.sort {|a,b| a[1] <=> b[1]}
+
+    ##Sort the should value passed into method
+    should_sort1 = should.sort {|a,b| a[0] <=> b[0]}
+    should_sort2 = should_sort1.sort {|a,b| a[1] <=> b[1]}
+
+    ##Create filterd variables to add/remove
+    should_unique = should_sort2 - is_array_sort2
+    is_unique = is_array_sort2 - should_sort2
+    ##Use the filtered variables to add missing and remove extra
+    if should_unique.length != 0
+      should_unique.each do |sub_array|
+        tegile_api_transport.project_lun_mapping_set_add(resource[:pool_name],resource[:project_name],sub_array)
+      end
+    end
+    if is_unique.length != 0
+      is_unique.each do |sub_array|
+        tegile_api_transport.project_lun_mapping_set_delete(resource[:pool_name],resource[:project_name],sub_array)
+      end
+    end
+
+    # should_unique = value - is
+    # is_unique = is - value
+    # if should_unique.length != 0
+    #   should_unique.each do |sub_array|
+    #     tegile_api_transport.project_lun_mapping_set_add(resource[:pool_name],resource[:project_name],sub_array[0],sub_array[1],sub_array[3])
+    #   end
+    # elsif is_unique.length != 0
+    #   is_unique.each do |sub_array|
+    #     tegile_api_transport.project_lun_mapping_set_delete(resource[:pool_name],resource[:project_name],sub_array[0],sub_array[1])  
+    #   end
+    # else
+    #   puts "nothing to change"
+    # end
   end
+
+  def nfs_network_acls
+    Puppet.info("##Inside provider_project_nfs_network_acls_get")
+    ##Get current state of project acls via api and then convert to sorted std_array
+    result = tegile_api_transport.project_nfs_network_acls_get(resource[:pool_name],resource[:project_name])
+    result_std_array = RubyMethods.network_acl_v21_to_array(result)
+    result_std_array_sort1 = result_std_array.sort {|a,b| a[0] <=> b[0]}
+    result_std_array_sort2 = result_std_array_sort1.sort {|a,b| a[1] <=> b[1]}
+  end
+
+  def nfs_network_acls=(should)
+    Puppet.info("##Inside provider_project_nfs_network_acls_set")
+    ##Get current state of project acls via api, convert to sorted std_array. This mimics the "nfs_network_acls" method, unsure if "is" value can be called from here
+    is = tegile_api_transport.project_nfs_network_acls_get(resource[:pool_name],resource[:project_name])
+    is_array = RubyMethods.network_acl_v21_to_array(is)
+    is_array_sort1 = is_array.sort {|a,b| a[0] <=> b[0]}
+    is_array_sort2 = is_array_sort1.sort {|a,b| a[1] <=> b[1]}
+    ##Sort the should value passed into method
+    should_sort1 = should.sort {|a,b| a[0] <=> b[0]}
+    should_sort2 = should_sort1.sort {|a,b| a[1] <=> b[1]}
+    ##Create filterd variables to add/remove
+    should_unique = should_sort2 - is_array_sort2
+    is_unique = is_array_sort2 - should_sort2
+    ##Use the filtered variables to add missing and remove extra
+    if should_unique.length != 0
+      should_unique.each do |sub_array|
+        tegile_api_transport.project_nfs_network_acls_set_add(resource[:pool_name],resource[:project_name],sub_array)
+      end
+    end
+    if is_unique.length != 0
+      is_unique.each do |sub_array|
+        tegile_api_transport.project_nfs_network_acls_set_delete(resource[:pool_name],resource[:project_name],sub_array)
+      end
+    end
+  end
+
+
+
 
 end

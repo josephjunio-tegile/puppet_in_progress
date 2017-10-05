@@ -1,3 +1,5 @@
+require 'puppet/tegile-puppet'
+
 Puppet::Type.newtype(:project) do
   @doc = "Type for create/delete project"
   Puppet.info("##Inside type_root_project")
@@ -68,13 +70,28 @@ Puppet::Type.newtype(:project) do
 
   newproperty(:lun_mapping, :array_matching => :all) do
     Puppet.info("##Inside type_property_lun_mapping")
+    ##custom insync? method to compare unsorted values
     def insync?(is)
-      is_sorted1 = is.sort {|a,b| a[0] <=> b[0]}
-      is_sorted2= is_sorted1.sort {|a,b| a[1] <=> b[1]}
-      should_sorted1 = should.sort {|a,b| a[0] <=> b[0]}
-      should_sorted2 = should_sorted1.sort {|a,b| a[1] <=> b[1]}
-      return is_sorted2 == should_sorted2
+      ##Find unique entries
+      is_unique = is - should
+      should_unique = should - is
+      ##Combine variables and check if empty
+      diff = is_unique + should_unique
+      diff.length == 0 ? true : false
     end
   end
 
+  newproperty(:nfs_network_acls, :array_matching => :all) do
+    Puppet.info("##Inside type_property_nfs_network_acls")
+    ##custom insync? method to compare unsorted values
+    def insync?(is)
+      ##Find unique entries
+      is_unique = is - should
+      should_unique = should - is
+      ##Combine variables and check if empty
+      diff = is_unique + should_unique
+      diff.length == 0 ? true : false
+    end
+  end
+  
 end

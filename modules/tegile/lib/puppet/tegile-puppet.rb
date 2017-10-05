@@ -1276,125 +1276,180 @@ class TegileApi
     end
   end
 
-  def project_mapping_create(pool_name,project_name,initiator_group_name,target_group_name,read_only)
-    api_instance = IFClient::SANApi.new
-    create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
-    create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    create_mapping_for_project_param.arg1_initiator_group_name = initiator_group_name
-    create_mapping_for_project_param.arg2_target_group_name = target_group_name
-    create_mapping_for_project_param.arg3_read_only = read_only
-    begin
-      ##Create a project level default mapping
-      result = api_instance.create_mapping_for_project_post(create_mapping_for_project_param)
-      #puts result.inspect
-      if result.value == 0
-        puts "#{initiator_group_name}/#{target_group_name} mapping created"
-      else
-        puts "Error with project_mapping_create"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-    end 
-  end
-
-  def project_mapping_delete(pool_name,project_name,initiator_group_name,target_group_name)
-    api_instance = IFClient::SANApi.new
-    delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
-    delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    delete_mapping_from_project_param.arg1_initiator_group_name = initiator_group_name
-    delete_mapping_from_project_param.arg2_target_group_name = target_group_name
-    begin
-      ##Deletes the view (mapping) between the given project, initiator group, and target group.
-      result = api_instance.delete_mapping_from_project_post(delete_mapping_from_project_param)
-      #puts result.inspect
-      if result.value == 0
-        puts "#{initiator_group_name}/#{target_group_name} mapping removed"
-      else
-        puts "Error with project_mapping_delete"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-    end 
-  end
-
   def project_lun_mapping_get(pool_name,project_name)
     api_instance = IFClient::SANApi.new
     get_project_default_iscsi_it_view_param = IFClient::GetProjectDefaultIscsiITViewParam.new
     get_project_default_iscsi_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
     begin
-      ##List all of the default iSCSI views of the project
+      ##List all of the default iSCSI views of the project in Array<ITViewV21> format
       result = api_instance.get_project_default_iscsi_it_view_post(get_project_default_iscsi_it_view_param)
-      result.sort! {|a,b| a.host_group_name <=> b.host_group_name}
-      result.sort! {|a,b| a.target_group_name <=> b.target_group_name}
-      #result.each {|x| puts x.inspect}
-      clean_mappings_array = []
-      result.each do |sub_array|
-        clean_mapping = []
-        clean_mapping[0] = sub_array.host_group_name
-        clean_mapping[1] = sub_array.target_group_name
-        clean_mapping[2] = sub_array.lun_nbr
-        clean_mapping[3] = sub_array.read_only
-        clean_mappings_array << clean_mapping
-      end
-      #clean_mappings_array.each {|x| puts x.inspect}
-      return clean_mappings_array
+      return result
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
+      puts "Exception when calling TegileApi(project_lun_mapping_get): #{error["message"]}"
+      fail
     end 
   end
 
-  def project_lun_mapping_set(value,pool_name,project_name)
-    is = project_lun_mapping_get(pool_name,project_name)
-    #puts value.inspect
-    #puts is.inspect
-    is_unique = is - value
-    should_unique = value - is
-    if should_unique.length != 0
-      should_unique.each do |sub_array|
-        project_mapping_create(pool_name,project_name,sub_array[0],sub_array[1],sub_array[3])
-        #puts "#{sub_array[0]} added"
+  def project_lun_mapping_set_add(pool_name,project_name,lun_mappings_array)
+    api_instance = IFClient::SANApi.new
+    create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
+    create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    create_mapping_for_project_param.arg1_initiator_group_name = lun_mappings_array[0]
+    create_mapping_for_project_param.arg2_target_group_name = lun_mappings_array[1]
+    create_mapping_for_project_param.arg3_read_only = lun_mappings_array[3]
+    begin
+      ##Create a project level default mapping
+      result = api_instance.create_mapping_for_project_post(create_mapping_for_project_param)
+      #puts result.inspect
+      if result.value == 0
+        puts "#{lun_mappings_array[0]}/#{lun_mappings_array[1]} mapping created"
+      else
+        puts "Error with project_lun_mapping_set_add"
       end
-    elsif is_unique.length != 0
-      is_unique.each do |sub_array|
-        project_mapping_delete(pool_name,project_name,sub_array[0],sub_array[1])
-        #puts "#{sub_array[0]} removed"
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_lun_mapping_set_add): #{error["message"]}"
+      fail
+    end 
+  end
+
+  def project_lun_mapping_set_delete(pool_name,project_name,lun_mappings_array)
+    api_instance = IFClient::SANApi.new
+    delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
+    delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    delete_mapping_from_project_param.arg1_initiator_group_name = lun_mappings_array[0]
+    delete_mapping_from_project_param.arg2_target_group_name = lun_mappings_array[1]
+    begin
+      ##Deletes the view (mapping) between the given project, initiator group, and target group.
+      result = api_instance.delete_mapping_from_project_post(delete_mapping_from_project_param)
+      #puts result.inspect
+      if result.value == 0
+        puts "#{lun_mappings_array[0]}/#{lun_mappings_array[1]} mapping removed"
+      else
+        puts "Error with project_lun_mapping_set_delete"
       end
-    else
-      puts "nothing to change"
+      rescue IFClient::ApiError => e
+        error = JSON.parse("#{e.response_body}")
+        puts "Exception when calling TegileApi(project_lun_mapping_set_delete): #{error["message"]}"
+        fail
     end
   end
 
+  def project_nfs_network_acls_get(pool_name,project_name)
+    api_instance = IFClient::NasApi.new
+    get_nfs_network_ac_ls_on_project_param = IFClient::GetNFSNetworkACLsOnProjectParam.new
+    get_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      ##Returns all the Network ACLs for the NFS Project as Array<NetworkACLV21>
+      result = api_instance.get_nfs_network_ac_ls_on_project_post(get_nfs_network_ac_ls_on_project_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_nfs_network_acls_get): #{error["message"]}"
+      fail
+    end   
+  end
+
+  def project_nfs_network_acls_set_add(pool_name,project_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    add_nfs_network_acl_on_project_param = IFClient::AddNFSNetworkACLOnProjectParam.new
+    add_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    add_nfs_network_acl_on_project_param.arg1_type = net_acl_array[0]
+    add_nfs_network_acl_on_project_param.arg2_host = net_acl_array[1]
+    add_nfs_network_acl_on_project_param.arg3_access_mode = net_acl_array[2]
+    add_nfs_network_acl_on_project_param.arg4_is_root = net_acl_array[3]
+    begin
+      ##Add network ACL to NFS Project
+      result = api_instance.add_nfs_network_acl_on_project_post(add_nfs_network_acl_on_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} created"
+      else
+        puts "Error with project_nfs_network_acls_set_add"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_nfs_network_acls_set_add): #{error["message"]}"
+    end 
+  end
+
+  def project_nfs_network_acls_set_delete(pool_name,project_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    remove_nfs_network_acl_on_project_param = IFClient::RemoveNFSNetworkACLOnProjectParam.new
+    remove_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    remove_nfs_network_acl_on_project_param.arg1_type = net_acl_array[0]
+    remove_nfs_network_acl_on_project_param.arg2_host = net_acl_array[1]
+    begin
+      ##Remove network ACL from NFS Project
+      result = api_instance.remove_nfs_network_acl_on_project_post(remove_nfs_network_acl_on_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} removed"
+      else
+        puts "Error with project_nfs_network_acls_set_delete"
+      end
+      rescue IFClient::ApiError => e
+        error = JSON.parse("#{e.response_body}")
+        puts "Exception when calling TegileApi(project_nfs_network_acls_set_delete): #{error["message"]}"
+        fail
+    end
+  end
+
+  
+
+
+end
+
+
+
+
+
+
+module RubyMethods
+
+  def RubyMethods.network_acl_v21_to_array(networkaclv21_array)
+    return_array = []
+    networkaclv21_array.each do |sub_array|
+      temp_array = []
+      temp_array[0] = sub_array.host_type
+      temp_array[1] = sub_array.host
+      temp_array[2] = sub_array.access_mode
+      temp_array[3] = sub_array.root_access_for_nfs
+      return_array << temp_array
+    end
+    return return_array
+  end
+
+  def RubyMethods.array_to_network_acl_v21(array)
+    return_array = []
+    array.each do |sub_array|
+      temp_array = IFClient::NetworkACLV21.new
+      temp_array.host_type = sub_array[0]
+      temp_array.host = sub_array[1]
+      temp_array.access_mode = sub_array[2]
+      temp_array.root_access_for_nfs = sub_array[3]
+      return_array << temp_array
+    end
+    return return_array
+  end
+
+  def RubyMethods.it_view_v21_to_array(itviewv21_array)
+    return_array = []
+    itviewv21_array.each do |sub_array|
+      temp_array = []
+      temp_array[0] = sub_array.host_group_name
+      temp_array[1] = sub_array.target_group_name
+      temp_array[2] = sub_array.lun_nbr
+      temp_array[3] = sub_array.read_only
+      return_array << temp_array
+    end
+    return return_array
+  end
+  
 
 
 
   
-
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
 end
