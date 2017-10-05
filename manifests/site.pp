@@ -36,7 +36,7 @@ node 'tegile-3.7' {
    default_lun_block_size     => "64KB",
    default_share_block_size   => "64KB",
    default_thin_provisioning  => true,
-   lun_mapping                => [["initiator-group4", "iscsi-target-group2", -1, false],["initiator-group2", "iscsi-target-group2", -1, false],["initiator-group1", "iscsi-target-group4", -1, false],["initiator-group1", "iscsi-target-group2", -1, false]],
+   lun_mapping                => [["initiator-group4", "iscsi-target-group2", -1, false],["initiator-group2", "iscsi-target-group2", -1, false]],
    nfs_network_acls           => [["IP", "3.3.3.3", "rw", false],["IP", "1.1.1.1", "rw", false],["IP", "2.2.2.2", "rw", false]],
   }
 

@@ -1397,6 +1397,67 @@ class TegileApi
     end
   end
 
+  def share_nfs_network_acls_get(pool_name,project_name,share_name)
+    api_instance = IFClient::NasApi.new
+    get_nfs_network_ac_ls_on_share_param = IFClient::GetNFSNetworkACLsOnShareParam.new
+    get_nfs_network_ac_ls_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Returns all the Network ACLs for the NFS share in Array<NetworkACLV21> format
+      result = api_instance.get_nfs_network_ac_ls_on_share_post(get_nfs_network_ac_ls_on_share_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_nfs_network_acls_get): #{error["message"]}"
+      fail
+    end   
+  end
+
+  def share_nfs_network_acls_set_add(pool_name,project_name,share_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    add_nfs_network_acl_on_param = IFClient::AddNFSNetworkACLOnParam.new
+    add_nfs_network_acl_on_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    add_nfs_network_acl_on_param.arg1_type = net_acl_array[0]
+    add_nfs_network_acl_on_param.arg2_host = net_acl_array[1]
+    add_nfs_network_acl_on_param.arg3_access_mode = net_acl_array[2]
+    add_nfs_network_acl_on_param.arg4_is_root = net_acl_array[3]
+    begin
+      ##Add network ACL to NFS share
+      result = api_instance.add_nfs_network_acl_on_share_post(add_nfs_network_acl_on_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} created"
+      else
+        puts "Error with TegileApi(share_nfs_network_acls_set_add)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_nfs_network_acls_set_add): #{error["message"]}"
+    end 
+  end
+
+  def share_nfs_network_acls_set_delete(pool_name,project_name,share_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    remove_nfs_network_acl_on_share_param = IFClient::RemoveNFSNetworkACLOnShareParam.new
+    remove_nfs_network_acl_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    remove_nfs_network_acl_on_share_param.arg1_type = net_acl_array[0]
+    remove_nfs_network_acl_on_share_param.arg2_host = net_acl_array[1]
+    begin
+      ##Remove network ACL from NFS Project
+      result = api_instance.remove_nfs_network_acl_on_share_post(remove_nfs_network_acl_on_share_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} removed"
+      else
+        puts "Error with TegileApi(share_nfs_network_acls_set_delete)"
+      end
+      rescue IFClient::ApiError => e
+        error = JSON.parse("#{e.response_body}")
+        puts "Exception when calling TegileApi(share_nfs_network_acls_set_delete): #{error["message"]}"
+        fail
+    end
+  end
+
   
 
 

@@ -1,0 +1,10 @@
+# IFClient::PoolV10
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**available_size** | **Integer** | The available size of the pool in bytes. | [optional] 
+**name** | **String** | Name of the storage pool. | [optional] 
+**total_size** | **Integer** | The total size of the pool in bytes. | [optional] 
+
+

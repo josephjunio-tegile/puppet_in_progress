@@ -32,4 +32,8 @@ Puppet::Type.newtype(:share) do
     Puppet.info("##Inside type_property_override_project_nfs_network_acls")
   end
 
+  newproperty(:nfs_network_acls, :array_matching => :all) do
+    Puppet.info("##Inside type_property_nfs_network_acls")
+  end
+
  end
