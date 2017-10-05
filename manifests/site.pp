@@ -11,14 +11,15 @@ node 'tegile-3.7' {
   #  #inherit_mappings      => "no",
   # }
 
-  # share { 'TestingResource2':
-  #  ensure                            => present,
-  #  share_name                        => "share1",
-  #  project_name                      => "project1",
-  #  pool_name                         => "pool-a",
-  #  block_size                        => "32KB",
-  #  #override_project_nfs_network_acls => "no",
-  # }
+  share { 'TestingResource2':
+   ensure                            => present,
+   share_name                        => "share1",
+   project_name                      => "project1",
+   pool_name                         => "pool-a",
+   block_size                        => "32KB",
+  #  override_project_nfs_network_acls => "no",
+   nfs_network_acls                  => [["IP", "30.3.3.3", "rw", false],["IP", "10.1.1.1", "rw", false],["IP", "20.2.2.2", "rw", false]],
+  }
 
   project { 'TestingResource2.1':
    ensure                     => present,

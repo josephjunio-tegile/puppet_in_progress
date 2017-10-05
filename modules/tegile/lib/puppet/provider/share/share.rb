@@ -55,12 +55,12 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     ##Use the filtered variables to add missing and remove extra
     if should_unique.length != 0
       should_unique.each do |sub_array|
-        tegile_api_transport.project_nfs_network_acls_set_add(resource[:pool_name],resource[:project_name],resource[:share_name],sub_array)
+        tegile_api_transport.share_nfs_network_acls_set_add(resource[:pool_name],resource[:project_name],resource[:share_name],sub_array)
       end
     end
     if is_unique.length != 0
       is_unique.each do |sub_array|
-        tegile_api_transport.project_nfs_network_acls_set_delete(resource[:pool_name],resource[:project_name],resource[:share_name],sub_array)
+        tegile_api_transport.share_nfs_network_acls_set_delete(resource[:pool_name],resource[:project_name],resource[:share_name],sub_array)
       end
     end
   end

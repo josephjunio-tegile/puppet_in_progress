@@ -39,14 +39,14 @@ class TegileApi
     begin
       #Creates a share with the specified share options and share permissions
       result = api_instance.create_share_post(create_share_param)
-      if result == 0
+      if result.value == 0
         puts "#{share_name} created"
       else
         puts "Error When Creating Volume"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
+      puts "Exception when calling TegileApi(share_create): #{error["message"]}"
       fail
     end
   end
