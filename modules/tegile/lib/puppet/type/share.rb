@@ -22,7 +22,7 @@ Puppet::Type.newtype(:share) do
     Puppet.info("##Inside type_param_project_name")
   end
 
-  newparam(:block_size) do
+  newproperty(:block_size) do
     ##4KB,8KB,16KB,32KB,64KB,128KB
     Puppet.info("##Inside type_param_block_size")
     defaultto :"32KB"
@@ -34,6 +34,15 @@ Puppet::Type.newtype(:share) do
 
   newproperty(:nfs_network_acls, :array_matching => :all) do
     Puppet.info("##Inside type_property_nfs_network_acls")
+    ##custom insync? method to compare unsorted values
+    def insync?(is)
+      ##Find unique entries
+      is_unique = is - should
+      should_unique = should - is
+      ##Combine variables and check if empty
+      diff = is_unique + should_unique
+      diff.length == 0 ? true : false
+    end
   end
 
  end

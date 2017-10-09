@@ -39,9 +39,21 @@ Puppet::Type.newtype(:lun) do
     defaultto :iSCSI
   end
 
-  newproperty(:inherit_mappings) do
-    ##yes.no
-    Puppet.info("##Inside type_param_inherit_mappings")
+  newproperty(:override_project_mappings) do
+    Puppet.info("##Inside type_property_override_project_mappings")
+  end
+
+  newproperty(:lun_mappings, :array_matching => :all) do
+    Puppet.info("##Inside type_property_lun_mappings")
+    ##custom insync? method to compare unsorted values
+    # def insync?(is)
+    #   ##Find unique entries
+    #   is_unique = is - should
+    #   should_unique = should - is
+    #   ##Combine variables and check if empty
+    #   diff = is_unique + should_unique
+    #   diff.length == 0 ? true : false
+    # end
   end
 
  end

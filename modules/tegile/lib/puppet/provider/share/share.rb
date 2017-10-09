@@ -19,15 +19,31 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     tegile_api_transport.share_exists(resource[:share_name],resource[:pool_name],resource[:project_name])
   end
 
-  def override_project_nfs_network_acls
-    Puppet.info("##Inside provider_share_override_project_network_acls_get")
-    tegile_api_transport.share_acl_inherit_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+  def block_size
+    Puppet.info("##Inside provider_share_block_size_get")
+    tegile_api_transport.share_block_size_get(resource[:pool_name],resource[:project_name],resource[:share_name])
   end
 
-  def override_project_nfs_network_acls=(value)
+  def block_size=(should)
+    Puppet.info("##Inside provider_share_block_size_set")
+    tegile_api_transport.share_block_size_set(should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def override_project_nfs_network_acls
+    Puppet.info("##Inside provider_share_override_project_network_acls_get")
+    ##Use api to get status of share override_sharenfs property, then convert to yes/no before returning
+    ##Using default true/false was causing the insync? method to behave unexpectedly
+    result = tegile_api_transport.share_acl_inherit_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    result == true ? "yes" : "no"
+  end
+
+  def override_project_nfs_network_acls=(should)
     Puppet.info("##Inside provider_share_override_project_network_acls_set")
-    puts "should be #{value}"
-    tegile_api_transport.share_acl_inherit_set(resource[:pool_name],resource[:project_name],resource[:share_name])
+    ##If override project is enabled then we will use api to set back to inherit
+    ##No change needed if override is set to yes, the "nfs_network_acls=" method will over ride when used
+    if should == "no"
+      tegile_api_transport.share_acl_inherit_set(resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
   end
 
   def nfs_network_acls
@@ -41,6 +57,10 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def nfs_network_acls=(should)
     Puppet.info("##Inside provider_share_nfs_network_acls_set")
+    ##Check to make sure the "override_project_nfs_network_acls" type is set to yes before continuing
+    if resource[:override_project_nfs_network_acls] == "no"
+      fail "override_project_nfs_network_acls must be set to yes before network acls can bet configured"
+    end
     ##Get current state of share acls via api, convert to sorted std_array. This mimics the "nfs_network_acls" method, unsure if "is" value can be called from here
     is = tegile_api_transport.share_nfs_network_acls_get(resource[:pool_name],resource[:project_name],resource[:share_name])
     is_array = RubyMethods.network_acl_v21_to_array(is)

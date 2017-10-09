@@ -1,4 +1,4 @@
-require 'puppet/tegile-puppet'
+# require 'puppet/tegile-puppet'
 
 Puppet::Type.newtype(:project) do
   @doc = "Type for create/delete project"

@@ -44,6 +44,7 @@ Puppet::Type.newtype(:iscsi_target) do
 
   newparam(:iscsi_target_port) do
     Puppet.info("##Inside type_param_iscsi_target_group")
+    defaultto :"3260"
   end
 
  end

@@ -13,6 +13,10 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
         #puts "enabling nfs"
         tegile_api_transport.set_nfs_sharing_on(resource[:project_name],resource[:pool_name])
       end
+      if enabled_protocols.include?("smb")
+        #puts "enabling smb"
+        tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
+      end
     end
   end
 
