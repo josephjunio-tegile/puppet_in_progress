@@ -7,6 +7,22 @@ Puppet::Type.newtype(:project) do
   apply_to_device
   ensurable
 
+  autorequire(:initiator_group) do
+    required_initiator_groups = []
+    self[:lun_mapping].each do |sub_array|
+      required_initiator_groups << sub_array[0]
+    end
+    required_initiator_groups
+  end
+
+  autorequire(:iscsi_target_group) do
+    required_target_groups = []
+    self[:lun_mapping].each do |sub_array|
+      required_target_groups << sub_array[1]
+    end
+    required_target_groups
+  end
+
   newparam(:project_name) do
     isnamevar
     Puppet.info("##Inside type_param_project_name")

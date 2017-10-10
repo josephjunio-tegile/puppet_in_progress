@@ -18,6 +18,16 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
         tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
       end
     end
+    if resource[:lun_mapping] != nil
+      resource[:lun_mapping].each do |sub_array|
+        tegile_api_transport.project_lun_mapping_set_add(resource[:pool_name],resource[:project_name],sub_array)
+      end
+    end
+    if resource[:nfs_network_acls] != nil
+      resource[:nfs_network_acls].each do |sub_array|
+        tegile_api_transport.project_nfs_network_acls_set_add(resource[:pool_name],resource[:project_name],sub_array)
+      end
+    end
   end
 
   def destroy

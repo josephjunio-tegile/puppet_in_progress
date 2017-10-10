@@ -200,15 +200,15 @@ class TegileApi
     begin
         ##Creates an initiator group on a Tegile array.
       result = api_instance.create_initiator_group_post(create_initiator_group_param)
-      if result == 0
+      if result.value == 0
         puts "#{initiator_group_name} created"
       else
-        puts "Error"
+        puts "Error with TegileApi(initiator_group_create)"
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->create_initiator_group_post: #{e}"
-      fail
-    end
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(initiator_group_create): #{error["message"]}"
+    end 
   end
 
   def initiator_group_delete(initiator_group_name)
@@ -218,15 +218,15 @@ class TegileApi
     begin
         ##Delete an Initiator Group
       result = api_instance.delete_initiator_group_post(delete_initiator_group_param)
-      if result == 0
+      if result.value == 0
         puts "#{initiator_group_name} deleted"
       else
         puts "Error"
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->delete_initiator_group_post: #{e}"
-      fail
-    end
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(initiator_group_delete): #{error["message"]}"
+    end 
   end
 
   def initiator_exists(initiator_name)
@@ -263,7 +263,7 @@ class TegileApi
       ##Creates an iSCSI initiator object on the Tegile array. If the initiator name already exists, then the method fails.
       result = api_instance.create_iscsi_initiator_post(create_iscsi_initiator_param)
       #puts result
-      if result == 0
+      if result.value == 0
         puts "#{initiator_name} created"
       else
         puts "Error"
@@ -302,7 +302,7 @@ class TegileApi
       ##Associates an initiator with an initiator group.
       result = api_instance.add_initiator_to_initiator_group_post(add_initiator_to_initiator_group_param)
       #puts result
-      if result == 0
+      if result.value == 0
         puts "#{initiator_name} added to #{initiator_group_name}"
       else
         puts "Error"

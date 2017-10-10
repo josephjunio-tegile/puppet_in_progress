@@ -7,8 +7,6 @@ Puppet::Type.type(:initiator_group).provide(:lun,:parent => Puppet::Provider::Te
   def create
     Puppet.info("##Inside provider_initiator_group_create")
     tegile_api_transport.initiator_group_create(resource[:initiator_group_name])
-    puts "adding to holder to mark as iscsi"
-    tegile_api_transport.add_initiator_to_initiator_group("iqn.2017-07.com.test:holder",resource[:initiator_group_name])
   end
 
   def destroy
