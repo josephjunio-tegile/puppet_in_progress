@@ -18,8 +18,8 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
         tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
       end
     end
-    if resource[:lun_mapping] != nil
-      resource[:lun_mapping].each do |sub_array|
+    if resource[:lun_mappings] != nil
+      resource[:lun_mappings].each do |sub_array|
         tegile_api_transport.project_lun_mapping_set_add(resource[:pool_name],resource[:project_name],sub_array)
       end
     end
@@ -32,8 +32,7 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def destroy
     Puppet.info("##Inside provider_project_destroy")
-    puts "Deleting projects not supported"
-    fail
+    fail "Deleting projects not supported"
   end
 
   def exists?
@@ -121,7 +120,7 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
     tegile_api_transport.project_intended_protocol_list_set(value,resource[:pool_name],resource[:project_name])
   end
 
-  def lun_mapping
+  def lun_mappings
     Puppet.info("##Inside provider_project_lun_mapping_get")
     ##Get current state of project mappings via api and then convert to sorted std_array
     result = tegile_api_transport.project_lun_mapping_get(resource[:pool_name],resource[:project_name])
@@ -130,7 +129,7 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
     result_std_array_sort2 = result_std_array_sort1.sort {|a,b| a[1] <=> b[1]}
   end
 
-  def lun_mapping=(should)
+  def lun_mappings=(should)
     Puppet.info("##Inside provider_project_lun_mapping_set")
     ##Get current state of project mappings via api, convert to sorted std_array. This mimics the "lun_mapping" method, unsure if "is" value can be called from here
     is = tegile_api_transport.project_lun_mapping_get(resource[:pool_name],resource[:project_name])

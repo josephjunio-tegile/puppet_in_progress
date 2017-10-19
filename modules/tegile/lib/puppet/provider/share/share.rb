@@ -7,6 +7,14 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def create
     Puppet.info("##Inside provider_share_create")
     tegile_api_transport.share_create(resource[:pool_name],resource[:project_name],resource[:share_name],resource[:block_size])
+    if resource[:nfs_network_acls] != nil && resource[:override_project_nfs_network_acls] == "yes"
+      resource[:nfs_network_acls].each do |sub_array|
+        tegile_api_transport.share_nfs_network_acls_set_add(resource[:pool_name],resource[:project_name],resource[:share_name],sub_array)
+      end
+    end
+    if resource[:nfs_network_acls] != nil && resource[:override_project_nfs_network_acls] == "no"
+      fail "override_project_nfs_network_acls must be set to yes before network acls can bet configured"
+    end
   end
 
   def destroy
@@ -59,6 +67,9 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     Puppet.info("##Inside provider_share_nfs_network_acls_set")
     ##Check to make sure the "override_project_nfs_network_acls" type is set to yes before continuing
     if resource[:override_project_nfs_network_acls] == "no"
+      fail "override_project_nfs_network_acls must be set to yes before network acls can bet configured"
+    end
+    if resource[:override_project_nfs_network_acls] == nil
       fail "override_project_nfs_network_acls must be set to yes before network acls can bet configured"
     end
     ##Get current state of share acls via api, convert to sorted std_array. This mimics the "nfs_network_acls" method, unsure if "is" value can be called from here

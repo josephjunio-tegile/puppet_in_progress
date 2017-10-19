@@ -34,3 +34,14 @@ mappings_array.sort! {|a,b| a.target_group_name <=> b.target_group_name}
 
 ##command to compare sets of ITViewV21
 puts array.==(array_to_compared)
+
+##Code for create an fail
+if result.value == 0
+    puts "#{iscsi_target_name} created"
+  else
+    fail "Error with TegileApi(method_name)"
+  end
+rescue IFClient::ApiError => e
+    error = JSON.parse("#{e.response_body}")
+    fail "Exception when calling TegileApi(method_name): #{error["message"]}"
+end

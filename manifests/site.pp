@@ -1,84 +1,255 @@
-node 'tegile-3.7' {
+node 'tegile-3.7_2' {
 
-  # lun { 'TestingResource1':
-  #  ensure                     => present,
-  #  lun_name                   => "lun1",
-  #  project_name               => "project1",
-  #  pool_name                  => "pool-a",
-  #  lun_size                   => 132070244352,
-  #  block_size                 => "32KB",
-  #  lun_protocol               => "iSCSI",
-  #  override_project_mappings  => "yes",
-  #  lun_mappings               => [["initiator-group4", "iscsi-target-group3", -1, false],["initiator-group2", "iscsi-target-group1", -1, false]],
-  # }
 
-  # share { 'TestingResource2':
-  #  ensure                            => present,
-  #  share_name                        => "share1",
-  #  project_name                      => "project1",
-  #  pool_name                         => "pool-a",
-  #  block_size                        => "32KB",
-  # #  override_project_nfs_network_acls => "yes",
-  # #  nfs_network_acls                  => [["IP", "30.3.3.3", "rw", false],["IP", "10.1.1.1", "rw", false],["IP", "20.2.2.2", "rw", false]],
-  # }
+  ##VMWARE Configuration
+  project { 'VMware-Project':
+   ensure                     => present,
+   project_name               => "vmware-project",
+   pool_name                  => "pool-a",
+   compression_type           => "lz4",
+   compressed_log             => "lz4",
+   intended_protocol_list     => ["iSCSI","NFS"],
+   quota                      => 1288490188800,
+   dedup                      => "on",
+   default_lun_block_size     => "64KB",
+   default_share_block_size   => "32KB",
+   default_thin_provisioning  => true,
+   lun_mappings               => [["vmware-ig-1", "vmware-tg-1", -1, false],["vmware-ig-2", "vmware-tg-2", -1, false]],
+   nfs_network_acls           => [["IP", "1.1.1.1", "rw", false],["IP", "2.2.2.2", "rw", false]],
+  }
 
-  # project { 'TestingResource2.1':
-  #  ensure                     => present,
-  #  project_name               => "project1",
-  #  pool_name                  => "pool-a",
-  #  compression_type           => "lz4",
-  #  compressed_log             => "lz4",
-  #  intended_protocol_list     => ["iSCSI","NFS","SMB"],
-  #  quota                      => 1288490188800,
-  #  dedup                      => "on",
-  #  ##primary_cache             => "All",
-  #  ##secondary_cache           => "All",
-  #  ##acl_inherit               => "On",
-  #  ##default_lun_size           => 429496729600,
-  #  default_lun_block_size     => "64KB",
-  #  default_share_block_size   => "64KB",
-  #  default_thin_provisioning  => true,
-  #  lun_mapping                => [["initiator-group4", "iscsi-target-group2", -1, false],["initiator-group1", "iscsi-target-group2", -1, false],["puppet-initiator-group1", "iscsi-target-group1", -1, false]],
-  #  nfs_network_acls           => [["IP", "3.3.3.3", "rw", false],["IP", "1.1.1.1", "rw", false],["IP", "2.2.2.2", "rw", false]],
-  # }
+  lun { 'VMware-LUN1':
+   ensure                     => present,
+   lun_name                   => "vmware-lun1",
+   project_name               => "vmware-project",
+   pool_name                  => "pool-a",
+   lun_size                   => 132070244352,
+   block_size                 => "32KB",
+   lun_protocol               => "iSCSI",
+  }
 
-  #iscsi_target { 'TestingResource3':
-  #  ensure                    => present,
-  #  iscsi_target_name         => "iscsi-target1",
-  #  iscsi_target_alias        => "iscsi-target1",
-  #  iscsi_target_group        => "iscsi-target-group1",
-  #  iscsi_target_auth         => "none",
-  #  iscsi_target_chap_name    => "",
-  #  iscsi_target_chap_secret  => "",
-  #  iscsi_target_ip           => "10.65.3.33",
-  #  iscsi_target_port         => "3260",
-  #}
+  lun { 'VMware-LUN2':
+   ensure                     => present,
+   lun_name                   => "vmware-lun2",
+   project_name               => "vmware-project",
+   pool_name                  => "pool-a",
+   lun_size                   => 132070244352,
+   block_size                 => "32KB",
+   lun_protocol               => "iSCSI",
+  }
 
-  initiator { 'TestingResource6':
+  share { 'VMware-Share1':
+   ensure                            => present,
+   share_name                        => "vmware-share1",
+   project_name                      => "vmware-project",
+   pool_name                         => "pool-a",
+   block_size                        => "32KB",
+   override_project_nfs_network_acls => "no",
+  }
+
+  share { 'VMware-Share2':
+   ensure                            => present,
+   share_name                        => "vmware-share2",
+   project_name                      => "vmware-project",
+   pool_name                         => "pool-a",
+   block_size                        => "32KB",
+   override_project_nfs_network_acls => "yes",
+   nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.4", "rw", false]],
+  }
+
+   initiator { 'VMware-Initiator1':
    ensure                    => present,
-   initiator_name            => "iqn.2017-07.com.test:puppet-host1",
-   initiator_group_name      => "puppet-initiator-group1",
-  #  initiator_chap_user_name  => "",
-  #  initiator_chap_secret     => "",
+   initiator_name            => "iqn.2017-07.com.test:vmware-host1",
+   initiator_group_name      => "vmware-ig-1",
   }
 
-  initiator_group { 'TestingResource6.1':
+  initiator_group { 'VMware-InitiatorGroup1':
    ensure                => present,
-   initiator_group_name  => "puppet-initiator-group1",
+   initiator_group_name  => "vmware-ig-1",
   }
 
-  initiator_group { 'TestingResource6.2':
-   ensure                => present,
-   initiator_group_name  => "initiator-group1",
+  iscsi_target { 'VMware-Target1':
+   ensure                    => present,
+   iscsi_target_name         => "vmware-iscsi-target1",
+   iscsi_target_alias        => "vmware-iscsi-target1",
+   iscsi_target_group        => "vmware-tg-1",
+   iscsi_target_ip           => "10.65.3.33",
+   iscsi_target_port         => "3260",
   }
 
-  iscsi_target_group { 'TestingResource3.1':
+  iscsi_target_group { 'VMware-TargetGroup1':
     ensure                  => present,
-    iscsi_target_group_name => "iscsi-target-group55",
+    iscsi_target_group_name => "vmware-tg-1",
     pool_name               => "pool-a",
   }
 
+  initiator { 'VMware-Initiator2':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host2",
+   initiator_group_name      => "vmware-ig-2",
+  }
+
+  initiator_group { 'VMware-InitiatorGroup2':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-2",
+  }
+
+  iscsi_target { 'VMware-Target2':
+   ensure                    => present,
+   iscsi_target_name         => "vmware-iscsi-target2",
+   iscsi_target_alias        => "vmware-iscsi-target2",
+   iscsi_target_group        => "vmware-tg-2",
+   iscsi_target_ip           => "10.65.3.34",
+   iscsi_target_port         => "3260",
+  }
+
+  iscsi_target_group { 'VMware-TargetGroup2':
+    ensure                  => present,
+    iscsi_target_group_name => "vmware-tg-2",
+    pool_name               => "pool-a",
+  }
+
+
+
+  ##SQL Configuration
+  project { 'SQL-Project':
+   ensure                     => present,
+   project_name               => "sql-project",
+   pool_name                  => "pool-a",
+   compression_type           => "lz4",
+   compressed_log             => "lz4",
+   intended_protocol_list     => ["iSCSI"],
+   quota                      => 1288490188800,
+   dedup                      => "on",
+   default_lun_block_size     => "32KB",
+   default_share_block_size   => "32KB",
+   default_thin_provisioning  => true,
+   lun_mappings               => [["sql-ig", "sql-tg", -1, false]],
+  }
+
+  lun { 'SQL-LUN1':
+   ensure                     => present,
+   lun_name                   => "sql-lun1",
+   project_name               => "sql-project",
+   pool_name                  => "pool-a",
+   lun_size                   => 132070244352,
+   block_size                 => "32KB",
+   lun_protocol               => "iSCSI",
+  }
+
+  lun { 'SQL-LUN2':
+   ensure                     => present,
+   lun_name                   => "sql-lun2",
+   project_name               => "sql-project",
+   pool_name                  => "pool-a",
+   lun_size                   => 132070244352,
+   block_size                 => "32KB",
+   lun_protocol               => "iSCSI",
+  }
+
+  lun { 'SQL-LUN3':
+   ensure                     => present,
+   lun_name                   => "sql-lun3",
+   project_name               => "sql-project",
+   pool_name                  => "pool-a",
+   lun_size                   => 132070244352,
+   block_size                 => "128KB",
+   lun_protocol               => "iSCSI",
+  }
+
+  lun { 'SQL-LUN4':
+   ensure                     => present,
+   lun_name                   => "sql-lun4",
+   project_name               => "sql-project",
+   pool_name                  => "pool-a",
+   lun_size                   => 132070244352,
+   block_size                 => "16KB",
+   lun_protocol               => "iSCSI",
+  }
+
+  lun { 'SQL-LUN5':
+   ensure                     => present,
+   lun_name                   => "sql-lun5",
+   project_name               => "sql-project",
+   pool_name                  => "pool-a",
+   lun_size                   => 132070244352,
+   block_size                 => "64KB",
+   lun_protocol               => "iSCSI",
+  }
+
+  initiator { 'SQL-Initiator':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:sql-host",
+   initiator_group_name      => "sql-ig",
+  }
+
+  initiator_group { 'SQL-InitiatorGroup':
+   ensure                => present,
+   initiator_group_name  => "sql-ig",
+  }
+
+  iscsi_target { 'SQL-Target':
+   ensure                    => present,
+   iscsi_target_name         => "sql-iscsi-target",
+   iscsi_target_alias        => "sql-iscsi-target",
+   iscsi_target_group        => "sql-tg",
+   iscsi_target_ip           => "10.65.3.33",
+   iscsi_target_port         => "3260",
+  }
+
+  iscsi_target_group { 'SQL-TargetGroup':
+    ensure                  => present,
+    iscsi_target_group_name => "sql-tg",
+    pool_name               => "pool-a",
+  }
+
+
+
+  ##LOGREPO Configuration
+  project { 'LogRepo-Project':
+   ensure                     => present,
+   project_name               => "logrepo-project",
+   pool_name                  => "pool-a",
+   compression_type           => "lz4",
+   compressed_log             => "lz4",
+   intended_protocol_list     => ["iSCSI","NFS"],
+   quota                      => 1288490188800,
+   dedup                      => "on",
+   default_lun_block_size     => "32KB",
+   default_share_block_size   => "32KB",
+   default_thin_provisioning  => true,
+   nfs_network_acls           => [["IP", "11.11.11.11", "rw", false],["IP", "22.22.22.22", "rw", false]],
+  }
+
+  share { 'LogRepo-Share1':
+   ensure                            => present,
+   share_name                        => "logrepo-share1",
+   project_name                      => "logrepo-project",
+   pool_name                         => "pool-a",
+   block_size                        => "128KB",
+  }
+
+  share { 'LogRepo-Share2':
+   ensure                            => present,
+   share_name                        => "logrepo-share2",
+   project_name                      => "logrepo-project",
+   pool_name                         => "pool-a",
+   block_size                        => "128KB",
+   override_project_nfs_network_acls => "yes",
+   nfs_network_acls                  => [["IP", "222.222.222.222", "rw", false],["IP", "33.33.33.33", "rw", false]],
+  }
+
+  share { 'LogRepo-Share3':
+   ensure                            => present,
+   share_name                        => "logrepo-share3",
+   project_name                      => "logrepo-project",
+   pool_name                         => "pool-a",
+   block_size                        => "128KB",
+  }
+
 }
+
+
 
 
  node default {

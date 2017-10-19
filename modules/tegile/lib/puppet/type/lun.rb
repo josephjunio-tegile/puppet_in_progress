@@ -9,6 +9,26 @@ Puppet::Type.newtype(:lun) do
       self[:project_name]
   end
 
+  autorequire(:initiator_group) do
+    if self[:lun_mappings] != nil
+      required_initiator_groups = []
+      self[:lun_mappings].each do |sub_array|
+        required_initiator_groups << sub_array[0]
+      end
+      required_initiator_groups
+    end
+  end
+
+ autorequire(:iscsi_target_group) do
+    if self[:lun_mappings] != nil
+      required_target_groups = []
+      self[:lun_mappings].each do |sub_array|
+        required_target_groups << sub_array[1]
+      end
+      required_target_groups
+    end
+  end
+
   newparam(:lun_name) do
     isnamevar
     Puppet.info("##Inside type_param_lun_name")

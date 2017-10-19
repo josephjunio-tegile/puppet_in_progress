@@ -8,21 +8,25 @@ Puppet::Type.newtype(:project) do
   ensurable
 
   autorequire(:initiator_group) do
-    required_initiator_groups = []
-    self[:lun_mapping].each do |sub_array|
-      required_initiator_groups << sub_array[0]
+    if self[:lun_mappings] != nil
+      required_initiator_groups = []
+      self[:lun_mappings].each do |sub_array|
+        required_initiator_groups << sub_array[0]
+      end
+      required_initiator_groups
     end
-    required_initiator_groups
   end
 
   autorequire(:iscsi_target_group) do
-    required_target_groups = []
-    self[:lun_mapping].each do |sub_array|
-      required_target_groups << sub_array[1]
+    if self[:lun_mappings] != nil
+      required_target_groups = []
+      self[:lun_mappings].each do |sub_array|
+        required_target_groups << sub_array[1]
+      end
+      required_target_groups
     end
-    required_target_groups
   end
-
+  
   newparam(:project_name) do
     isnamevar
     Puppet.info("##Inside type_param_project_name")
@@ -84,7 +88,7 @@ Puppet::Type.newtype(:project) do
     Puppet.info("##Inside type_property_default_share_block_size")
   end
 
-  newproperty(:lun_mapping, :array_matching => :all) do
+  newproperty(:lun_mappings, :array_matching => :all) do
     Puppet.info("##Inside type_property_lun_mapping")
     ##custom insync? method to compare unsorted values
     def insync?(is)

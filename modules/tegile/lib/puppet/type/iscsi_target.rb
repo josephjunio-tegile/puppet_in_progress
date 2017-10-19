@@ -28,6 +28,7 @@ Puppet::Type.newtype(:iscsi_target) do
 
   newparam(:iscsi_target_auth) do
     Puppet.info("##Inside type_param_iscsi_target_group")
+    defaultto :"none"
   end
 
   newparam(:iscsi_target_chap_name) do

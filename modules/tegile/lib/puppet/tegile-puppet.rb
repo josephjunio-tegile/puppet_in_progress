@@ -46,8 +46,7 @@ class TegileApi
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_create): #{error["message"]}"
-      fail
+      fail "Exception when calling TegileApi(share_create): #{error["message"]}"
     end
   end
 
@@ -87,8 +86,8 @@ class TegileApi
       api_instance.delete_share_post(delete_share_param)
       puts "#{share_name} deleted"
     rescue IFClient::ApiError => e
-      puts "Exception when calling DataApi->delete_share_post: #{e}"
-      fail
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_create): #{error["message"]}"
     end
   end
 
@@ -266,11 +265,11 @@ class TegileApi
       if result.value == 0
         puts "#{initiator_name} created"
       else
-        puts "Error"
+        puts "Error with TegileApi(initiator_create)"
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->create_iscsi_initiator_post: #{e}"
-      fail
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(initiator_create): #{error["message"]}"
     end
   end
 
@@ -282,14 +281,14 @@ class TegileApi
       ##Delete an iSCSI Initiator
       result = api_instance.delete_iscsi_initiator_post(delete_iscsi_initiator_param)
       #puts result
-      if result == 0
+      if result.value == 0
         puts "#{initiator_name} deleted"
       else
-        puts "Error"
+        fail "Error with TegileApi(initiator_delete)"
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->delete_iscsi_initiator_post: #{e}"
-      fail
+        error = JSON.parse("#{e.response_body}")
+        fail "Exception when calling TegileApi(initiator_delete): #{error["message"]}"
     end
   end
 
@@ -305,11 +304,11 @@ class TegileApi
       if result.value == 0
         puts "#{initiator_name} added to #{initiator_group_name}"
       else
-        puts "Error"
+        puts "Error with TegileApi(add_initiator_to_initiator_group)"
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->add_initiator_to_initiator_group_post: #{e}"
-      fail
+        error = JSON.parse("#{e.response_body}")
+        fail "Exception when calling TegileApi(add_initiator_to_initiator_group): #{error["message"]}"
     end
   end
 
@@ -397,15 +396,15 @@ class TegileApi
     begin
       ##Delete a Target Group
       result = api_instance.delete_target_group_post(delete_target_group_param)
-      if result == 0
+      if result.value == 0
         puts "#{iscsi_target_group_name} deleted"
       else
-        puts "Error deleting target group"
+        puts "Error with TegileApi(iscsi_target_group_delete)"
       end
     rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
+        error = JSON.parse("#{e.response_body}")
+        fail "Exception when calling TegileApi(iscsi_target_group_delete): #{error["message"]}"
+    endail
     end
   end
 
@@ -462,14 +461,14 @@ class TegileApi
       ##Create an iSCSI Target
       result = api_instance.create_iscsi_target_post(create_iscsi_target_param)
       #puts result
-      if result == 0
+      if result.value == 0
         puts "#{iscsi_target_name} created"
       else
-        puts "Error"
+        puts "Error with TegileApi(iscsi_target_create)"
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->create_iscsi_target_post: #{e}"
-      fail
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(iscsi_target_create): #{error["message"]}"
     end
   end
 
@@ -481,14 +480,14 @@ class TegileApi
       ##Delete an iSCSI Target
       result = api_instance.delete_iscsi_target_post(delete_iscsi_target_param)
       #puts result
-      if result == 0
+      if result.value == 0
         puts "#{iscsi_target_name} deleted"
       else
-        puts "Error deleting target group"
+        puts "Error with TegileApi(iscsi_target_delete)"
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->delete_iscsi_target_post: #{e}"
-      fail
+        error = JSON.parse("#{e.response_body}")
+        fail "Exception when calling TegileApi(iscsi_target_delete): #{error["message"]}"
     end
   end
 
@@ -580,49 +579,50 @@ class TegileApi
     end
   end
 
-  def lun_mapping_create(pool_name,project_name,lun_name,initiator_group_name,target_group_name) ##Will override project if used
-    api_instance = IFClient::SANApi.new
-    create_mapping_for_volume_param = IFClient::CreateMappingForVolumeParam.new
-    create_mapping_for_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    create_mapping_for_volume_param.arg1_initiator_group_name = initiator_group_name
-    create_mapping_for_volume_param.arg2_target_group_name = target_group_name
-    create_mapping_for_volume_param.arg3_lun_number = -1
-    create_mapping_for_volume_param.arg4_read_only = false
-    begin
-      ##Maps a volume to an initiator group and a target group.
-      result = api_instance.create_mapping_for_volume_post(create_mapping_for_volume_param)
-      #puts result
-      if result == 0
-        puts "Mapping for #{lun_name} created"
-      else
-        puts "Error"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->create_mapping_for_volume_post: #{e}"
-      fail
-    end
-  end
+##Shouldnt be needed, never version down below
+  # def lun_mapping_create(pool_name,project_name,lun_name,initiator_group_name,target_group_name) ##Will override project if used
+  #   api_instance = IFClient::SANApi.new
+  #   create_mapping_for_volume_param = IFClient::CreateMappingForVolumeParam.new
+  #   create_mapping_for_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+  #   create_mapping_for_volume_param.arg1_initiator_group_name = initiator_group_name
+  #   create_mapping_for_volume_param.arg2_target_group_name = target_group_name
+  #   create_mapping_for_volume_param.arg3_lun_number = -1
+  #   create_mapping_for_volume_param.arg4_read_only = false
+  #   begin
+  #     ##Maps a volume to an initiator group and a target group.
+  #     result = api_instance.create_mapping_for_volume_post(create_mapping_for_volume_param)
+  #     #puts result
+  #     if result == 0
+  #       puts "Mapping for #{lun_name} created"
+  #     else
+  #       puts "Error"
+  #     end
+  #   rescue IFClient::ApiError => e
+  #     puts "Exception when calling SANApi->create_mapping_for_volume_post: #{e}"
+  #     fail
+  #   end
+  # end
 
-  def lun_mapping_delete(pool_name,project_name,lun_name,initiator_group_name,target_group_name)
-    api_instance = IFClient::SANApi.new
-    delete_mapping_from_volume_param = IFClient::DeleteMappingFromVolumeParam.new
-    delete_mapping_from_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    delete_mapping_from_volume_param.arg1_initiator_group_name = initiator_group_name
-    delete_mapping_from_volume_param.arg2_target_group_name = target_group_name
-    begin
-      #Deletes the view (mapping) between the given volume, initiator group, and target group.
-      result = api_instance.delete_mapping_from_volume_post(delete_mapping_from_volume_param)
-      #puts result
-      if result == 0
-        puts "mapping for #{lun_name} deleted"
-      else
-        puts "Error deleting mapping"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->delete_mapping_from_volume_post: #{e}"
-      fail
-    end
-  end
+  # def lun_mapping_delete(pool_name,project_name,lun_name,initiator_group_name,target_group_name)
+  #   api_instance = IFClient::SANApi.new
+  #   delete_mapping_from_volume_param = IFClient::DeleteMappingFromVolumeParam.new
+  #   delete_mapping_from_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+  #   delete_mapping_from_volume_param.arg1_initiator_group_name = initiator_group_name
+  #   delete_mapping_from_volume_param.arg2_target_group_name = target_group_name
+  #   begin
+  #     #Deletes the view (mapping) between the given volume, initiator group, and target group.
+  #     result = api_instance.delete_mapping_from_volume_post(delete_mapping_from_volume_param)
+  #     #puts result
+  #     if result == 0
+  #       puts "mapping for #{lun_name} deleted"
+  #     else
+  #       puts "Error deleting mapping"
+  #     end
+  #   rescue IFClient::ApiError => e
+  #     puts "Exception when calling SANApi->delete_mapping_from_volume_post: #{e}"
+  #     fail
+  #   end
+  # end
 
   def project_nfs_network_acl_exists(pool_name,project_name,acl_type,acl_host)
     api_instance = IFClient::NasApi.new
@@ -1496,14 +1496,16 @@ class TegileApi
     end 
   end
 
-  def lun_lun_mappings_set_add(pool_name,project_name,lun_name,mappings_array)
+  ## Used to create lun_mappings
+  ## "itviewv21_array" should be array of it_view_v21 objects
+  def lun_mappings_create(pool_name,project_name,lun_name,itviewv21_array)
     api_instance = IFClient::SANApi.new
     create_mapping_for_volume_param = IFClient::CreateMappingForVolumeParam.new
     create_mapping_for_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    create_mapping_for_volume_param.arg1_initiator_group_name = mappings_array[0]
-    create_mapping_for_volume_param.arg2_target_group_name = mappings_array[1]
-    create_mapping_for_volume_param.arg3_lun_number = mappings_array[2]
-    create_mapping_for_volume_param.arg4_read_only = mappings_array[3]
+    create_mapping_for_volume_param.arg1_initiator_group_name = mappings_array.host_group_name
+    create_mapping_for_volume_param.arg2_target_group_name = mappings_array.target_group_name
+    create_mapping_for_volume_param.arg3_lun_number = mappings_array.lun_nbr
+    create_mapping_for_volume_param.arg4_read_only = mappings_array.read_only
     begin
       ##Maps a volume to an initiator group and a target group.
       result = api_instance.create_mapping_for_volume_post(create_mapping_for_volume_param)
@@ -1515,16 +1517,18 @@ class TegileApi
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(lun_lun_mappings_set_add): #{error["message"]}"
+      puts "Exception when calling TegileApi(lun_mappings_create): #{error["message"]}"
     end 
   end
 
-  def lun_lun_mappings_set_delete(pool_name,project_name,lun_name,mappings_array)
+  ## Used to delete lun_mappings
+  ## "itviewv21_array" should be array of it_view_v21 objects
+  def lun_mappings_delete(pool_name,project_name,lun_name,itviewv21_array)
     api_instance = IFClient::SANApi.new
     delete_mapping_from_volume_param = IFClient::DeleteMappingFromVolumeParam.new
     delete_mapping_from_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    delete_mapping_from_volume_param.arg1_initiator_group_name = mappings_array[0]
-    delete_mapping_from_volume_param.arg2_target_group_name = mappings_array[1]
+    delete_mapping_from_volume_param.arg1_initiator_group_name = mappings_array.host_group_name
+    delete_mapping_from_volume_param.arg2_target_group_name = mappings_array.target_group_name=
     begin
       ##Deletes the view (mapping) between the given volume, initiator group, and target group.
       result = api_instance.delete_mapping_from_volume_post(delete_mapping_from_volume_param)
@@ -1532,11 +1536,11 @@ class TegileApi
       if result.value == 0
         puts "mapping for #{mappings_array[0]}/#{mappings_array[1]} deleted"
       else
-        puts "Error with TegileApi(lun_lun_mappings_set_delete)"
+        puts "Error with TegileApi(lun_mappings_delete)"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(lun_lun_mappings_set_delete): #{error["message"]}"
+      puts "Exception when calling TegileApi(lun_mappings_delete): #{error["message"]}"
     end 
   end
 
@@ -1547,12 +1551,11 @@ class TegileApi
     begin
       ##Get the Share details.
       result = api_instance.get_share_post(get_share_param)
-      puts result.record_size.value
+      # puts result.record_size.value
       return result.record_size.value
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_block_size_get): #{error["message"]}"
-      fail
+      fail "Exception when calling TegileApi(share_block_size_get): #{error["message"]}"
     end 
   end
 
@@ -1623,18 +1626,65 @@ module RubyMethods
     return return_array
   end
   
-  def RubyMethods.it_view_v21_to_array_nolun_noreadonly(itviewv21_array)
-    ##accept it_view_v21 object, convert to array without lun_nbr and read_only 
+  # def RubyMethods.it_view_v21_to_array_nolun_noreadonly(itviewv21_array)
+  #   ##accept it_view_v21 object, convert to array without lun_nbr and read_only 
+  #   return_array = []
+  #   itviewv21_array.each do |sub_array|
+  #     temp_array = []
+  #     temp_array[0] = sub_array.host_group_name
+  #     temp_array[1] = sub_array.target_group_name
+  #     return_array << temp_array
+  #   end
+  #   return return_array
+  # end
+
+  ##Used to convert standard array from manifest into it_view_v21 object
+  ##Accepts array of arrays and returns array of it_view_v21 objects
+  def RubyMethods.array_of_arrays_to_it_view_v21(array_of_arrays)
     return_array = []
-    itviewv21_array.each do |sub_array|
-      temp_array = []
-      temp_array[0] = sub_array.host_group_name
-      temp_array[1] = sub_array.target_group_name
-      return_array << temp_array
+    array_of_arrays.each do |sub_array|
+        array = IFClient::ITViewV21.new
+        array.host_group_name = sub_array[0]
+        array.target_group_name = sub_array[1]
+        array.lun_nbr = sub_array[2]
+        array.read_only = sub_array[3]
+        return_array << array
     end
     return return_array
   end
 
+  ##Used to find what lun_mappings need to be added
+  ##Finds "should" entries missing from "is"
+  ##Takes array of arrays of it_view_v21 objects and returns the same
+  def RubyMethods.find_it_view_v21_to_create(should,is)
+    matches_found = []
+    should.each do |sub_array1|
+      is.each do |sub_array2| 
+        if sub_array1.host_group_name + sub_array1.target_group_name == sub_array2.host_group_name + sub_array2.target_group_name
+          # puts "match found for #{sub_array1}"
+          matches_found << sub_array1
+        end
+      end
+    end
+    missing = should - matches_found
+    return missing 
+  end
 
-  
+  ##Used to find what needs to be deleted from lun_mappins
+  ##Finds "is" entries missing from "should"
+  ##Takes array of arrays of it_view_v21 objects and returns the same
+  def RubyMethods.find_it_view_v21_to_delete(should,is)
+    matches_found = []
+    is.each do |sub_array1|
+      should.each do |sub_array2| 
+        if sub_array1.host_group_name + sub_array1.target_group_name == sub_array2.host_group_name + sub_array2.target_group_name
+          # puts "match found for #{sub_array1}"
+          matches_found << sub_array1
+        end
+      end
+    end
+    extra = is - matches_found
+    return missing 
+  end
+
 end
