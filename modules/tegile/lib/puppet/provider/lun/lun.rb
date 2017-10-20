@@ -7,6 +7,29 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def create
     Puppet.info("##Inside provider_lun_create")
     tegile_api_transport.lun_create(resource[:lun_name],resource[:pool_name],resource[:project_name],resource[:lun_protocol],resource[:lun_size],resource[:block_size])
+    if resource[:lun_mappings] != nil
+      if resource[:override_project_mappings] == "no" or resource[:override_project_mappings] == nil
+        fail "override_project_mappings must be set to yes before network acls can bet configured"
+      elsif resource[:override_project_mappings] == "yes"
+        ##Get current state of lun mappings via api. This mimics the "lun_mappings" method without needing to convert it to an array or sorting, unsure if "is" value can be called from here
+        is = tegile_api_transport.lun_lun_mappings_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+        should_itview = RubyMethods.array_of_arrays_to_it_view_v21(resource[:lun_mappings])
+        ##Use custom compare methods for should/is values to get create/delete
+        lun_mappings_create = RubyMethods.find_it_view_v21_to_create(should_itview,is)
+        lun_mappings_delete = RubyMethods.find_it_view_v21_to_delete(should_itview,is)
+        ##Use the resulting variables to create missing and remove extra
+        if lun_mappings_create.length != 0
+          lun_mappings_create.each do |sub_array|
+            tegile_api_transport.lun_mappings_create(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
+          end
+        end
+        if lun_mappings_delete.length != 0
+          lun_mappings_delete.each do |sub_array|
+            tegile_api_transport.lun_mappings_delete(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
+          end
+        end
+      end
+    end
   end
 
   def destroy
@@ -41,7 +64,7 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def lun_mappings
     Puppet.info("##Inside provider_lun_lun_mappings_get")
-    ##Get current state of lun mappings via api, convert to class objects, then sort
+    ##Get current state of lun mappings via api, convert from class object to array, then sort
     result = tegile_api_transport.lun_lun_mappings_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
     # puts result.inspect
     result_array = RubyMethods.it_view_v21_to_array(result)
@@ -59,10 +82,11 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     end
     ##Get current state of lun mappings via api. This mimics the "lun_mappings" method without needing to convert it to an array or sorting, unsure if "is" value can be called from here
     is = tegile_api_transport.lun_lun_mappings_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    should_itview = RubyMethods.array_of_arrays_to_it_view_v21(should)
 
     ##Use custom compare methods for should/is values to get create/delete
-    lun_mappings_create = RubyMethods.find_it_view_v21_to_create(should,is)
-    lun_mappings_delete = RubyMethods.find_it_view_v21_to_delete(should,is)
+    lun_mappings_create = RubyMethods.find_it_view_v21_to_create(should_itview,is)
+    lun_mappings_delete = RubyMethods.find_it_view_v21_to_delete(should_itview,is)
 
     ##Use the resulting variables to create missing and remove extra
     if lun_mappings_create.length != 0

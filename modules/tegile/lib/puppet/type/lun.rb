@@ -66,14 +66,15 @@ Puppet::Type.newtype(:lun) do
   newproperty(:lun_mappings, :array_matching => :all) do
     Puppet.info("##Inside type_property_lun_mappings")
     ##custom insync? method to compare unsorted values
-    # def insync?(is)
-    #   ##Find unique entries
-    #   is_unique = is - should
-    #   should_unique = should - is
-    #   ##Combine variables and check if empty
-    #   diff = is_unique + should_unique
-    #   diff.length == 0 ? true : false
-    # end
+    def insync?(is)
+      should_itview = RubyMethods.array_of_arrays_to_it_view_v21(should)
+      is_itview = RubyMethods.array_of_arrays_to_it_view_v21(is)
+      missing = RubyMethods.find_it_view_v21_to_create(should_itview,is_itview)
+      extra = RubyMethods.find_it_view_v21_to_delete(should_itview,is_itview)
+      ##Combine variables and check if empty
+      diff = missing + extra
+      diff.length == 0 ? true : false
+    end
   end
 
  end
