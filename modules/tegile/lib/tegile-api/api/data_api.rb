@@ -231,6 +231,59 @@ module IFClient
       return data, status_code, headers
     end
 
+    # Deletes the specified project.
+    # 
+    # @param delete_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMANDSTATUS]
+    def delete_project_post(delete_project_param, opts = {})
+      data, _status_code, _headers = delete_project_post_with_http_info(delete_project_param, opts)
+      return data
+    end
+
+    # Deletes the specified project.
+    # 
+    # @param delete_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMANDSTATUS, Fixnum, Hash)>] COMMANDSTATUS data, response status code and response headers
+    def delete_project_post_with_http_info(delete_project_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: DataApi.delete_project_post ..."
+      end
+      # verify the required parameter 'delete_project_param' is set
+      if @api_client.config.client_side_validation && delete_project_param.nil?
+        fail ArgumentError, "Missing the required parameter 'delete_project_param' when calling DataApi.delete_project_post"
+      end
+      # resource path
+      local_var_path = "/deleteProject"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(delete_project_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMANDSTATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: DataApi#delete_project_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # Deletes the specified share, and optionally, any dependents of the share.
     # 
     # @param delete_share_param 
