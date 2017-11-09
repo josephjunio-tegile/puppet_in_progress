@@ -2,7 +2,7 @@ node 'tegile-3.7_2' {
 
 
   ##VMWARE Configuration
-  project { 'VMware-Project':
+/*   project { 'VMware-Project':
    ensure                     => present,
    project_name               => "vmware-project",
    pool_name                  => "pool-a",
@@ -115,7 +115,7 @@ node 'tegile-3.7_2' {
     iscsi_target_group_name => "vmware-tg-1",
     pool_name               => "pool-a",
   }
-
+ */
   
 
 
@@ -262,5 +262,5 @@ node 'tegile-3.7_2' {
 
 
 
- node default {
-}
+#  node default {
+# }

@@ -13,9 +13,6 @@ Puppet::Type.newtype(:iscsi_target) do
     #desc "The name of the host. "
     isnamevar
     Puppet.info("##Inside type_param_iscsi_target_name")
-    #validate do |value|
-    #fail("host name: #{value} can not be empty or null") if value == "null" or value.strip.empty?
-    #end
   end
 
   newparam(:iscsi_target_alias) do

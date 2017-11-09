@@ -69,10 +69,21 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def override_project_nfs_network_acls=(should)
     Puppet.info("##Inside provider_share_override_project_network_acls_set")
-    ##If override project is enabled then we will use api to set back to inherit
-    ##No change needed if override is set to yes, the "nfs_network_acls=" method will over ride when used
+    ##If override is set to "no" api is used to set back to inherit
+    ##If override is set to "yes" api is used to retrieve them, convert to array, and remove them. api to remove will set share override value to true
     if should == "no"
       tegile_api_transport.share_acl_inherit_set(resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if should == "yes"
+      puts "removing any inherited network acls and permitting explicit mappings"
+      is = tegile_api_transport.share_nfs_network_acls_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+      # puts is.inspect
+      is_array = RubyMethods.network_acl_v21_to_array(is)
+      if is_array.length != 0
+        is_array.each do |sub_array|
+          tegile_api_transport.share_nfs_network_acls_set_delete(resource[:pool_name],resource[:project_name],resource[:share_name],sub_array)
+        end
+      end
     end
   end
 
@@ -89,7 +100,7 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     Puppet.info("##Inside provider_share_nfs_network_acls_set")
     ##Check to make sure the "override_project_nfs_network_acls" type is set to yes before continuing
     if resource[:override_project_nfs_network_acls] == "no"
-      fail "override_project_nfs_network_acls must be set to yes before network acls can bet configured"
+      fail "override_project_nfs_network_acls must be set to yes before network acls can be configured"
     end
     if resource[:override_project_nfs_network_acls] == nil
       fail "override_project_nfs_network_acls must be set to yes before network acls can bet configured"

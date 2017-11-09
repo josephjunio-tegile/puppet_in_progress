@@ -7,6 +7,14 @@ Puppet::Type.newtype(:project) do
   apply_to_device
   ensurable
 
+  validate do
+    if self[:nfs_network_acls] != nil
+      if self[:intended_protocol_list].include?("NFS") != true
+        fail "NFS not enabled via intended_protocol_list"
+      end
+    end
+  end
+
   autorequire(:initiator_group) do
     if self[:lun_mappings] != nil
       required_initiator_groups = []
@@ -48,11 +56,21 @@ Puppet::Type.newtype(:project) do
 
   newproperty(:intended_protocol_list, :array_matching => :all) do
     Puppet.info("##Inside type_property_intended_protocol_list")
+    ##Make sure value in manifest is all uppercase
+    munge do |value|
+      upcase = value.upcase
+      if upcase == "ISCSI"
+        return "iSCSI"
+      end
+      return upcase
+    end
   end
 
   newproperty(:quota) do
     Puppet.info("##Inside type_property_quota")
-    ##In Bytes
+    munge do |value|
+      value*1024*1024*1024
+    end
   end
 
   newproperty(:dedup) do
@@ -98,6 +116,12 @@ Puppet::Type.newtype(:project) do
       ##Combine variables and check if empty
       diff = is_unique + should_unique
       diff.length == 0 ? true : false
+    end
+    ##validate lun mapping value in manifest, this value is not passed to the method so we want to confirm intended behavior
+    validate do |value|
+      unless value[2] == -1
+        fail "lun number must be set to -1 on project mappings"
+      end
     end
   end
 

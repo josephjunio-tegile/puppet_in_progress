@@ -52,13 +52,19 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def override_project_mappings=(should)
     Puppet.info("##Inside provider_lun_override_project_mappings_set")
-    ##If override project is enabled then we will use api to set back to inherit
-    ##No change needed if override is set to yes, the "lun_mappings=" method will over ride when used
+    ##If override is no use api to set back to inherit
+    ##If override is yes use api to get existing mappings and remove. currently when api removes mappings the override value is not set
     if should == "no"
       tegile_api_transport.lun_override_project_mappings_set(resource[:pool_name],resource[:project_name],resource[:lun_name])
     end
     if should == "yes"
-      puts "lun_mappings will be allowed"
+      puts "removing any inherited mappings and permitting explicit mappings"
+      is = tegile_api_transport.lun_lun_mappings_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+      if is.length != 0
+        is.each do |sub_array|
+          tegile_api_transport.lun_mappings_delete(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
+        end
+      end
     end
   end
 
@@ -68,10 +74,7 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     result = tegile_api_transport.lun_lun_mappings_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
     # puts result.inspect
     result_array = RubyMethods.it_view_v21_to_array(result)
-    # puts result_class.inspect
-##No need to sort if using custom insync? code
-    # result_array_sort1 = result_array.sort {|a,b| a[0] <=> b[0]}
-    # result_array_sort2 = result_array_sort1.sort {|a,b| a[1] <=> b[1]}
+    # puts result_class.inspect\
   end
 
   def lun_mappings=(should)

@@ -19,7 +19,7 @@ Puppet::Type.newtype(:lun) do
     end
   end
 
- autorequire(:iscsi_target_group) do
+  autorequire(:iscsi_target_group) do
     if self[:lun_mappings] != nil
       required_target_groups = []
       self[:lun_mappings].each do |sub_array|
@@ -43,8 +43,10 @@ Puppet::Type.newtype(:lun) do
   end
 
   newparam(:lun_size) do
-    ##Set in bytes
     Puppet.info("##Inside type_param_lun_size")
+    munge do |value|
+      value*1024*1024*1024
+    end
   end
 
   newparam(:block_size) do

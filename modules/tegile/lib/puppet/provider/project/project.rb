@@ -8,13 +8,13 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
     Puppet.info("##Inside provider_project_create")
     tegile_api_transport.project_create(resource[:project_name],resource[:pool_name],resource[:compression_type],resource[:compressed_log],resource[:intended_protocol_list],resource[:quota],resource[:dedup],resource[:primary_cache],resource[:secondary_cache],resource[:acl_inherit],resource[:default_lun_size],resource[:default_lun_block_size],resource[:default_thin_provisioning],resource[:default_share_block_size])
     if resource[:intended_protocol_list] != nil
-      enabled_protocols = resource[:intended_protocol_list].each {|x| x.downcase!}
-      if enabled_protocols.include?("nfs")
-        #puts "enabling nfs"
+      enabled_protocols = resource[:intended_protocol_list]
+      if enabled_protocols.include?("NFS")
+        puts "enabling nfs"
         tegile_api_transport.set_nfs_sharing_on(resource[:project_name],resource[:pool_name])
       end
-      if enabled_protocols.include?("smb")
-        #puts "enabling smb"
+      if enabled_protocols.include?("SMB")
+        puts "enabling smb"
         tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
       end
     end
@@ -32,7 +32,7 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def destroy
     Puppet.info("##Inside provider_project_destroy")
-    fail "Deleting projects not supported"
+    tegile_api_transport.project_delete(resource[:project_name],resource[:pool_name])
   end
 
   def exists?
@@ -118,6 +118,14 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def intended_protocol_list=(value)
     Puppet.info("##Inside provider_project_intended_protocol_list_set")
     tegile_api_transport.project_intended_protocol_list_set(value,resource[:pool_name],resource[:project_name])
+    if value.include?("NFS")
+      puts "enabling nfs"
+      tegile_api_transport.set_nfs_sharing_on(resource[:project_name],resource[:pool_name])
+    end
+    if value.include?("SMB")
+      puts "enabling smb"
+      tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
+    end
   end
 
   def lun_mappings
@@ -155,20 +163,6 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
         tegile_api_transport.project_lun_mapping_set_delete(resource[:pool_name],resource[:project_name],sub_array)
       end
     end
-
-    # should_unique = value - is
-    # is_unique = is - value
-    # if should_unique.length != 0
-    #   should_unique.each do |sub_array|
-    #     tegile_api_transport.project_lun_mapping_set_add(resource[:pool_name],resource[:project_name],sub_array[0],sub_array[1],sub_array[3])
-    #   end
-    # elsif is_unique.length != 0
-    #   is_unique.each do |sub_array|
-    #     tegile_api_transport.project_lun_mapping_set_delete(resource[:pool_name],resource[:project_name],sub_array[0],sub_array[1])  
-    #   end
-    # else
-    #   puts "nothing to change"
-    # end
   end
 
   def nfs_network_acls
