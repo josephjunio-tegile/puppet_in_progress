@@ -1488,7 +1488,7 @@ class TegileApi
       result = api_instance.create_mapping_for_volume_post(create_mapping_for_volume_param)
       # puts result.inspect
       if result.value == 0
-        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name} created"
+        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name}/lun##{itviewv21_array.lun_nbr} created"
       else
         puts "Error with TegileApi(lun_lun_mappings_set_add)"
       end
@@ -1511,7 +1511,7 @@ class TegileApi
       result = api_instance.delete_mapping_from_volume_post(delete_mapping_from_volume_param)
       # puts result.inspect
       if result.value == 0
-        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name} deleted"
+        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name}/lun##{itviewv21_array.lun_nbr} deleted"
       else
         puts "Error with TegileApi(lun_mappings_delete)"
       end
@@ -1652,21 +1652,52 @@ module RubyMethods
     return extra 
   end
 
-  ##Used to find what needs to be deleted from lun_mappings, also compares lun_num
+  ##Used to find what needs to be deleted from lun_mappings, also compares lun_num&read_only if not set to -1
   ##Finds "is" entries missing from "should"
   ##Takes array of arrays of it_view_v21 objects and returns the same
-  def RubyMethods.find_it_view_v21_to_delete_lun_num(should,is)
+  def RubyMethods.find_it_view_v21_to_delete_lun(should,is)
     matches_found = []
     is.each do |sub_array1|
       should.each do |sub_array2| 
-        if sub_array1.host_group_name + sub_array1.target_group_name + sub_array1.lun_number == sub_array2.host_group_name + sub_array2.target_group_name + sub_array2.lun_number
-          # puts "match found for #{sub_array1}"
-          matches_found << sub_array1
+            if sub_array2.lun_nbr == -1
+                if sub_array1.host_group_name + sub_array1.target_group_name == sub_array2.host_group_name + sub_array2.target_group_name
+                    # puts "-1 match found for #{sub_array1}"
+                    matches_found << sub_array1
+                end        
+            else
+                if sub_array1 == sub_array2
+                    # puts "match found for #{sub_array1}"
+                    matches_found << sub_array1
+                end
+            end
         end
-      end
     end
     extra = is - matches_found
     return extra 
+  end
+
+  ##Used to find what needs to be added to lun_mappings, also compares lun_num&read_only if not set to -1
+  ##Finds "should" entries missing from "is"
+  ##Takes array of arrays of it_view_v21 objects and returns the same
+  def RubyMethods.find_it_view_v21_to_create_lun(should,is)
+    matches_found = []
+    should.each do |sub_array1|
+        is.each do |sub_array2| 
+            if sub_array1.lun_nbr == -1
+                if sub_array1.host_group_name + sub_array1.target_group_name == sub_array2.host_group_name + sub_array2.target_group_name
+                    # puts "-1 match found for #{sub_array1}"
+                    matches_found << sub_array1
+                end
+            else
+                if sub_array1 == sub_array2
+                    # puts "match found for #{sub_array1}"
+                    matches_found << sub_array1  
+                end
+            end
+        end
+    end
+    missing = should - matches_found
+    return missing 
   end
 
 end

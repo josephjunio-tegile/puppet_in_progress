@@ -71,8 +71,8 @@ Puppet::Type.newtype(:lun) do
     def insync?(is)
       should_itview = RubyMethods.array_of_arrays_to_it_view_v21(should)
       is_itview = RubyMethods.array_of_arrays_to_it_view_v21(is)
-      missing = RubyMethods.find_it_view_v21_to_create(should_itview,is_itview)
-      extra = RubyMethods.find_it_view_v21_to_delete(should_itview,is_itview)
+      missing = RubyMethods.find_it_view_v21_to_create_lun(should_itview,is_itview)
+      extra = RubyMethods.find_it_view_v21_to_delete_lun(should_itview,is_itview)
       ##Combine variables and check if empty
       diff = missing + extra
       diff.length == 0 ? true : false

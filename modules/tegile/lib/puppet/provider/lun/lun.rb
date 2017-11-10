@@ -18,14 +18,14 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
         lun_mappings_create = RubyMethods.find_it_view_v21_to_create(should_itview,is)
         lun_mappings_delete = RubyMethods.find_it_view_v21_to_delete(should_itview,is)
         ##Use the resulting variables to create missing and remove extra
-        if lun_mappings_create.length != 0
-          lun_mappings_create.each do |sub_array|
-            tegile_api_transport.lun_mappings_create(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
-          end
-        end
         if lun_mappings_delete.length != 0
           lun_mappings_delete.each do |sub_array|
             tegile_api_transport.lun_mappings_delete(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
+          end
+        end
+        if lun_mappings_create.length != 0
+          lun_mappings_create.each do |sub_array|
+            tegile_api_transport.lun_mappings_create(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
           end
         end
       end
@@ -74,7 +74,9 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     result = tegile_api_transport.lun_lun_mappings_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
     # puts result.inspect
     result_array = RubyMethods.it_view_v21_to_array(result)
-    # puts result_class.inspect\
+    # puts "should:#{resource[:lun_mappings].inspect}"
+    # puts "is:#{result_array.inspect}"
+    return result_array
   end
 
   def lun_mappings=(should)
@@ -88,18 +90,19 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     should_itview = RubyMethods.array_of_arrays_to_it_view_v21(should)
 
     ##Use custom compare methods for should/is values to get create/delete
-    lun_mappings_create = RubyMethods.find_it_view_v21_to_create(should_itview,is)
-    lun_mappings_delete = RubyMethods.find_it_view_v21_to_delete(should_itview,is)
+    ##If lun_num is not -1 then compares full mapping value
+    lun_mappings_delete = RubyMethods.find_it_view_v21_to_delete_lun(should_itview,is)
+    lun_mappings_create = RubyMethods.find_it_view_v21_to_create_lun(should_itview,is)
 
     ##Use the resulting variables to create missing and remove extra
-    if lun_mappings_create.length != 0
-      lun_mappings_create.each do |sub_array|
-        tegile_api_transport.lun_mappings_create(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
-      end
-    end
     if lun_mappings_delete.length != 0
       lun_mappings_delete.each do |sub_array|
         tegile_api_transport.lun_mappings_delete(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
+      end
+    end
+    if lun_mappings_create.length != 0
+      lun_mappings_create.each do |sub_array|
+        tegile_api_transport.lun_mappings_create(resource[:pool_name],resource[:project_name],resource[:lun_name],sub_array)
       end
     end
   end
