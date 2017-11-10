@@ -1,13 +1,10 @@
-node 'tegile-3.7' {
+node 'tegile-3.7__NO' {
 
   iscsi_target { 'TestingResource3':
    ensure                    => present,
    iscsi_target_name         => "puppet-iscsi-target1",
    iscsi_target_alias        => "puppet-iscsi-target1",
    iscsi_target_group        => "puppet-iscsi-target-group1",
-  #  iscsi_target_auth         => "none",
-  #  iscsi_target_chap_name    => "",
-  #  iscsi_target_chap_secret  => "",
    iscsi_target_ip           => "10.65.3.33",
    iscsi_target_port         => "3260",
   }
@@ -16,8 +13,6 @@ node 'tegile-3.7' {
    ensure                    => present,
    initiator_name            => "iqn.2017-07.com.test:puppet-host1",
    initiator_group_name      => "puppet-initiator-group1",
-  #  initiator_chap_user_name  => "",
-  #  initiator_chap_secret     => "",
   }
   
   initiator_group { 'TestingResource6.1':
@@ -40,7 +35,7 @@ node 'tegile-3.7' {
    block_size                 => "32KB",
    lun_protocol               => "iSCSI",
    override_project_mappings  => "yes",
-   lun_mappings               => [["initiator-group3", "iscsi-target-group3", 3, false],["initiator-group4", "iscsi-target-group4", 4, false]],
+   lun_mappings               => [["initiator-group3", "iscsi-target-group3", 3, false],["puppet-initiator-group1", "puppet-iscsi-target-group1", 4, false]],
   }
 
   share { 'TestingResource2':
@@ -62,10 +57,6 @@ node 'tegile-3.7' {
    intended_protocol_list     => ["iscsi", "nfs"],
    quota                      => 100,
    dedup                      => "on",
-   ##primary_cache             => "All",
-   ##secondary_cache           => "All",
-   ##acl_inherit               => "On",
-   ##default_lun_size           => 429496729600,
    default_lun_block_size     => "32KB",
    default_share_block_size   => "32KB",
    default_thin_provisioning  => true,
