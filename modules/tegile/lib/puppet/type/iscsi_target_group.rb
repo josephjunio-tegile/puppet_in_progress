@@ -12,7 +12,11 @@ Puppet::Type.newtype(:iscsi_target_group) do
   end
 
   newparam(:pool_name) do
-    Puppet.info("##Inside type_param_pool_name")
+    Puppet.info("##Inside type_param_iscsi_target_group_pool_name")
+  end
+
+  newproperty(:members, :array_matching => :all) do
+    Puppet.info("##Inside type_param_iscsi_target_group_members")
   end
 
 end

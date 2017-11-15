@@ -19,4 +19,20 @@ Puppet::Type.type(:initiator_group).provide(:lun,:parent => Puppet::Provider::Te
     tegile_api_transport.initiator_group_exists(resource[:initiator_group_name])
   end
 
+  def members
+    Puppet.info("##Inside provider_initiator_group_members_get")
+    tegile_api_transport.initiator_group_members_get(resource[:initiator_group_name])
+  end
+
+  def members=(should)
+    Puppet.info("##Inside provider_initiator_group_members_set")
+  
+    should.each do |x|
+      puts x
+      tegile_api_transport.initiator_group_members_set_list_in_group(x)
+    end
+    # tegile_api_transport.initiator_group_members_set_add_to_group(resource[:initiator_group_name],x)
+    
+  end
+
 end

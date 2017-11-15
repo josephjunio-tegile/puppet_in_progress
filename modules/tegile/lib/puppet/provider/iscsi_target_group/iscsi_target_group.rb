@@ -41,4 +41,16 @@ Puppet::Type.type(:iscsi_target_group).provide(:lun,:parent => Puppet::Provider:
 
   end
 
+  def members
+    Puppet.info("##Inside provider_iscsi_target_group_members_get")
+    tegile_api_transport.list_targets_in_target_group_post(resource[:iscsi_target_group_name])
+  end
+
+  def members=(should)
+    Puppet.info("##Inside provider_iscsi_target_group_members_set")
+    should.each do |x|
+      tegile_api_transport.move_target_to_target_group_post(x,resource[:iscsi_target_group_name])
+    end
+  end
+
 end
