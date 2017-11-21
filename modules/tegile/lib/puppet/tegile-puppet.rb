@@ -366,7 +366,7 @@ class TegileApi
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(iscsi_target_group_create): #{error["message"]}"
+      fail "Exception when calling TegileApi(iscsi_target_group_create): #{error["message"]}"
     end 
   end
 
@@ -402,7 +402,6 @@ class TegileApi
     rescue IFClient::ApiError => e
         error = JSON.parse("#{e.response_body}")
         fail "Exception when calling TegileApi(iscsi_target_group_delete): #{error["message"]}"
-    endail
     end
   end
 
@@ -1556,17 +1555,17 @@ class TegileApi
 
   ##
   def initiator_group_members_get(initiator_group_name)
-  api_instance = IFClient::SANApi.new
-  list_initiators_in_initiator_group_param = IFClient::ListInitiatorsInInitiatorGroupParam.new
-  list_initiators_in_initiator_group_param.arg0_initiator_group_name = initiator_group_name
-  begin
-    ##Lists all initiators belonging to the specified initiator group
-    result = api_instance.list_initiators_in_initiator_group_post(list_initiators_in_initiator_group_param)
-    puts result.inspect
-    return result
-  rescue IFClient::ApiError => e
-    error = JSON.parse("#{e.response_body}")
-    fail "Exception when calling TegileApi(initiator_group_members_get): #{error["message"]}"
+    api_instance = IFClient::SANApi.new
+    list_initiators_in_initiator_group_param = IFClient::ListInitiatorsInInitiatorGroupParam.new
+    list_initiators_in_initiator_group_param.arg0_initiator_group_name = initiator_group_name
+    begin
+      ##Lists all initiators belonging to the specified initiator group
+      result = api_instance.list_initiators_in_initiator_group_post(list_initiators_in_initiator_group_param)
+      puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(initiator_group_members_get): #{error["message"]}"
     end
   end
 
@@ -1608,22 +1607,23 @@ class TegileApi
   end
 
   ##
-  def list_targets_in_target_group_post(target_group_name)
+  def list_targets_in_target_group(target_group_name)
     api_instance = IFClient::SANApi.new
     list_targets_in_target_group_param = IFClient::ListTargetsInTargetGroupParam.new
     list_targets_in_target_group_param.arg0_target_group_name = target_group_name
     begin
       ##Lists all targets associated with the target group.
       result = api_instance.list_targets_in_target_group_post(list_targets_in_target_group_param)
-      # puts result.inspect
+      puts result.inspect
       return result
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(list_targets_in_target_group_post) #{error["message"]}"
+      fail "Exception when calling TegileApi(list_targets_in_target_group) #{error["message"]}"
     end
   end
 
-  def move_target_to_target_group_post(target_name,new_target_group_name)
+  ##
+  def move_target_to_target_group(target_name,new_target_group_name)
     api_instance = IFClient::SANApi.new
     move_target_to_target_group_param = IFClient::MoveTargetToTargetGroupParam.new
     move_target_to_target_group_param.arg0_target_name = target_name
@@ -1631,15 +1631,15 @@ class TegileApi
     begin
       ##Move a target specified with targetName to a new target group specified with newTargetGroupName
       result = api_instance.move_target_to_target_group_post(move_target_to_target_group_param)
-      puts result.inspect
-      # if result.value == 0
+      # puts result.inspect
+      if result.value == 0
         puts "target:#{target_name} moved to target_group:#{new_target_group_name}"
       else
-        puts "Error with TegileApi(move_target_to_target_group_post)"
+        puts "Error with TegileApi(move_target_to_target_group)"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(move_target_to_target_group_post) #{error["message"]}"
+      fail "Exception when calling TegileApi(move_target_to_target_group) #{error["message"]}"
     end
   end
 

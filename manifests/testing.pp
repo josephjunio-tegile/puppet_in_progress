@@ -1,16 +1,17 @@
 node 'tegile-3.7' {
 
-  # iscsi_target { 'TestingResource3':
-  #  ensure                    => present,
-  #  iscsi_target_name         => "puppet-iscsi-target1",
-  #  iscsi_target_alias        => "puppet-iscsi-target1",
-  #  iscsi_target_group        => "puppet-iscsi-target-group1",
-  # #  iscsi_target_auth         => "none",
-  # #  iscsi_target_chap_name    => "",
-  # #  iscsi_target_chap_secret  => "",
-  #  iscsi_target_ip           => "10.65.3.33",
-  #  iscsi_target_port         => "3260",
-  # }
+  iscsi_target { 'TestingResource3':
+   ensure                    => present,
+   iscsi_target_name         => "puppet-iscsi-target1",
+   iscsi_target_alias        => "puppet-iscsi-target1",
+  #  iscsi_target_group        => "iscsi-target-group1",
+   pool_name                 => "pool-a",
+  #  iscsi_target_auth         => "none",
+  #  iscsi_target_chap_name    => "",
+  #  iscsi_target_chap_secret  => "",
+   iscsi_target_ip           => "10.65.3.33",
+   iscsi_target_port         => "3260",
+  }
 
   # initiator { 'TestingResource6':
   #  ensure                    => present,
@@ -26,12 +27,12 @@ node 'tegile-3.7' {
   #  members              => ["iqn.2017-07.com.test:puppet-host1","iqn.2017-07.com.test:holder","iqn.2017-07.com.test:host1","iqn.2017-07.com.test:host2"],
   # }
 
-  iscsi_target_group { 'TestingResource3.1':
-    ensure                  => present,
-    iscsi_target_group_name => "puppet-iscsi-target-group1",
-    pool_name               => "pool-a",
-    members                 => ["iqn.2012-02.com.tegile:holder-target","iqn.2012-02.com.tegile:iscsi-target1","iqn.2012-02.com.tegile:iscsi-target2"],
-  }
+  # iscsi_target_group { 'TestingResource3.1':
+  #   ensure                  => present,
+  #   iscsi_target_group_name => "puppet-iscsi-target-group1",
+  #   pool_name               => "pool-a",
+  #   members                 => ["iqn.2012-02.com.tegile:holder-target","iqn.2012-02.com.tegile:iscsi-target1","iqn.2012-02.com.tegile:iscsi-target2"],
+  # }
 
   # lun { 'TestingResource1':
   #  ensure                     => present,

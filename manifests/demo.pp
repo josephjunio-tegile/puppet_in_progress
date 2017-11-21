@@ -1,15 +1,74 @@
-node 'tegile-3.7_2' {
+node 'tegile-3.7_demo' {
 
 
   ##VMWARE Configuration
-/*   project { 'VMware-Project':
+  initiator_group { 'VMware-InitiatorGroup1':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-1",
+  }
+
+  initiator_group { 'VMware-InitiatorGroup2':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-2",
+  }
+
+  initiator_group { 'VMware-InitiatorGroup3':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-3",
+  }
+
+  initiator_group { 'VMware-InitiatorGroup4':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-4",
+  }
+
+  initiator { 'VMware-Initiator1':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host1",
+   initiator_group_name      => "vmware-ig-1",
+  }
+
+  initiator { 'VMware-Initiator2':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host2",
+   initiator_group_name      => "vmware-ig-2",
+  }
+
+  initiator { 'VMware-Initiator3':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host3",
+   initiator_group_name      => "vmware-ig-3",
+  }
+
+  initiator { 'VMware-Initiator4':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host4",
+   initiator_group_name      => "vmware-ig-4",
+  }
+
+  iscsi_target_group { 'VMware-TargetGroup1':
+    ensure                  => present,
+    iscsi_target_group_name => "vmware-tg-1",
+    pool_name               => "pool-a",
+  }
+
+  iscsi_target { 'VMware-Target1':
+   ensure                    => present,
+   iscsi_target_name         => "vmware-iscsi-target1",
+   iscsi_target_alias        => "vmware-iscsi-target1",
+   iscsi_target_group        => "vmware-tg-1",
+   iscsi_target_ip           => "10.65.3.33",
+   iscsi_target_port         => "3260",
+  }
+
+  project { 'VMware-Project':
    ensure                     => present,
    project_name               => "vmware-project",
    pool_name                  => "pool-a",
    compression_type           => "lz4",
    compressed_log             => "lz4",
    intended_protocol_list     => ["iSCSI","NFS"],
-   quota                      => 1288490188800,
+   quota                      => 1536,
    dedup                      => "on",
    default_thin_provisioning  => true,
    lun_mappings               => [["vmware-ig-1", "vmware-tg-1", -1, false],["vmware-ig-2", "vmware-tg-1", -1, false]],
@@ -21,7 +80,7 @@ node 'tegile-3.7_2' {
    lun_name                   => "vmware-lun1",
    project_name               => "vmware-project",
    pool_name                  => "pool-a",
-   lun_size                   => 119185342464,
+   lun_size                   => 100,
    block_size                 => "32KB",
    lun_protocol               => "iSCSI",
   }
@@ -31,7 +90,7 @@ node 'tegile-3.7_2' {
    lun_name                   => "vmware-lun2",
    project_name               => "vmware-project",
    pool_name                  => "pool-a",
-   lun_size                   => 238370684928,
+   lun_size                   => 200,
    block_size                 => "64KB",
    lun_protocol               => "iSCSI",
    override_project_mappings  => "yes",
@@ -57,65 +116,8 @@ node 'tegile-3.7_2' {
    nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.4", "rw", false]],
   }
 
-   initiator { 'VMware-Initiator1':
-   ensure                    => present,
-   initiator_name            => "iqn.2017-07.com.test:vmware-host1",
-   initiator_group_name      => "vmware-ig-1",
-  }
 
-  initiator { 'VMware-Initiator2':
-   ensure                    => present,
-   initiator_name            => "iqn.2017-07.com.test:vmware-host2",
-   initiator_group_name      => "vmware-ig-2",
-  }
 
-  initiator { 'VMware-Initiator3':
-   ensure                    => present,
-   initiator_name            => "iqn.2017-07.com.test:vmware-host3",
-   initiator_group_name      => "vmware-ig-3",
-  }
-
-  initiator { 'VMware-Initiator4':
-   ensure                    => present,
-   initiator_name            => "iqn.2017-07.com.test:vmware-host4",
-   initiator_group_name      => "vmware-ig-4",
-  }
-
-  initiator_group { 'VMware-InitiatorGroup1':
-   ensure                => present,
-   initiator_group_name  => "vmware-ig-1",
-  }
-
-  initiator_group { 'VMware-InitiatorGroup2':
-   ensure                => present,
-   initiator_group_name  => "vmware-ig-2",
-  }
-
-  initiator_group { 'VMware-InitiatorGroup3':
-   ensure                => present,
-   initiator_group_name  => "vmware-ig-3",
-  }
-
-  initiator_group { 'VMware-InitiatorGroup4':
-   ensure                => present,
-   initiator_group_name  => "vmware-ig-4",
-  }
-
-  iscsi_target { 'VMware-Target1':
-   ensure                    => present,
-   iscsi_target_name         => "vmware-iscsi-target1",
-   iscsi_target_alias        => "vmware-iscsi-target1",
-   iscsi_target_group        => "vmware-tg-1",
-   iscsi_target_ip           => "10.65.3.33",
-   iscsi_target_port         => "3260",
-  }
-
-  iscsi_target_group { 'VMware-TargetGroup1':
-    ensure                  => present,
-    iscsi_target_group_name => "vmware-tg-1",
-    pool_name               => "pool-a",
-  }
- */
   
 
 
