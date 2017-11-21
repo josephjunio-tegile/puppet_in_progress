@@ -261,8 +261,3 @@ node 'tegile-3.7_demo' {
 
 }
 
-
-
-
-#  node default {
-# }

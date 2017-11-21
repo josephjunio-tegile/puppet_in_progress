@@ -14,9 +14,9 @@ Puppet::Type.newtype(:initiator) do
     Puppet.info("##Inside type_param_initiator_name")
   end
 
-  # newparam(:initiator_group_name) do
-  #   Puppet.info("##Inside type_param_initiator_group_name")
-  # end
+  newparam(:initiator_group_name) do
+    Puppet.info("##Inside type_param_initiator_group_name")
+  end
 
   newparam(:initiator_chap_user_name) do
     Puppet.info("##Inside type_param_initiator_chap_user_name")
