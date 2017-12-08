@@ -77,31 +77,6 @@ node 'tegile-3.7_demo' {
    lun_mappings               => [["vmware-ig-1", "vmware-tg-1", -1, false],["vmware-ig-2", "vmware-tg-1", -1, false]],
   }
 
-  lun { 'VMware-LUN1':
-   ensure                     => absent,
-   lun_name                   => "vmware-lun1",
-   project_name               => "vmware-iscsi",
-   pool_name                  => "pool-a",
-   lun_size                   => 100,
-   block_size                 => "32KB",
-   lun_protocol               => "iSCSI",
-   override_project_mappings  => "no",
-  }
-
-  lun { 'VMware-LUN2':
-   ensure                     => absent,
-   lun_name                   => "vmware-lun2",
-   project_name               => "vmware-iscsi",
-   pool_name                  => "pool-a",
-   lun_size                   => 200,
-   block_size                 => "64KB",
-   lun_protocol               => "iSCSI",
-   override_project_mappings  => "yes",
-   lun_mappings               => [["vmware-ig-3", "vmware-tg-1", -1, false],["vmware-ig-4", "vmware-tg-1", -1, false]],
-  }
-
-
-
 
 
 

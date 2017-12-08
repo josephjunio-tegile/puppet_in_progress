@@ -1,104 +1,104 @@
 node 'tegile-3.7_demo' {
 
-#   ##VMWARE-SAN-Config
-#   initiator_group { 'VMware-InitiatorGroup1':
-#    ensure                => present,
-#    initiator_group_name  => "vmware-ig-1",
-#   }
+  ##VMWARE-SAN-Config
+  initiator_group { 'VMware-InitiatorGroup1':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-1",
+  }
 
-#   initiator_group { 'VMware-InitiatorGroup2':
-#    ensure                => present,
-#    initiator_group_name  => "vmware-ig-2",
-#   }
+  initiator_group { 'VMware-InitiatorGroup2':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-2",
+  }
 
-#   initiator_group { 'VMware-InitiatorGroup3':
-#    ensure                => present,
-#    initiator_group_name  => "vmware-ig-3",
-#   }
+  initiator_group { 'VMware-InitiatorGroup3':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-3",
+  }
 
-#   initiator_group { 'VMware-InitiatorGroup4':
-#    ensure                => present,
-#    initiator_group_name  => "vmware-ig-4",
-#   }
+  initiator_group { 'VMware-InitiatorGroup4':
+   ensure                => present,
+   initiator_group_name  => "vmware-ig-4",
+  }
 
-#   initiator { 'VMware-Initiator1':
-#    ensure                    => present,
-#    initiator_name            => "iqn.2017-07.com.test:vmware-host1",
-#    initiator_group_name      => "vmware-ig-1",
-#   }
+  initiator { 'VMware-Initiator1':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host1",
+   initiator_group_name      => "vmware-ig-1",
+  }
 
-#   initiator { 'VMware-Initiator2':
-#    ensure                    => present,
-#    initiator_name            => "iqn.2017-07.com.test:vmware-host2",
-#    initiator_group_name      => "vmware-ig-2",
-#   }
+  initiator { 'VMware-Initiator2':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host2",
+   initiator_group_name      => "vmware-ig-2",
+  }
 
-#   initiator { 'VMware-Initiator3':
-#    ensure                    => present,
-#    initiator_name            => "iqn.2017-07.com.test:vmware-host3",
-#    initiator_group_name      => "vmware-ig-3",
-#   }
+  initiator { 'VMware-Initiator3':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host3",
+   initiator_group_name      => "vmware-ig-3",
+  }
 
-#   initiator { 'VMware-Initiator4':
-#    ensure                    => present,
-#    initiator_name            => "iqn.2017-07.com.test:vmware-host4",
-#    initiator_group_name      => "vmware-ig-4",
-#   }
+  initiator { 'VMware-Initiator4':
+   ensure                    => present,
+   initiator_name            => "iqn.2017-07.com.test:vmware-host4",
+   initiator_group_name      => "vmware-ig-4",
+  }
 
-#   iscsi_target_group { 'VMware-TargetGroup1':
-#     ensure                  => present,
-#     iscsi_target_group_name => "vmware-tg-1",
-#     pool_name               => "pool-a",
-#   }
+  iscsi_target_group { 'VMware-TargetGroup1':
+    ensure                  => present,
+    iscsi_target_group_name => "vmware-tg-1",
+    pool_name               => "pool-a",
+  }
 
-#   iscsi_target { 'VMware-Target1':
-#    ensure                    => present,
-#    iscsi_target_name         => "vmware-iscsi-target1",
-#    iscsi_target_alias        => "vmware-iscsi-target1",
-#    iscsi_target_group        => "vmware-tg-1",
-#    iscsi_target_ip           => "10.65.3.33",
-#    iscsi_target_port         => "3260",
-#   }
-
-
+  iscsi_target { 'VMware-Target1':
+   ensure                    => present,
+   iscsi_target_name         => "vmware-iscsi-target1",
+   iscsi_target_alias        => "vmware-iscsi-target1",
+   iscsi_target_group        => "vmware-tg-1",
+   iscsi_target_ip           => "10.65.3.33",
+   iscsi_target_port         => "3260",
+  }
 
 
-#   ##VMWare-LUN-Config
-#   project { 'VMware-iSCSI':
-#    ensure                     => present,
-#    project_name               => "vmware-iscsi",
-#    pool_name                  => "pool-a",
-#    compression_type           => "lz4",
-#    compressed_log             => "lz4",
-#    dedup                      => "on",
-#    quota                      => 2096,
-#    default_thin_provisioning  => true,
-#    intended_protocol_list     => ["iSCSI"],
-#    lun_mappings               => [["vmware-ig-1", "vmware-tg-1", -1, false],["vmware-ig-2", "vmware-tg-1", -1, false]],
-#   }
 
-#   lun { 'VMware-LUN1':
-#    ensure                     => present,
-#    lun_name                   => "vmware-lun1",
-#    project_name               => "vmware-iscsi",
-#    pool_name                  => "pool-a",
-#    lun_size                   => 100,
-#    block_size                 => "32KB",
-#    lun_protocol               => "iSCSI",
-#    override_project_mappings  => "no",
-#   }
 
-#   lun { 'VMware-LUN2':
-#    ensure                     => present,
-#    lun_name                   => "vmware-lun2",
-#    project_name               => "vmware-iscsi",
-#    pool_name                  => "pool-a",
-#    lun_size                   => 200,
-#    block_size                 => "64KB",
-#    lun_protocol               => "iSCSI",
-#    override_project_mappings  => "yes",
-#    lun_mappings               => [["vmware-ig-3", "vmware-tg-1", -1, false],["vmware-ig-4", "vmware-tg-1", -1, false]],
-#   }
+  ##VMWare-LUN-Config
+  project { 'VMware-iSCSI':
+   ensure                     => present,
+   project_name               => "vmware-iscsi",
+   pool_name                  => "pool-a",
+   compression_type           => "lz4",
+   compressed_log             => "lz4",
+   dedup                      => "on",
+   quota                      => 2096,
+   default_thin_provisioning  => true,
+   intended_protocol_list     => ["iSCSI"],
+   lun_mappings               => [["vmware-ig-1", "vmware-tg-1", -1, false],["vmware-ig-2", "vmware-tg-1", -1, false]],
+  }
+
+  lun { 'VMware-LUN1':
+   ensure                     => present,
+   lun_name                   => "vmware-lun1",
+   project_name               => "vmware-iscsi",
+   pool_name                  => "pool-a",
+   lun_size                   => 100,
+   block_size                 => "32KB",
+   lun_protocol               => "iSCSI",
+   override_project_mappings  => "no",
+  }
+
+  lun { 'VMware-LUN2':
+   ensure                     => present,
+   lun_name                   => "vmware-lun2",
+   project_name               => "vmware-iscsi",
+   pool_name                  => "pool-a",
+   lun_size                   => 200,
+   block_size                 => "64KB",
+   lun_protocol               => "iSCSI",
+   override_project_mappings  => "yes",
+   lun_mappings               => [["vmware-ig-3", "vmware-tg-1", -1, false],["vmware-ig-4", "vmware-tg-1", -1, false]],
+  }
 
 
 
@@ -140,7 +140,7 @@ node 'tegile-3.7_demo' {
 
 
 
-  
+
 
 
 #   ##SQL-SAN-Config

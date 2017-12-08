@@ -63,65 +63,6 @@ node 'tegile-3.7_demo' {
 
 
 
-  ##VMWare-LUN-Config
-  project { 'VMware-iSCSI':
-   ensure                     => absent,
-   project_name               => "vmware-iscsi",
-   pool_name                  => "pool-a",
-   compression_type           => "lz4",
-   compressed_log             => "lz4",
-   dedup                      => "on",
-   quota                      => 2096,
-   default_thin_provisioning  => true,
-   intended_protocol_list     => ["iSCSI"],
-   lun_mappings               => [["vmware-ig-1", "vmware-tg-1", -1, false],["vmware-ig-2", "vmware-tg-1", -1, false]],
-  }
-
-  lun { 'VMware-LUN1':
-   ensure                     => absent,
-   lun_name                   => "vmware-lun1",
-   project_name               => "vmware-iscsi",
-   pool_name                  => "pool-a",
-   lun_size                   => 100,
-   block_size                 => "32KB",
-   lun_protocol               => "iSCSI",
-   override_project_mappings  => "no",
-  }
-
-  lun { 'VMware-LUN2':
-   ensure                     => absent,
-   lun_name                   => "vmware-lun2",
-   project_name               => "vmware-iscsi",
-   pool_name                  => "pool-a",
-   lun_size                   => 200,
-   block_size                 => "64KB",
-   lun_protocol               => "iSCSI",
-   override_project_mappings  => "yes",
-   lun_mappings               => [["vmware-ig-3", "vmware-tg-1", -1, false],["vmware-ig-4", "vmware-tg-1", -1, false]],
-  }
-
-
-
-
-
-
-  ##VMWare-Share-Config
-  project { 'VMware-NFS':
-   ensure                     => absent,
-   project_name               => "vmware-nfs",
-   pool_name                  => "pool-a",
-   compression_type           => "lz4",
-   compressed_log             => "lz4",
-   dedup                      => "on",
-   quota                      => 1536,
-   default_thin_provisioning  => true,
-   intended_protocol_list     => ["nfs"],
-   nfs_network_acls           => [["IP", "1.1.1.1", "rw", false],["IP", "2.2.2.2", "rw", false]],
-  }
-
-
-
-
 
   
 
