@@ -137,7 +137,7 @@ def inherit_property_from_project(project_name,volume_name)
     api_instance = IFClient::DataApi.new
     inherit_property_from_project_param = IFClient::InheritPropertyFromProjectParam.new
     inherit_property_from_project_param.arg0_dataset_path = "pool-a/Local/#{project_name}/#{volume_name}"
-    inherit_property_from_project_param.arg1_prop_name = "AclInherit"
+    inherit_property_from_project_param.arg1_prop_name = "CompressedLog"
     
     begin
       #Inherit properties from parent project settings (revert/rollback to parent setting)
@@ -149,7 +149,7 @@ def inherit_property_from_project(project_name,volume_name)
     end
 end
 
-# inherit_property_from_project("ui-project1","api-share4")
+# inherit_property_from_project("ui-project1","api-lun1")
 
 
 def create_project(project_name)
@@ -299,7 +299,7 @@ def modify_volume_properties(project_name,lun_name)
     # volume.readonly = "on"
     # volume.logbias = "throughput"
     # volume.sync = ????
-    # volume.reservation_in_byte = 162135015424
+    volume.reservation_in_byte = 162135015424
     # volume.block_size = "32KB"  ###No work
     # volume.write_back_cache = "disable"
     
@@ -317,9 +317,6 @@ def modify_volume_properties(project_name,lun_name)
     end
 end
 
-def method_name
-    
-end
 
 # get_volume("ui-project1","api-lun1")
 # create_volume("ui-project1","api-lun1")
