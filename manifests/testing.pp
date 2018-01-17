@@ -1,4 +1,5 @@
-node 'tegile-3.7' {
+###testing for new membership
+node 'tegile-3.7__off' {
 
   iscsi_target { 'TestingResource3':
    ensure                    => present,

@@ -58,7 +58,11 @@ Puppet::Type.newtype(:lun) do
   newparam(:lun_protocol) do
     ##iSCSI,FC
     Puppet.info("##Inside type_param_lun_protocol")
-    defaultto :iSCSI
+  end
+
+  newparam(:thin_provision) do
+    ##true/false
+    Puppet.info("##Inside type_param_thin_provision")
   end
 
   newproperty(:override_project_mappings) do
@@ -77,6 +81,30 @@ Puppet::Type.newtype(:lun) do
       diff = missing + extra
       diff.length == 0 ? true : false
     end
+  end
+
+  newproperty(:compression) do
+    Puppet.info("##Inside type_property_compression")
+  end
+
+  newproperty(:dedup) do
+    Puppet.info("##Inside type_property_dedup")
+  end
+
+  newproperty(:primary_cache) do
+    Puppet.info("##Inside type_property_primary_cache")
+  end
+
+  newproperty(:secondary_cache) do
+    Puppet.info("##Inside type_property_secondary_cache")
+  end
+
+  newproperty(:readonly) do
+    Puppet.info("##Inside type_property_readonly")
+  end
+
+  newproperty(:logbias) do
+    Puppet.info("##Inside type_property_logbias")
   end
 
  end

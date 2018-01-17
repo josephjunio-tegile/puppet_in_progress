@@ -6,7 +6,7 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def create
     Puppet.info("##Inside provider_share_create")
-    tegile_api_transport.share_create(resource[:pool_name],resource[:project_name],resource[:share_name],resource[:block_size])
+    tegile_api_transport.share_create(resource[:pool_name],resource[:project_name],resource[:share_name],resource[:block_size],resource[:mount_point])
     ##check if nfs_network_acls are present and sync them up
     if resource[:nfs_network_acls] != nil
       if resource[:override_project_nfs_network_acls] == "no" or resource[:override_project_nfs_network_acls] == nil
@@ -36,7 +36,30 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
         end
       end
     end
-
+    if resource[:dedup] != nil
+      tegile_api_transport.share_modify_set("dedup",resource[:dedup],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:compression] != nil
+      tegile_api_transport.share_modify_set("compression",resource[:compression],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:primary_cache] != nil
+      tegile_api_transport.share_modify_set("primary_cache",resource[:primary_cache],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:secondary_cache] != nil
+      tegile_api_transport.share_modify_set("secondary_cache",resource[:secondary_cache],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:quota] != nil
+      tegile_api_transport.share_modify_set("quota_in_byte",resource[:quota],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:reservation] != nil
+      tegile_api_transport.share_modify_set("reservation_in_byte",resource[:reservation],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:readonly] != nil
+      tegile_api_transport.share_modify_set("readonly",resource[:readonly],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:logbias] != nil
+      tegile_api_transport.share_modify_set("logbias",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
   end
 
   def destroy
@@ -128,5 +151,104 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
       end
     end
   end
+
+  def dedup
+    Puppet.info("##Inside provider_share_dedup_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.dedup
+    returned.dedup
+  end
+
+  def dedup=(should)
+    Puppet.info("##Inside provider_share_dedup_set")
+    tegile_api_transport.share_modify_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def compression
+    Puppet.info("##Inside provider_share_compression_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.compression
+    returned.compression
+  end
+
+  def compression=(should)
+    Puppet.info("##Inside provider_share_compression_set")
+    tegile_api_transport.share_modify_set("compression",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def quota
+    Puppet.info("##Inside provider_share_quota_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.quota_in_byte
+    returned.quota_in_byte
+  end
+
+  def quota=(should)
+    Puppet.info("##Inside provider_share_quota_set")
+    tegile_api_transport.share_modify_set("quota_in_byte",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def reservation
+    Puppet.info("##Inside provider_share_reservation_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.reservation_in_byte
+    returned.reservation_in_byte
+  end
+
+  def reservation=(should)
+    Puppet.info("##Inside provider_share_reservation_set")
+    tegile_api_transport.share_modify_set("reservation_in_byte",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def readonly
+    Puppet.info("##Inside provider_share_readonly_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.readonly
+    returned.readonly
+  end
+
+  def readonly=(should)
+    Puppet.info("##Inside provider_share_readonly_set")
+    tegile_api_transport.share_modify_set("readonly",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def logbias
+    Puppet.info("##Inside provider_share_logbias_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.logbias
+    returned.logbias
+  end
+
+  def logbias=(should)
+    Puppet.info("##Inside provider_share_logbias_set")
+    tegile_api_transport.share_modify_set("logbias",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def primary_cache
+    Puppet.info("##Inside provider_share_primary_cache_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.primary_cache
+    returned.primary_cache
+  end
+
+  def primary_cache=(should)
+    Puppet.info("##Inside provider_share_primary_cache_set")
+    tegile_api_transport.share_modify_set("primary_cache",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def secondary_cache
+    Puppet.info("##Inside provider_share_secondary_cache_get")
+    returned = tegile_api_transport.share_modify_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.secondary_cache
+    returned.secondary_cache
+  end
+
+  def secondary_cache=(should)
+    Puppet.info("##Inside provider_share_secondary_cache_set")
+    tegile_api_transport.share_modify_set("secondary_cache",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+
+
 
 end

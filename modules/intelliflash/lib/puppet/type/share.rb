@@ -28,6 +28,10 @@ Puppet::Type.newtype(:share) do
     defaultto :"32KB"
   end
 
+  newparam(:mount_point) do
+    Puppet.info("##Inside type_param_mount_point")
+  end
+
   newproperty(:override_project_nfs_network_acls) do
     Puppet.info("##Inside type_property_override_project_nfs_network_acls")
   end
@@ -45,6 +49,44 @@ Puppet::Type.newtype(:share) do
     end
   end
 
-  
+  newproperty(:dedup) do
+    Puppet.info("##Inside type_property_dedup")
+  end
+
+  newproperty(:compression) do
+    Puppet.info("##Inside type_property_compression")
+  end
+
+  newproperty(:primary_cache) do
+    Puppet.info("##Inside type_property_primary_cache")
+  end
+
+  newproperty(:secondary_cache) do
+    Puppet.info("##Inside type_property_primary_cache")
+  end
+
+  newproperty(:quota) do
+    Puppet.info("##Inside type_property_quota")
+    ##Convert input from GB to B
+    munge do |value|
+      value*1024*1024*1024
+    end
+  end
+
+  newproperty(:reservation) do
+    Puppet.info("##Inside type_property_reservation")
+    ##Convert input from GB to B
+    munge do |value|
+      value*1024*1024*1024
+    end
+  end
+
+  newproperty(:readonly) do
+    Puppet.info("##Inside type_property_readonly")
+  end
+
+  newproperty(:logbias) do
+    Puppet.info("##Inside type_property_logbias")
+  end
 
  end

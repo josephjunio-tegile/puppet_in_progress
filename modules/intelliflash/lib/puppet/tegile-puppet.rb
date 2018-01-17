@@ -14,13 +14,13 @@ class TegileApi
   end
 
 
-  def share_create(pool_name,project_name,share_name,block_size)
+  def share_create(pool_name,project_name,share_name,block_size,mount_point)
     api_instance = IFClient::DataApi.new
     ##Set share option params
     new_share_options = IFClient::ShareOptions.new
     #new_share_options.block_size = IFClient::BlockSizeEnum::N32_KB
     new_share_options.block_size = block_size
-    #new_share_options.mount_point = ##OPTIONAL
+    new_share_options.mount_point = mount_point
     new_share_options.quota = -1
     new_share_options.reservation = -1
     ##Set share permissions params
@@ -125,7 +125,7 @@ class TegileApi
     end
   end
 
-  def lun_create(lun_name,pool_name,project_name,lun_protocol,lun_size,block_size)
+  def lun_create(lun_name,pool_name,project_name,lun_protocol,lun_size,block_size,thin_provision)
     api_instance = IFClient::DataApi.new
     #Set volume params
     new_vol = IFClient::VolumeV10.new
@@ -136,7 +136,7 @@ class TegileApi
     new_vol.vol_size = lun_size
     #new_vol.block_size = IFClient::BlockSizeEnum::N32_KB  ##ReferencesBlockSizeEnum
     new_vol.block_size = block_size
-    new_vol.thin_provision = true
+    new_vol.thin_provision = thin_provision
     #new_vol.local = true ##OPTIONAL
     create_volume_param = IFClient::CreateVolumeParam.new
     create_volume_param.arg0_volume = new_vol
@@ -1552,6 +1552,124 @@ class TegileApi
       fail
     end 
   end
+
+  ## Method using the tegile api to get all share property
+  ## Used by puppet share_property_get
+  def share_modify_get(pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    get_share_param = IFClient::GetShareParam.new
+    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Get the Share details.
+      result = api_instance.get_share_post(get_share_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_modify_get): #{error["message"]}"
+    end 
+  end
+
+  ## Method using the tegile api to set any share property, case statement has to be updated for properties that need support
+  ## Used by puppet share_property_set
+  def share_modify_set(property,property_value,pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    modify_share = IFClient::ShareV21.new
+    case property
+    when "dedup"
+      modify_share.dedup = property_value
+    when "compression"
+      modify_share.compression = property_value
+    when "quota_in_byte"
+      modify_share.quota_in_byte = property_value
+    when "reservation_in_byte"
+      modify_share.reservation_in_byte = property_value
+    when "readonly"
+      modify_share.readonly = property_value
+    when "logbias"
+      modify_share.logbias = property_value
+    when "primary_cache"
+      modify_share.primary_cache = property_value
+    when "secondary_cache"
+      modify_share.secondary_cache = property_value
+    end
+    modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
+    modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    modify_share_properties_param.arg1_share = modify_share
+    begin
+      ##Modify value of a subset of project properties
+      result = api_instance.modify_share_properties_post(modify_share_properties_param)
+      if result.value == 0
+        # puts result.inspect
+        puts "changed #{property} to #{property_value}"
+      else
+        puts "Error with TegileApi(share_modify_set)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_block_size_set): #{error["message"]}"
+      fail
+    end 
+  end
+
+  ## Method using the tegile api to get all lun property
+  ## Used by puppet lun_property_get
+  def lun_get(pool_name,project_name,lun_name)
+    api_instance = IFClient::DataApi.new
+    get_volume_param = IFClient::GetVolumeParam.new
+    get_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    begin
+      ##Get the Volume details
+      result = api_instance.get_volume_post(get_volume_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(lun_get): #{error["message"]}"
+    end 
+  end
+
+  ## Method using the tegile api to set any lun property, case statement has to be updated for properties that need support
+  ## Used by puppet lun_property_set
+  def lun_set(property,property_value,pool_name,project_name,lun_name)
+    api_instance = IFClient::DataApi.new
+    modify_lun = IFClient::VolumeV21.new
+    case property
+    when "compression"
+      modify_lun.compression = property_value
+    when "dedup"
+      modify_lun.dedup = property_value
+    when "primary_cache"
+      modify_lun.primary_cache = property_value
+    when "secondary_cache"
+      modify_lun.secondary_cache = property_value
+    when "readonly"
+      modify_lun.readonly = property_value
+    when "logbias"
+      modify_lun.logbias = property_value
+    end
+    modify_volume_properties_param = IFClient::ModifyVolumePropertiesParam.new
+    modify_volume_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    modify_volume_properties_param.arg1_volume = modify_lun
+    begin
+      #Modify value of a subset of Volume properties
+      result = api_instance.modify_volume_properties_post(modify_volume_properties_param)
+      if result.value == 0
+        # puts result.inspect
+        puts "changed #{property} to #{property_value}"
+      else
+        puts "Error with TegileApi(share_modify_set)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(lun_set): #{error["message"]}"
+      fail
+    end 
+  end
+
+
+
+
 
   ##
   def initiator_group_members_get(initiator_group_name)

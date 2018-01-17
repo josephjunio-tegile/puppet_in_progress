@@ -1,4 +1,4 @@
-node 'tegile-3.7_demo' {
+node 'tegile-3.7_demo_OFF' {
 
   ##VMWARE-SAN-Config
   initiator_group { 'VMware-InitiatorGroup1':
