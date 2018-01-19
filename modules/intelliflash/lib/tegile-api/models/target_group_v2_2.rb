@@ -14,9 +14,9 @@ require 'date'
 
 module IFClient
 
-  class InitiatorGroup_V2_1
-    # Initiator group name
-    attr_accessor :initiator_group_name
+  class TargetGroup_V2_2
+    # Target group name
+    attr_accessor :target_group_name
 
     # Protocol name
     attr_accessor :intended_protocol
@@ -25,7 +25,7 @@ module IFClient
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'initiator_group_name' => :'initiatorGroupName',
+        :'target_group_name' => :'targetGroupName',
         :'intended_protocol' => :'intendedProtocol'
       }
     end
@@ -33,7 +33,7 @@ module IFClient
     # Attribute type mapping.
     def self.swagger_types
       {
-        :'initiator_group_name' => :'String',
+        :'target_group_name' => :'String',
         :'intended_protocol' => :'String'
       }
     end
@@ -46,8 +46,8 @@ module IFClient
       # convert string to symbol for hash key
       attributes = attributes.each_with_object({}){|(k,v), h| h[k.to_sym] = v}
 
-      if attributes.has_key?(:'initiatorGroupName')
-        self.initiator_group_name = attributes[:'initiatorGroupName']
+      if attributes.has_key?(:'targetGroupName')
+        self.target_group_name = attributes[:'targetGroupName']
       end
 
       if attributes.has_key?(:'intendedProtocol')
@@ -74,7 +74,7 @@ module IFClient
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          initiator_group_name == o.initiator_group_name &&
+          target_group_name == o.target_group_name &&
           intended_protocol == o.intended_protocol
     end
 
@@ -87,7 +87,7 @@ module IFClient
     # Calculates hash code according to all attributes.
     # @return [Fixnum] Hash code
     def hash
-      [initiator_group_name, intended_protocol].hash
+      [target_group_name, intended_protocol].hash
     end
 
     # Builds the object from hash

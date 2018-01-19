@@ -45,7 +45,7 @@ class TegileApi
 
   def project_create(project_name,pool_name,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size)
     api_instance = IFClient::DataApi.new
-    new_project = IFClient::ProjectV21.new
+    new_project = IFClient::Project_V2_1.new
     new_project.project_name = project_name
     new_project.pool_name = pool_name
     new_project.compression = compression_type
@@ -285,7 +285,7 @@ class TegileApi
   ##Can move into project_set?
   def project_intended_protocol_list_set(intended_protocols,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.intended_protocol_list = intended_protocols
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -450,7 +450,7 @@ class TegileApi
   ## Used by puppet project_property_set methods
   def project_set(property,property_value,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    modify_project = IFClient::ProjectV21.new
+    modify_project = IFClient::Project_V2_1.new
     case property
     when "default_volume_size_in_byte"
       modify_project.default_volume_size_in_byte = property_value
@@ -760,7 +760,7 @@ class TegileApi
   ##once test with 3.7.0.1 move to share_set
   def share_block_size_set(block_size,pool_name,project_name,share_name)
     api_instance = IFClient::DataApi.new
-    modify_share = IFClient::ShareV21.new
+    modify_share = IFClient::Share_V2_1.new
     modify_share.record_size = block_size
     modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
     modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
@@ -797,7 +797,7 @@ class TegileApi
   ## Used by puppet share_property_set methods
   def share_set(property,property_value,pool_name,project_name,share_name)
     api_instance = IFClient::DataApi.new
-    modify_share = IFClient::ShareV21.new
+    modify_share = IFClient::Share_V2_1.new
     case property
     when "dedup"
       modify_share.dedup = property_value
@@ -879,7 +879,7 @@ class TegileApi
   def lun_create(lun_name,pool_name,project_name,lun_protocol,lun_size,block_size,thin_provision)
     api_instance = IFClient::DataApi.new
     #Set volume params
-    new_vol = IFClient::VolumeV10.new
+    new_vol = IFClient::Volume_V1_0.new
     new_vol.name = lun_name
     new_vol.pool_name = pool_name
     new_vol.project_name = project_name
@@ -1065,7 +1065,7 @@ class TegileApi
   ## Used by puppet lun_property_set methods
   def lun_set(property,property_value,pool_name,project_name,lun_name)
     api_instance = IFClient::DataApi.new
-    modify_lun = IFClient::VolumeV21.new
+    modify_lun = IFClient::Volume_V2_1.new
     case property
     when "compression"
       modify_lun.compression = property_value
@@ -1185,7 +1185,7 @@ class TegileApi
 
   def initiator_create(initiator_name,initiator_chap_user_name,initiator_chap_secret)
     api_instance = IFClient::SANApi.new
-    new_initiator = IFClient::IscsiInitiatorV10.new
+    new_initiator = IFClient::IscsiInitiator_V1_0.new
     new_initiator.chap_secret = initiator_chap_secret
     new_initiator.chap_user_name = initiator_chap_user_name
     new_initiator.initiator_name = initiator_name
@@ -1379,7 +1379,7 @@ class TegileApi
 
   def iscsi_target_create(iscsi_target_name,iscsi_target_alias,iscsi_target_group,iscsi_target_auth,iscsi_target_chap_name,iscsi_target_chap_secret,iscsi_target_ip,iscsi_target_port)
     api_instance = IFClient::SANApi.new
-    new_iscsi_target = IFClient::ISCSITargetCreateV21.new
+    new_iscsi_target = IFClient::ISCSITargetCreate_V2_1.new
     new_iscsi_target.target_suffix_name = iscsi_target_name
     new_iscsi_target.target_alias = iscsi_target_alias
     new_iscsi_target.target_group_name = iscsi_target_group
@@ -1592,7 +1592,7 @@ end
   end
   def project_default_lun_block_size_set(block_size,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.default_volume_block_size = block_size
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1631,7 +1631,7 @@ end
   end
   def project_default_share_block_size_set(block_size,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.record_size = block_size
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1670,7 +1670,7 @@ end
   end
   def project_default_thin_provisioning_set(thin_provisioning,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.default_thin_provisioning = thin_provisioning
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1709,7 +1709,7 @@ end
   end
   def project_dedup_set(dedup,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.dedup = dedup
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1748,7 +1748,7 @@ end
   end
   def project_quota_set(quota,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.quota_in_byte = quota
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1787,7 +1787,7 @@ end
   end
   def project_compressed_log_set(compressed_log,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.compressed_log = compressed_log
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1826,7 +1826,7 @@ end
   end
   def project_compression_type_set(compression,pool_name,project_name)
     api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
+    project_properties = IFClient::Project_V2_1.new
     project_properties.compression = compression
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -1869,7 +1869,7 @@ module RubyMethods
   def RubyMethods.array_to_network_acl_v21(array)
     return_array = []
     array.each do |sub_array|
-      temp_array = IFClient::NetworkACLV21.new
+      temp_array = IFClient::NetworkACL_V2_1.new
       temp_array.host_type = sub_array[0]
       temp_array.host = sub_array[1]
       temp_array.access_mode = sub_array[2]

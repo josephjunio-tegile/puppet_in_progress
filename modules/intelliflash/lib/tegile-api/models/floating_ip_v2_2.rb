@@ -14,27 +14,47 @@ require 'date'
 
 module IFClient
 
-  class InitiatorGroup_V2_1
-    # Initiator group name
-    attr_accessor :initiator_group_name
+  class FloatingIP_V2_2
+    # Resource Group name
+    attr_accessor :resource_group_name
 
-    # Protocol name
-    attr_accessor :intended_protocol
+    # Description
+    attr_accessor :description
+
+    # Failover mode
+    attr_accessor :failover_mode
+
+    # Floating IP address
+    attr_accessor :ip_address
+
+    # Netmask
+    attr_accessor :netmask
+
+    # Pool name, might have multiple pool associated with this IP. They are separated by comma.
+    attr_accessor :pool_name
 
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'initiator_group_name' => :'initiatorGroupName',
-        :'intended_protocol' => :'intendedProtocol'
+        :'resource_group_name' => :'resourceGroupName',
+        :'description' => :'description',
+        :'failover_mode' => :'failoverMode',
+        :'ip_address' => :'ipAddress',
+        :'netmask' => :'netmask',
+        :'pool_name' => :'poolName'
       }
     end
 
     # Attribute type mapping.
     def self.swagger_types
       {
-        :'initiator_group_name' => :'String',
-        :'intended_protocol' => :'String'
+        :'resource_group_name' => :'String',
+        :'description' => :'String',
+        :'failover_mode' => :'String',
+        :'ip_address' => :'String',
+        :'netmask' => :'String',
+        :'pool_name' => :'String'
       }
     end
 
@@ -46,12 +66,28 @@ module IFClient
       # convert string to symbol for hash key
       attributes = attributes.each_with_object({}){|(k,v), h| h[k.to_sym] = v}
 
-      if attributes.has_key?(:'initiatorGroupName')
-        self.initiator_group_name = attributes[:'initiatorGroupName']
+      if attributes.has_key?(:'resourceGroupName')
+        self.resource_group_name = attributes[:'resourceGroupName']
       end
 
-      if attributes.has_key?(:'intendedProtocol')
-        self.intended_protocol = attributes[:'intendedProtocol']
+      if attributes.has_key?(:'description')
+        self.description = attributes[:'description']
+      end
+
+      if attributes.has_key?(:'failoverMode')
+        self.failover_mode = attributes[:'failoverMode']
+      end
+
+      if attributes.has_key?(:'ipAddress')
+        self.ip_address = attributes[:'ipAddress']
+      end
+
+      if attributes.has_key?(:'netmask')
+        self.netmask = attributes[:'netmask']
+      end
+
+      if attributes.has_key?(:'poolName')
+        self.pool_name = attributes[:'poolName']
       end
 
     end
@@ -74,8 +110,12 @@ module IFClient
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          initiator_group_name == o.initiator_group_name &&
-          intended_protocol == o.intended_protocol
+          resource_group_name == o.resource_group_name &&
+          description == o.description &&
+          failover_mode == o.failover_mode &&
+          ip_address == o.ip_address &&
+          netmask == o.netmask &&
+          pool_name == o.pool_name
     end
 
     # @see the `==` method
@@ -87,7 +127,7 @@ module IFClient
     # Calculates hash code according to all attributes.
     # @return [Fixnum] Hash code
     def hash
-      [initiator_group_name, intended_protocol].hash
+      [resource_group_name, description, failover_mode, ip_address, netmask, pool_name].hash
     end
 
     # Builds the object from hash

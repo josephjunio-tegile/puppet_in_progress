@@ -14,27 +14,22 @@ require 'date'
 
 module IFClient
 
-  class InitiatorGroup_V2_1
-    # Initiator group name
-    attr_accessor :initiator_group_name
-
-    # Protocol name
-    attr_accessor :intended_protocol
+  class GetFloatingIPListParam
+    # Name of a pool. Use \"All\" to fetch all floating IPs.
+    attr_accessor :arg0_pool_name
 
 
     # Attribute mapping from ruby-style variable name to JSON key.
     def self.attribute_map
       {
-        :'initiator_group_name' => :'initiatorGroupName',
-        :'intended_protocol' => :'intendedProtocol'
+        :'arg0_pool_name' => :'arg0_PoolName'
       }
     end
 
     # Attribute type mapping.
     def self.swagger_types
       {
-        :'initiator_group_name' => :'String',
-        :'intended_protocol' => :'String'
+        :'arg0_pool_name' => :'String'
       }
     end
 
@@ -46,12 +41,8 @@ module IFClient
       # convert string to symbol for hash key
       attributes = attributes.each_with_object({}){|(k,v), h| h[k.to_sym] = v}
 
-      if attributes.has_key?(:'initiatorGroupName')
-        self.initiator_group_name = attributes[:'initiatorGroupName']
-      end
-
-      if attributes.has_key?(:'intendedProtocol')
-        self.intended_protocol = attributes[:'intendedProtocol']
+      if attributes.has_key?(:'arg0_PoolName')
+        self.arg0_pool_name = attributes[:'arg0_PoolName']
       end
 
     end
@@ -60,12 +51,17 @@ module IFClient
     # @return Array for valid properies with the reasons
     def list_invalid_properties
       invalid_properties = Array.new
+      if @arg0_pool_name.nil?
+        invalid_properties.push("invalid value for 'arg0_pool_name', arg0_pool_name cannot be nil.")
+      end
+
       return invalid_properties
     end
 
     # Check to see if the all the properties in the model are valid
     # @return true if the model is valid
     def valid?
+      return false if @arg0_pool_name.nil?
       return true
     end
 
@@ -74,8 +70,7 @@ module IFClient
     def ==(o)
       return true if self.equal?(o)
       self.class == o.class &&
-          initiator_group_name == o.initiator_group_name &&
-          intended_protocol == o.intended_protocol
+          arg0_pool_name == o.arg0_pool_name
     end
 
     # @see the `==` method
@@ -87,7 +82,7 @@ module IFClient
     # Calculates hash code according to all attributes.
     # @return [Fixnum] Hash code
     def hash
-      [initiator_group_name, intended_protocol].hash
+      [arg0_pool_name].hash
     end
 
     # Builds the object from hash
