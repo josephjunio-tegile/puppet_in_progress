@@ -14,6 +14,491 @@ class TegileApi
   end
 
 
+
+  def project_exists(project_name,pool_name)
+    api_instance = IFClient::DataApi.new
+    list_projects_param = IFClient::ListProjectsParam.new
+    list_projects_param.arg0_pool_name = pool_name
+    list_projects_param.arg1_local = true
+    begin
+      #Lists all the pools on the Tegile array
+      result = api_instance.list_projects_post(list_projects_param)
+      # puts result.inspect
+      # puts result.length
+      if result.length == 0
+        return nil
+      else
+        exists = nil
+        result.each do |x|
+          if x.name == project_name
+            puts "found #{x.name}"
+            exists = true
+          end
+        end
+        return exists
+      end
+    rescue IFClient::ApiError => e
+      puts "Exception when calling DataApi->get_project_post: #{e}"
+      fail
+    end
+  end
+
+  def project_create(project_name,pool_name,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size)
+    api_instance = IFClient::DataApi.new
+    new_project = IFClient::ProjectV21.new
+    new_project.project_name = project_name
+    new_project.pool_name = pool_name
+    new_project.compression = compression_type
+    new_project.compressed_log = compressed_log
+    new_project.intended_protocol_list = intended_protocol_list
+    new_project.quota_in_byte = quota
+    new_project.dedup = dedup
+    new_project.primary_cache = primary_cache
+    new_project.secondary_cache = secondary_cache
+    new_project.acl_inherit = acl_inherit
+    new_project.default_volume_size_in_byte = default_lun_size
+    new_project.default_volume_block_size = default_lun_block_size
+    new_project.default_thin_provisioning = default_thin_provisioning
+    new_project.record_size = default_share_block_size
+    create_project_param = IFClient::CreateProjectParam.new
+    create_project_param.arg0_project = new_project
+    begin
+      ##Creates a project
+      result = api_instance.create_project_post(create_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "#{project_name} created"
+      else
+        fail "Error with TegileApi(project_create)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_create): #{error["message"]}"
+    end 
+  end
+
+  def project_delete(project_name,pool_name)
+    api_instance = IFClient::DataApi.new
+    delete_project_param = IFClient::DeleteProjectParam.new
+    delete_project_param.arg0_project_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      ##Deletes the specified project.
+      result = api_instance.delete_project_post(delete_project_param)
+      #puts result
+      if result.value == 0
+        sleep(5)
+        puts "#{project_name} deleted"
+      else
+        fail "Error with TegileApi(project_delete)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(project_delete): #{error["message"]}"
+    end 
+  end
+
+  def project_nfs_network_acl_exists(pool_name,project_name,acl_type,acl_host)
+    api_instance = IFClient::NasApi.new
+    get_nfs_network_ac_ls_on_project_param = IFClient::GetNFSNetworkACLsOnProjectParam.new
+    get_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      ##Returns all the Network ACLs for the NFS Project
+      result = api_instance.get_nfs_network_ac_ls_on_project_post(get_nfs_network_ac_ls_on_project_param)
+      #puts result
+      exists = nil
+      result.each do |x|
+        if x.host_type == acl_type && x.host == acl_host
+          exists = true
+          puts "found acl: #{project_name}__#{x.host_type}+#{x.host}"
+        end
+      end
+      return exists
+    rescue IFClient::ApiError => e
+      puts "Exception when calling NasApi->get_nfs_network_ac_ls_on_project_post: #{e}"
+      fail
+    end
+  end
+
+  def project_nfs_network_acl_create(pool_name,project_name,acl_type,acl_host,access_mode)
+    api_instance = IFClient::NasApi.new
+    add_nfs_network_acl_on_project_param = IFClient::AddNFSNetworkACLOnProjectParam.new
+    add_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    add_nfs_network_acl_on_project_param.arg1_type = acl_type
+    add_nfs_network_acl_on_project_param.arg2_host = acl_host
+    add_nfs_network_acl_on_project_param.arg3_access_mode = access_mode
+    add_nfs_network_acl_on_project_param.arg4_is_root = false
+    begin
+      #Add network ACL to NFS Project
+      result = api_instance.add_nfs_network_acl_on_project_post(add_nfs_network_acl_on_project_param)
+      #puts result
+      if result == 0
+        puts "acl for #{project_name} created"
+      else
+        puts "Error"
+      end
+    rescue IFClient::ApiError => e
+      puts "Exception when calling NasApi->add_nfs_network_acl_on_project_post: #{e}"
+      fail
+    end
+  end
+
+  def project_nfs_network_acl_delete(pool_name,project_name,acl_type,acl_host)
+    api_instance = IFClient::NasApi.new
+    remove_nfs_network_acl_on_project_param = IFClient::RemoveNFSNetworkACLOnProjectParam.new
+    remove_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    remove_nfs_network_acl_on_project_param.arg1_type = acl_type
+    remove_nfs_network_acl_on_project_param.arg2_host = acl_host
+    begin
+      ##Remove network ACL from NFS Project
+      result = api_instance.remove_nfs_network_acl_on_project_post(remove_nfs_network_acl_on_project_param)
+      #puts result
+      if result == 0
+        puts "acl for #{project_name} deleted"
+      else
+        puts "Error deleting mapping"
+      end
+    rescue IFClient::ApiError => e
+      puts "Exception when calling NasApi->remove_nfs_network_acl_on_project_post: #{e}"
+      fail
+    end
+  end
+
+  def project_nfs_network_acl_get(pool_name,project_name,network_acls)
+    api_instance = IFClient::NasApi.new
+    get_nfs_network_ac_ls_on_project_param = IFClient::GetNFSNetworkACLsOnProjectParam.new
+    get_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      ##Returns all the Network ACLs for the NFS Project
+      result = api_instance.get_nfs_network_ac_ls_on_project_post(get_nfs_network_ac_ls_on_project_param)
+      puts result
+      puts network_acls
+    rescue IFClient::ApiError => e
+      puts "Exception when calling NasApi->get_nfs_network_ac_ls_on_project_post: #{e}"
+      fail
+    end
+  end
+  
+  def project_mapping_exists(pool_name,project_name,initiator_group_name,target_group_name)
+    api_instance = IFClient::SANApi.new
+    get_project_default_iscsi_it_view_param = IFClient::GetProjectDefaultIscsiITViewParam.new
+    get_project_default_iscsi_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      ##List all of the default iSCSI views of the project
+      result = api_instance.get_project_default_iscsi_it_view_post(get_project_default_iscsi_it_view_param)
+      #puts result
+      exists = false
+      result.each do |x|
+        #puts "checking mapping: #{project_name}__#{x.host_group_name}+#{x.target_group_name}"
+        if x.host_group_name == initiator_group_name && x.target_group_name == target_group_name
+          exists = true
+          puts "found mapping: #{project_name}__#{x.host_group_name}+#{x.target_group_name}"
+        end
+      end
+      return exists
+    rescue IFClient::ApiError => e
+      puts "Exception when calling SANApi->get_project_default_iscsi_it_view_post: #{e}"
+      fail
+    end
+  end
+
+  def project_mapping_create__old(pool_name,project_name,initiator_group_name,target_group_name)
+    api_instance = IFClient::SANApi.new
+    create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
+    create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    create_mapping_for_project_param.arg1_initiator_group_name = initiator_group_name
+    create_mapping_for_project_param.arg2_target_group_name = target_group_name
+    create_mapping_for_project_param.arg3_read_only = false
+    begin
+      ##Create a project level default mapping
+      result = api_instance.create_mapping_for_project_post(create_mapping_for_project_param)
+      #puts result
+      if result == 0
+        puts "Mapping for #{project_name} created"
+      else
+        puts "Error"
+      end
+    rescue IFClient::ApiError => e
+      puts "Exception when calling SANApi->create_mapping_for_project_post: #{e}"
+      fail
+    end
+  end
+
+  def project_mapping_delete__old(pool_name,project_name,initiator_group_name,target_group_name)
+    api_instance = IFClient::SANApi.new
+    delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
+    delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    delete_mapping_from_project_param.arg1_initiator_group_name = initiator_group_name
+    delete_mapping_from_project_param.arg2_target_group_name = target_group_name
+    begin
+      ##Deletes the view (mapping) between the given project, initiator group, and target group.
+      result = api_instance.delete_mapping_from_project_post(delete_mapping_from_project_param)
+      #puts result
+      if result == 0
+        puts "mapping for #{project_name} deleted"
+      else
+        puts "Error deleting mapping"
+      end
+    rescue IFClient::ApiError => e
+      puts "Exception when calling SANApi->delete_mapping_from_project_post: #{e}"
+      fail
+    end
+  end
+
+  def project_set_smb_sharing_on(project_name,pool_name)
+    api_instance = IFClient::NasApi.new
+    set_smb_sharing_on_project_param = IFClient::SetSMBSharingOnProjectParam.new
+    set_smb_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    set_smb_sharing_on_project_param.arg1_turn_on = true
+    begin
+      ##Enable/Disable SMB protocol for a Project, If the dataset contains any network ACLs, they are removed as well.
+      result = api_instance.set_smb_sharing_on_project_post(set_smb_sharing_on_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "smb enabled"
+      else
+        puts "Error with TegileApi(project_set_smb_sharing_on)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_set_smb_sharing_on): #{error["message"]}"
+    end 
+  end
+
+  ##Can move into project_get?
+  def project_intended_protocol_list_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      # puts result.intended_protocol_list.inspect
+      return result.intended_protocol_list
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi: #{error["message"]}"
+    end
+  end
+  
+  ##Can move into project_set?
+  def project_intended_protocol_list_set(intended_protocols,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.intended_protocol_list = intended_protocols
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      #puts result
+      if result.value == 0
+        puts "intended_protocol_list set to #{intended_protocols}"
+      else
+        puts "Error with project_intended_protocol_list_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+
+  def project_lun_mapping_get(pool_name,project_name)
+    api_instance = IFClient::SANApi.new
+    get_project_default_iscsi_it_view_param = IFClient::GetProjectDefaultIscsiITViewParam.new
+    get_project_default_iscsi_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      ##List all of the default iSCSI views of the project in Array<ITViewV21> format
+      result = api_instance.get_project_default_iscsi_it_view_post(get_project_default_iscsi_it_view_param)
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_lun_mapping_get): #{error["message"]}"
+      fail
+    end 
+  end
+
+  def project_lun_mapping_set_add(pool_name,project_name,lun_mappings_array)
+    api_instance = IFClient::SANApi.new
+    create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
+    create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    create_mapping_for_project_param.arg1_initiator_group_name = lun_mappings_array[0]
+    create_mapping_for_project_param.arg2_target_group_name = lun_mappings_array[1]
+    create_mapping_for_project_param.arg3_read_only = lun_mappings_array[3]
+    begin
+      ##Create a project level default mapping
+      result = api_instance.create_mapping_for_project_post(create_mapping_for_project_param)
+      #puts result.inspect
+      if result.value == 0
+        puts "#{lun_mappings_array[0]}/#{lun_mappings_array[1]} mapping created"
+      else
+        puts "Error with project_lun_mapping_set_add"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_lun_mapping_set_add): #{error["message"]}"
+      fail
+    end 
+  end
+
+  def project_lun_mapping_set_delete(pool_name,project_name,lun_mappings_array)
+    api_instance = IFClient::SANApi.new
+    delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
+    delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    delete_mapping_from_project_param.arg1_initiator_group_name = lun_mappings_array[0]
+    delete_mapping_from_project_param.arg2_target_group_name = lun_mappings_array[1]
+    begin
+      ##Deletes the view (mapping) between the given project, initiator group, and target group.
+      result = api_instance.delete_mapping_from_project_post(delete_mapping_from_project_param)
+      #puts result.inspect
+      if result.value == 0
+        puts "#{lun_mappings_array[0]}/#{lun_mappings_array[1]} mapping removed"
+      else
+        puts "Error with project_lun_mapping_set_delete"
+      end
+      rescue IFClient::ApiError => e
+        error = JSON.parse("#{e.response_body}")
+        puts "Exception when calling TegileApi(project_lun_mapping_set_delete): #{error["message"]}"
+        fail
+    end
+  end
+
+  def project_nfs_network_acls_get(pool_name,project_name)
+    api_instance = IFClient::NasApi.new
+    get_nfs_network_ac_ls_on_project_param = IFClient::GetNFSNetworkACLsOnProjectParam.new
+    get_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      ##Returns all the Network ACLs for the NFS Project as Array<NetworkACLV21>
+      result = api_instance.get_nfs_network_ac_ls_on_project_post(get_nfs_network_ac_ls_on_project_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_nfs_network_acls_get): #{error["message"]}"
+      fail
+    end   
+  end
+
+  def project_nfs_network_acls_set_add(pool_name,project_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    add_nfs_network_acl_on_project_param = IFClient::AddNFSNetworkACLOnProjectParam.new
+    add_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    add_nfs_network_acl_on_project_param.arg1_type = net_acl_array[0]
+    add_nfs_network_acl_on_project_param.arg2_host = net_acl_array[1]
+    add_nfs_network_acl_on_project_param.arg3_access_mode = net_acl_array[2]
+    add_nfs_network_acl_on_project_param.arg4_is_root = net_acl_array[3]
+    begin
+      ##Add network ACL to NFS Project
+      result = api_instance.add_nfs_network_acl_on_project_post(add_nfs_network_acl_on_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} created"
+      else
+        puts "Error with project_nfs_network_acls_set_add"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_nfs_network_acls_set_add): #{error["message"]}"
+    end 
+  end
+
+  def project_nfs_network_acls_set_delete(pool_name,project_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    remove_nfs_network_acl_on_project_param = IFClient::RemoveNFSNetworkACLOnProjectParam.new
+    remove_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    remove_nfs_network_acl_on_project_param.arg1_type = net_acl_array[0]
+    remove_nfs_network_acl_on_project_param.arg2_host = net_acl_array[1]
+    begin
+      ##Remove network ACL from NFS Project
+      result = api_instance.remove_nfs_network_acl_on_project_post(remove_nfs_network_acl_on_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} removed"
+      else
+        puts "Error with project_nfs_network_acls_set_delete"
+      end
+      rescue IFClient::ApiError => e
+        error = JSON.parse("#{e.response_body}")
+        puts "Exception when calling TegileApi(project_nfs_network_acls_set_delete): #{error["message"]}"
+        fail
+    end
+  end
+
+  ## Method using the tegile api to get all project properties
+  ## Used by puppet project_property_get methods
+  def project_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = true
+    begin
+      ##Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(project_get): #{error["message"]}"
+    end
+  end
+
+  ## Method using the tegile api to set any project property, case statement has to be updated for properties that need support
+  ## Used by puppet project_property_set methods
+  def project_set(property,property_value,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    modify_project = IFClient::ProjectV21.new
+    case property
+    when "default_volume_size_in_byte"
+      modify_project.default_volume_size_in_byte = property_value
+    when "default_volume_block_size"
+      modify_project.default_volume_block_size = property_value
+    when "primary_cache"
+      modify_project.primary_cache = property_value
+    when "secondary_cache"
+      modify_project.secondary_cache = property_value
+    when "acl_inherit"
+      modify_project.acl_inherit = property_value
+    when "record_size"
+      modify_project.record_size = property_value
+    when "readonly"
+      modify_project.readonly = property_value
+    when "default_thin_provisioning"
+      modify_project.default_thin_provisioning = property_value
+    when "dedup"
+      modify_project.dedup = property_value
+    when "quota"
+      modify_project.quota_in_byte = property_value
+    when "compressed_log"
+      modify_project.compressed_log = property_value
+    when "compression_type"
+      modify_project.compression = property_value
+    end
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = modify_project
+    begin
+      ##Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      if result.value == 0
+        # puts result.inspect
+        puts "set #{property} to #{property_value}"
+      else
+        fail "Error with TegileApi(project_set)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(project_set): #{error["message"]}"
+    end 
+  end
+
+
+
+
+
   def share_create(pool_name,project_name,share_name,block_size,mount_point)
     api_instance = IFClient::DataApi.new
     ##Set share option params
@@ -90,6 +575,272 @@ class TegileApi
       fail "Exception when calling TegileApi(share_create): #{error["message"]}"
     end
   end
+
+  def share_nfs_network_acl_exists(pool_name,project_name,share_name,acl_type,acl_host)
+    api_instance = IFClient::NasApi.new
+    get_nfs_network_ac_ls_on_share_param = IFClient::GetNFSNetworkACLsOnShareParam.new
+    get_nfs_network_ac_ls_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Returns all the Network ACLs for the NFS share
+      result = api_instance.get_nfs_network_ac_ls_on_share_post(get_nfs_network_ac_ls_on_share_param)
+      #puts result
+      exists = nil
+      result.each do |x|
+        if x.host_type == acl_type && x.host == acl_host
+          exists = true
+          puts "found acl: #{share_name}__#{x.host_type}+#{x.host}"
+        end
+      end
+      return exists
+    rescue IFClient::ApiError => e
+      puts "Exception when calling NasApi->get_nfs_network_ac_ls_on_share_post: #{e}"
+      fail
+    end
+  end
+
+  def share_nfs_network_acl_create(pool_name,project_name,share_name,acl_type,acl_host,access_mode) ##Will override project if used
+    api_instance = IFClient::NasApi.new
+    add_nfs_network_acl_on_param = IFClient::AddNFSNetworkACLOnParam.new
+    add_nfs_network_acl_on_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    add_nfs_network_acl_on_param.arg1_type = acl_type
+    add_nfs_network_acl_on_param.arg2_host = acl_host
+    add_nfs_network_acl_on_param.arg3_access_mode = access_mode
+    add_nfs_network_acl_on_param.arg4_is_root = false
+    begin
+      ##Add network ACL to NFS share
+      result = api_instance.add_nfs_network_acl_on_share_post(add_nfs_network_acl_on_param)
+      #puts result
+      if result == 0
+        puts "acl for #{share_name} created"
+      else
+        puts "Error"
+      end
+    rescue IFClient::ApiError => e
+      puts "Exception when calling NasApi->add_nfs_network_acl_on_share_post: #{e}"
+      fail
+    end
+  end
+
+  def share_nfs_network_acl_delete(pool_name,project_name,share_name,acl_type,acl_host)
+    api_instance = IFClient::NasApi.new
+    remove_nfs_network_acl_on_share_param = IFClient::RemoveNFSNetworkACLOnShareParam.new
+    remove_nfs_network_acl_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    remove_nfs_network_acl_on_share_param.arg1_type = acl_type
+    remove_nfs_network_acl_on_share_param.arg2_host = acl_host
+    begin
+      ##Remove network ACL from NFS share
+      result = api_instance.remove_nfs_network_acl_on_share_post(remove_nfs_network_acl_on_share_param)
+      #puts result
+      if result == 0
+        puts "acl for #{share_name} deleted"
+      else
+        puts "Error deleting mapping"
+      end
+    rescue IFClient::ApiError => e
+      puts "Exception when calling NasApi->remove_nfs_network_acl_on_share_post: #{e}"
+      fail
+    end
+  end
+
+  ##rename for "net_acl"
+  def share_acl_inherit_get(pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    get_share_param = IFClient::GetShareParam.new
+    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Get the Share details
+      result = api_instance.get_share_post(get_share_param)
+      #puts result.override_sharenfs
+      return result.override_sharenfs
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_acl_inherit_get): #{error["message"]}"
+      fail
+    end
+  end
+
+  ##rename for "net_acl"
+  def share_acl_inherit_set(pool_name,project_name,share_name)
+    api_instance = IFClient::NasApi.new
+    inherit_network_ac_lsettings_from_project_param = IFClient::InheritNetworkACLsettingsFromProjectParam.new
+    inherit_network_ac_lsettings_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Set the share property to inherit NFS or SMB ACL settings from project.
+      result = api_instance.inherit_network_ac_lsettings_from_project_post(inherit_network_ac_lsettings_from_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "Inherit network acls from project enabled for #{share_name}"
+      else
+        puts "Error with TegileApi(share_nfs_network_acls_set_delete)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_acl_inherit_set): #{error["message"]}"
+      fail
+    end
+  end
+
+  def share_nfs_network_acls_get(pool_name,project_name,share_name)
+    api_instance = IFClient::NasApi.new
+    get_nfs_network_ac_ls_on_share_param = IFClient::GetNFSNetworkACLsOnShareParam.new
+    get_nfs_network_ac_ls_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Returns all the Network ACLs for the NFS share in Array<NetworkACLV21> format
+      result = api_instance.get_nfs_network_ac_ls_on_share_post(get_nfs_network_ac_ls_on_share_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_nfs_network_acls_get): #{error["message"]}"
+      fail
+    end   
+  end
+
+  def share_nfs_network_acls_set_add(pool_name,project_name,share_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    add_nfs_network_acl_on_param = IFClient::AddNFSNetworkACLOnParam.new
+    add_nfs_network_acl_on_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    add_nfs_network_acl_on_param.arg1_type = net_acl_array[0]
+    add_nfs_network_acl_on_param.arg2_host = net_acl_array[1]
+    add_nfs_network_acl_on_param.arg3_access_mode = net_acl_array[2]
+    add_nfs_network_acl_on_param.arg4_is_root = net_acl_array[3]
+    begin
+      ##Add network ACL to NFS share
+      result = api_instance.add_nfs_network_acl_on_share_post(add_nfs_network_acl_on_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} created"
+      else
+        puts "Error with TegileApi(share_nfs_network_acls_set_add)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_nfs_network_acls_set_add): #{error["message"]}"
+    end 
+  end
+
+  def share_nfs_network_acls_set_delete(pool_name,project_name,share_name,net_acl_array)
+    api_instance = IFClient::NasApi.new
+    remove_nfs_network_acl_on_share_param = IFClient::RemoveNFSNetworkACLOnShareParam.new
+    remove_nfs_network_acl_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    remove_nfs_network_acl_on_share_param.arg1_type = net_acl_array[0]
+    remove_nfs_network_acl_on_share_param.arg2_host = net_acl_array[1]
+    begin
+      ##Remove network ACL from NFS Project
+      result = api_instance.remove_nfs_network_acl_on_share_post(remove_nfs_network_acl_on_share_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "network acl for #{net_acl_array[1]} removed"
+      else
+        puts "Error with TegileApi(share_nfs_network_acls_set_delete)"
+      end
+      rescue IFClient::ApiError => e
+        error = JSON.parse("#{e.response_body}")
+        puts "Exception when calling TegileApi(share_nfs_network_acls_set_delete): #{error["message"]}"
+        fail
+    end
+  end
+
+  ##once test with 3.7.0.1 move to share_get
+  def share_block_size_get(pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    get_share_param = IFClient::GetShareParam.new
+    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Get the Share details.
+      result = api_instance.get_share_post(get_share_param)
+      # puts result.record_size.value
+      return result.record_size.value
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_block_size_get): #{error["message"]}"
+    end 
+  end
+
+  ##once test with 3.7.0.1 move to share_set
+  def share_block_size_set(block_size,pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    modify_share = IFClient::ShareV21.new
+    modify_share.record_size = block_size
+    modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
+    modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    modify_share_properties_param.arg1_share = modify_share
+    begin
+      ##Modify value of a subset of project properties
+      result = api_instance.modify_share_properties_post(modify_share_properties_param)
+      puts result.inspect
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_block_size_set): #{error["message"]}"
+      fail
+    end 
+  end
+
+  ## Method using the tegile api to get all share property
+  ## Used by puppet share_property_get methods
+  def share_get(pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    get_share_param = IFClient::GetShareParam.new
+    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Get the Share details.
+      result = api_instance.get_share_post(get_share_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_get): #{error["message"]}"
+    end 
+  end
+
+  ## Method using the tegile api to set any share property, case statement has to be updated for properties that need support
+  ## Used by puppet share_property_set methods
+  def share_set(property,property_value,pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    modify_share = IFClient::ShareV21.new
+    case property
+    when "dedup"
+      modify_share.dedup = property_value
+    when "compression"
+      modify_share.compression = property_value
+    when "quota"
+      modify_share.quota_in_byte = property_value
+    when "reservation"
+      modify_share.reservation_in_byte = property_value
+    when "readonly"
+      modify_share.readonly = property_value
+    when "logbias"
+      modify_share.logbias = property_value
+    when "primary_cache"
+      modify_share.primary_cache = property_value
+    when "secondary_cache"
+      modify_share.secondary_cache = property_value
+    when "acl_inherit"
+      modify_share.acl_inherit = property_value
+    end
+    modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
+    modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    modify_share_properties_param.arg1_share = modify_share
+    begin
+      ##Modify value of a subset of project properties
+      result = api_instance.modify_share_properties_post(modify_share_properties_param)
+      if result.value == 0
+        # puts result.inspect
+        puts "set #{property} to #{property_value}"
+      else
+        fail "Error with TegileApi(share_set)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_set): #{error["message"]}"
+    end 
+  end
+
+
+
+
+
+
 
   def lun_exists(lun_name,pool_name,project_name)
     api_instance = IFClient::DataApi.new
@@ -169,6 +920,190 @@ class TegileApi
       fail
     end
   end
+
+  def lun_mapping_exists(pool_name,project_name,lun_name,initiator_group_name,target_group_name)
+    api_instance = IFClient::SANApi.new
+    get_volume_it_view_param = IFClient::GetVolumeITViewParam.new
+    get_volume_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    begin
+      ##List all of the existing views of the volume
+      result = api_instance.get_volume_it_view_post(get_volume_it_view_param)
+      #puts result
+      exists = nil
+      result.each do |x|
+        if x.host_group_name == initiator_group_name && x.target_group_name == target_group_name
+          exists = true
+          puts "found mapping: #{lun_name}__#{x.host_group_name}+#{x.target_group_name}"
+        end
+      end
+      return exists
+    rescue IFClient::ApiError => e
+      puts "Exception when calling SANApi->get_volume_it_view_post: #{e}"
+      fail
+    end
+  end
+
+  def lun_override_project_mappings_get(pool_name,project_name,lun_name)
+    api_instance = IFClient::DataApi.new
+    get_volume_param = IFClient::GetVolumeParam.new
+    get_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    begin
+      ##Get the Volume details.
+      result = api_instance.get_volume_post(get_volume_param)
+      # puts result.override_views
+      return result.override_views
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(lun_override_project_mappings_get): #{error["message"]}"
+      fail
+    end
+  end
+
+  def lun_override_project_mappings_set(pool_name,project_name,lun_name)
+    api_instance = IFClient::DataApi.new
+    inherit_property_from_project_param = IFClient::InheritPropertyFromProjectParam.new
+    inherit_property_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    inherit_property_from_project_param.arg1_prop_name = "Views"
+    begin
+      ##Inherit properties from parent project settings (revert/rollback to parent setting)
+      result = api_instance.inherit_property_from_project_post(inherit_property_from_project_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "lun mappings set to inherit for #{lun_name}"
+      else
+        puts "Error with TegileApi(lun_override_project_mappings_set)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(lun_override_project_mappings_set): #{error["message"]}"
+      fail
+    end
+  end
+
+  def lun_lun_mappings_get(pool_name,project_name,lun_name)
+    api_instance = IFClient::SANApi.new
+    get_volume_it_view_param = IFClient::GetVolumeITViewParam.new
+    get_volume_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    begin
+      ##List all of the existing views of the volume and return in Array<ITViewV21>
+      result = api_instance.get_volume_it_view_post(get_volume_it_view_param)
+      # puts "lun_mapping_get: #{result.inspect}"
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(lun_lun_mappings_get): #{error["message"]}"
+      fail
+    end 
+  end
+
+  ## Used to create lun_mappings
+  ## "itviewv21_array" should be array of it_view_v21 objects
+  def lun_mappings_create(pool_name,project_name,lun_name,itviewv21_array)
+    api_instance = IFClient::SANApi.new
+    create_mapping_for_volume_param = IFClient::CreateMappingForVolumeParam.new
+    create_mapping_for_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    create_mapping_for_volume_param.arg1_initiator_group_name = itviewv21_array.host_group_name
+    create_mapping_for_volume_param.arg2_target_group_name = itviewv21_array.target_group_name
+    create_mapping_for_volume_param.arg3_lun_number = itviewv21_array.lun_nbr
+    create_mapping_for_volume_param.arg4_read_only = itviewv21_array.read_only
+    begin
+      ##Maps a volume to an initiator group and a target group.
+      result = api_instance.create_mapping_for_volume_post(create_mapping_for_volume_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name}/lun##{itviewv21_array.lun_nbr} created"
+      else
+        puts "Error with TegileApi(lun_lun_mappings_set_add)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(lun_mappings_create): #{error["message"]}"
+    end 
+  end
+
+  ## Used to delete lun_mappings
+  ## "itviewv21_array" should be array of it_view_v21 objects
+  def lun_mappings_delete(pool_name,project_name,lun_name,itviewv21_array)
+    api_instance = IFClient::SANApi.new
+    delete_mapping_from_volume_param = IFClient::DeleteMappingFromVolumeParam.new
+    delete_mapping_from_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    delete_mapping_from_volume_param.arg1_initiator_group_name = itviewv21_array.host_group_name
+    delete_mapping_from_volume_param.arg2_target_group_name = itviewv21_array.target_group_name
+    begin
+      ##Deletes the view (mapping) between the given volume, initiator group, and target group.
+      result = api_instance.delete_mapping_from_volume_post(delete_mapping_from_volume_param)
+      # puts result.inspect
+      if result.value == 0
+        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name}/lun##{itviewv21_array.lun_nbr} deleted"
+      else
+        puts "Error with TegileApi(lun_mappings_delete)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(lun_mappings_delete): #{error["message"]}"
+    end 
+  end
+  
+  ## Method using the tegile api to get all lun properties
+  ## Used by puppet lun_property_get methods
+  def lun_get(pool_name,project_name,lun_name)
+    api_instance = IFClient::DataApi.new
+    get_volume_param = IFClient::GetVolumeParam.new
+    get_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    begin
+      ##Get the Volume details
+      result = api_instance.get_volume_post(get_volume_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(lun_get): #{error["message"]}"
+    end 
+  end
+
+  ## Method using the tegile api to set any lun property, case statement has to be updated for properties that need support
+  ## Used by puppet lun_property_set methods
+  def lun_set(property,property_value,pool_name,project_name,lun_name)
+    api_instance = IFClient::DataApi.new
+    modify_lun = IFClient::VolumeV21.new
+    case property
+    when "compression"
+      modify_lun.compression = property_value
+    when "dedup"
+      modify_lun.dedup = property_value
+    when "primary_cache"
+      modify_lun.primary_cache = property_value
+    when "secondary_cache"
+      modify_lun.secondary_cache = property_value
+    when "readonly"
+      modify_lun.readonly = property_value
+    when "logbias"
+      modify_lun.logbias = property_value
+    end
+    modify_volume_properties_param = IFClient::ModifyVolumePropertiesParam.new
+    modify_volume_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    modify_volume_properties_param.arg1_volume = modify_lun
+    begin
+      #Modify value of a subset of Volume properties
+      result = api_instance.modify_volume_properties_post(modify_volume_properties_param)
+      if result.value == 0
+        # puts result.inspect
+        puts "set #{property} to #{property_value}"
+      else
+        fail "Error with TegileApi(lun_set)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(lun_set): #{error["message"]}"
+      fail
+    end 
+  end
+
+
+
+
+
+
 
   def initiator_group_exists(initiator_group_name)
     api_instance = IFClient::SANApi.new
@@ -488,1189 +1423,6 @@ class TegileApi
     end
   end
 
-  def project_mapping_exists(pool_name,project_name,initiator_group_name,target_group_name)
-    api_instance = IFClient::SANApi.new
-    get_project_default_iscsi_it_view_param = IFClient::GetProjectDefaultIscsiITViewParam.new
-    get_project_default_iscsi_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    begin
-      ##List all of the default iSCSI views of the project
-      result = api_instance.get_project_default_iscsi_it_view_post(get_project_default_iscsi_it_view_param)
-      #puts result
-      exists = false
-      result.each do |x|
-        #puts "checking mapping: #{project_name}__#{x.host_group_name}+#{x.target_group_name}"
-        if x.host_group_name == initiator_group_name && x.target_group_name == target_group_name
-          exists = true
-          puts "found mapping: #{project_name}__#{x.host_group_name}+#{x.target_group_name}"
-        end
-      end
-      return exists
-    rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->get_project_default_iscsi_it_view_post: #{e}"
-      fail
-    end
-  end
-
-  def project_mapping_create__old(pool_name,project_name,initiator_group_name,target_group_name)
-    api_instance = IFClient::SANApi.new
-    create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
-    create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    create_mapping_for_project_param.arg1_initiator_group_name = initiator_group_name
-    create_mapping_for_project_param.arg2_target_group_name = target_group_name
-    create_mapping_for_project_param.arg3_read_only = false
-    begin
-      ##Create a project level default mapping
-      result = api_instance.create_mapping_for_project_post(create_mapping_for_project_param)
-      #puts result
-      if result == 0
-        puts "Mapping for #{project_name} created"
-      else
-        puts "Error"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->create_mapping_for_project_post: #{e}"
-      fail
-    end
-  end
-
-  def project_mapping_delete__old(pool_name,project_name,initiator_group_name,target_group_name)
-    api_instance = IFClient::SANApi.new
-    delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
-    delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    delete_mapping_from_project_param.arg1_initiator_group_name = initiator_group_name
-    delete_mapping_from_project_param.arg2_target_group_name = target_group_name
-    begin
-      ##Deletes the view (mapping) between the given project, initiator group, and target group.
-      result = api_instance.delete_mapping_from_project_post(delete_mapping_from_project_param)
-      #puts result
-      if result == 0
-        puts "mapping for #{project_name} deleted"
-      else
-        puts "Error deleting mapping"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->delete_mapping_from_project_post: #{e}"
-      fail
-    end
-  end
-
-  def lun_mapping_exists(pool_name,project_name,lun_name,initiator_group_name,target_group_name)
-    api_instance = IFClient::SANApi.new
-    get_volume_it_view_param = IFClient::GetVolumeITViewParam.new
-    get_volume_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    begin
-      ##List all of the existing views of the volume
-      result = api_instance.get_volume_it_view_post(get_volume_it_view_param)
-      #puts result
-      exists = nil
-      result.each do |x|
-        if x.host_group_name == initiator_group_name && x.target_group_name == target_group_name
-          exists = true
-          puts "found mapping: #{lun_name}__#{x.host_group_name}+#{x.target_group_name}"
-        end
-      end
-      return exists
-    rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->get_volume_it_view_post: #{e}"
-      fail
-    end
-  end
-
-  def project_nfs_network_acl_exists(pool_name,project_name,acl_type,acl_host)
-    api_instance = IFClient::NasApi.new
-    get_nfs_network_ac_ls_on_project_param = IFClient::GetNFSNetworkACLsOnProjectParam.new
-    get_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    begin
-      ##Returns all the Network ACLs for the NFS Project
-      result = api_instance.get_nfs_network_ac_ls_on_project_post(get_nfs_network_ac_ls_on_project_param)
-      #puts result
-      exists = nil
-      result.each do |x|
-        if x.host_type == acl_type && x.host == acl_host
-          exists = true
-          puts "found acl: #{project_name}__#{x.host_type}+#{x.host}"
-        end
-      end
-      return exists
-    rescue IFClient::ApiError => e
-      puts "Exception when calling NasApi->get_nfs_network_ac_ls_on_project_post: #{e}"
-      fail
-    end
-  end
-
-  def project_nfs_network_acl_create(pool_name,project_name,acl_type,acl_host,access_mode)
-    api_instance = IFClient::NasApi.new
-    add_nfs_network_acl_on_project_param = IFClient::AddNFSNetworkACLOnProjectParam.new
-    add_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    add_nfs_network_acl_on_project_param.arg1_type = acl_type
-    add_nfs_network_acl_on_project_param.arg2_host = acl_host
-    add_nfs_network_acl_on_project_param.arg3_access_mode = access_mode
-    add_nfs_network_acl_on_project_param.arg4_is_root = false
-    begin
-      #Add network ACL to NFS Project
-      result = api_instance.add_nfs_network_acl_on_project_post(add_nfs_network_acl_on_project_param)
-      #puts result
-      if result == 0
-        puts "acl for #{project_name} created"
-      else
-        puts "Error"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling NasApi->add_nfs_network_acl_on_project_post: #{e}"
-      fail
-    end
-  end
-
-  def project_nfs_network_acl_delete(pool_name,project_name,acl_type,acl_host)
-    api_instance = IFClient::NasApi.new
-    remove_nfs_network_acl_on_project_param = IFClient::RemoveNFSNetworkACLOnProjectParam.new
-    remove_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    remove_nfs_network_acl_on_project_param.arg1_type = acl_type
-    remove_nfs_network_acl_on_project_param.arg2_host = acl_host
-    begin
-      ##Remove network ACL from NFS Project
-      result = api_instance.remove_nfs_network_acl_on_project_post(remove_nfs_network_acl_on_project_param)
-      #puts result
-      if result == 0
-        puts "acl for #{project_name} deleted"
-      else
-        puts "Error deleting mapping"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling NasApi->remove_nfs_network_acl_on_project_post: #{e}"
-      fail
-    end
-  end
-
-  def project_nfs_network_acl_get(pool_name,project_name,network_acls)
-    api_instance = IFClient::NasApi.new
-    get_nfs_network_ac_ls_on_project_param = IFClient::GetNFSNetworkACLsOnProjectParam.new
-    get_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    begin
-      ##Returns all the Network ACLs for the NFS Project
-      result = api_instance.get_nfs_network_ac_ls_on_project_post(get_nfs_network_ac_ls_on_project_param)
-      puts result
-      puts network_acls
-    rescue IFClient::ApiError => e
-      puts "Exception when calling NasApi->get_nfs_network_ac_ls_on_project_post: #{e}"
-      fail
-    end
-  end
-
-  def share_nfs_network_acl_exists(pool_name,project_name,share_name,acl_type,acl_host)
-    api_instance = IFClient::NasApi.new
-    get_nfs_network_ac_ls_on_share_param = IFClient::GetNFSNetworkACLsOnShareParam.new
-    get_nfs_network_ac_ls_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    begin
-      ##Returns all the Network ACLs for the NFS share
-      result = api_instance.get_nfs_network_ac_ls_on_share_post(get_nfs_network_ac_ls_on_share_param)
-      #puts result
-      exists = nil
-      result.each do |x|
-        if x.host_type == acl_type && x.host == acl_host
-          exists = true
-          puts "found acl: #{share_name}__#{x.host_type}+#{x.host}"
-        end
-      end
-      return exists
-    rescue IFClient::ApiError => e
-      puts "Exception when calling NasApi->get_nfs_network_ac_ls_on_share_post: #{e}"
-      fail
-    end
-  end
-
-  def share_nfs_network_acl_create(pool_name,project_name,share_name,acl_type,acl_host,access_mode) ##Will override project if used
-    api_instance = IFClient::NasApi.new
-    add_nfs_network_acl_on_param = IFClient::AddNFSNetworkACLOnParam.new
-    add_nfs_network_acl_on_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    add_nfs_network_acl_on_param.arg1_type = acl_type
-    add_nfs_network_acl_on_param.arg2_host = acl_host
-    add_nfs_network_acl_on_param.arg3_access_mode = access_mode
-    add_nfs_network_acl_on_param.arg4_is_root = false
-    begin
-      ##Add network ACL to NFS share
-      result = api_instance.add_nfs_network_acl_on_share_post(add_nfs_network_acl_on_param)
-      #puts result
-      if result == 0
-        puts "acl for #{share_name} created"
-      else
-        puts "Error"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling NasApi->add_nfs_network_acl_on_share_post: #{e}"
-      fail
-    end
-  end
-
-  def share_nfs_network_acl_delete(pool_name,project_name,share_name,acl_type,acl_host)
-    api_instance = IFClient::NasApi.new
-    remove_nfs_network_acl_on_share_param = IFClient::RemoveNFSNetworkACLOnShareParam.new
-    remove_nfs_network_acl_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    remove_nfs_network_acl_on_share_param.arg1_type = acl_type
-    remove_nfs_network_acl_on_share_param.arg2_host = acl_host
-    begin
-      ##Remove network ACL from NFS share
-      result = api_instance.remove_nfs_network_acl_on_share_post(remove_nfs_network_acl_on_share_param)
-      #puts result
-      if result == 0
-        puts "acl for #{share_name} deleted"
-      else
-        puts "Error deleting mapping"
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling NasApi->remove_nfs_network_acl_on_share_post: #{e}"
-      fail
-    end
-  end
-
-  def list_system_properties
-    api_instance = IFClient::SystemApi.new
-    list_system_properties_param = IFClient::ListSystemPropertiesParam.new
-    list_system_properties_param.arg0_properties = ["ZEBI_GUI_VERSION"]
-    begin
-      ##Lists values of the requested system properties for a Tegile array.
-      result = api_instance.list_system_properties_post(list_system_properties_param)
-      puts result
-    rescue IFClient::ApiError => e
-      puts "Exception when calling SystemApi->list_system_properties_post: #{e}"
-      fail
-    end
-  end
-
-  def project_exists(project_name,pool_name)
-    api_instance = IFClient::DataApi.new
-    list_projects_param = IFClient::ListProjectsParam.new
-    list_projects_param.arg0_pool_name = pool_name
-    list_projects_param.arg1_local = true
-    begin
-      #Lists all the pools on the Tegile array
-      result = api_instance.list_projects_post(list_projects_param)
-      # puts result.inspect
-      # puts result.length
-      if result.length == 0
-        return nil
-      else
-        exists = nil
-        result.each do |x|
-          if x.name == project_name
-            puts "found #{x.name}"
-            exists = true
-          end
-        end
-        return exists
-      end
-    rescue IFClient::ApiError => e
-      puts "Exception when calling DataApi->get_project_post: #{e}"
-      fail
-    end
-  end
-
-  def project_create(project_name,pool_name,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size)
-    api_instance = IFClient::DataApi.new
-    new_project = IFClient::ProjectV21.new
-    new_project.project_name = project_name
-    new_project.pool_name = pool_name
-    new_project.compression = compression_type
-    new_project.compressed_log = compressed_log
-    new_project.intended_protocol_list = intended_protocol_list
-    new_project.quota_in_byte = quota
-    new_project.dedup = dedup
-    new_project.primary_cache = primary_cache
-    new_project.secondary_cache = secondary_cache
-    new_project.acl_inherit = acl_inherit
-    new_project.default_volume_size_in_byte = default_lun_size
-    new_project.default_volume_block_size = default_lun_block_size
-    new_project.default_thin_provisioning = default_thin_provisioning
-    new_project.record_size = default_share_block_size
-    create_project_param = IFClient::CreateProjectParam.new
-    create_project_param.arg0_project = new_project
-    begin
-      ##Creates a project
-      result = api_instance.create_project_post(create_project_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "#{project_name} created"
-      else
-        fail "Error with TegileApi(project_create)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(project_create): #{error["message"]}"
-    end 
-  end
-
-  def project_delete(project_name,pool_name)
-    api_instance = IFClient::DataApi.new
-    delete_project_param = IFClient::DeleteProjectParam.new
-    delete_project_param.arg0_project_dataset_path = "#{pool_name}/Local/#{project_name}"
-    begin
-      ##Deletes the specified project.
-      result = api_instance.delete_project_post(delete_project_param)
-      #puts result
-      if result.value == 0
-        sleep(5)
-        puts "#{project_name} deleted"
-      else
-        fail "Error with TegileApi(project_delete)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(project_delete): #{error["message"]}"
-    end 
-  end
-
-  def set_nfs_sharing_on(project_name,pool_name)
-    api_instance = IFClient::NasApi.new
-    set_nfs_sharing_on_project_param = IFClient::SetNFSSharingOnProjectParam.new
-    set_nfs_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    set_nfs_sharing_on_project_param.arg1_turn_on = true
-    begin
-      ##Enable/Disable NFS protocol for a Project
-      result = api_instance.set_nfs_sharing_on_project_post(set_nfs_sharing_on_project_param)
-      #puts result
-      if result.value == 0
-        puts "nfs enabled"
-      else
-        fail "Error with TegileApi(set_nfs_sharing_on)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(set_nfs_sharing_on): #{error["message"]}"
-    end 
-  end
-
-  def project_set_smb_sharing_on(project_name,pool_name)
-    api_instance = IFClient::NasApi.new
-    set_smb_sharing_on_project_param = IFClient::SetSMBSharingOnProjectParam.new
-    set_smb_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    set_smb_sharing_on_project_param.arg1_turn_on = true
-    begin
-      ##Enable/Disable SMB protocol for a Project, If the dataset contains any network ACLs, they are removed as well.
-      result = api_instance.set_smb_sharing_on_project_post(set_smb_sharing_on_project_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "smb enabled"
-      else
-        puts "Error with TegileApi(project_set_smb_sharing_on)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(project_set_smb_sharing_on): #{error["message"]}"
-    end 
-  end
-
-  def get_lun_size(lun_name,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_volume_param = IFClient::GetVolumeParam.new
-    get_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    begin
-      ##Get the Volume details
-      result = api_instance.get_volume_post(get_volume_param)
-      #puts result.vol_size
-      return result.vol_size
-    rescue IFClient::ApiError => e
-      puts "Exception when calling DataApi->get_volume_post: #{e}"
-      fail
-    end
-  end
-
-  def share_acl_inherit_get(pool_name,project_name,share_name)
-    api_instance = IFClient::DataApi.new
-    get_share_param = IFClient::GetShareParam.new
-    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    begin
-      ##Get the Share details
-      result = api_instance.get_share_post(get_share_param)
-      #puts result.override_sharenfs
-      return result.override_sharenfs
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_acl_inherit_get): #{error["message"]}"
-      fail
-    end
-  end
-
-  def share_acl_inherit_set(pool_name,project_name,share_name)
-    api_instance = IFClient::NasApi.new
-    inherit_network_ac_lsettings_from_project_param = IFClient::InheritNetworkACLsettingsFromProjectParam.new
-    inherit_network_ac_lsettings_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    begin
-      ##Set the share property to inherit NFS or SMB ACL settings from project.
-      result = api_instance.inherit_network_ac_lsettings_from_project_post(inherit_network_ac_lsettings_from_project_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "Inherit network acls from project enabled for #{share_name}"
-      else
-        puts "Error with TegileApi(share_nfs_network_acls_set_delete)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_acl_inherit_set): #{error["message"]}"
-      fail
-    end
-  end
-
-  def lun_override_project_mappings_get(pool_name,project_name,lun_name)
-    api_instance = IFClient::DataApi.new
-    get_volume_param = IFClient::GetVolumeParam.new
-    get_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    begin
-      ##Get the Volume details.
-      result = api_instance.get_volume_post(get_volume_param)
-      # puts result.override_views
-      return result.override_views
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(lun_override_project_mappings_get): #{error["message"]}"
-      fail
-    end
-  end
-
-  def lun_override_project_mappings_set(pool_name,project_name,lun_name)
-    api_instance = IFClient::DataApi.new
-    inherit_property_from_project_param = IFClient::InheritPropertyFromProjectParam.new
-    inherit_property_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    inherit_property_from_project_param.arg1_prop_name = "Views"
-    begin
-      ##Inherit properties from parent project settings (revert/rollback to parent setting)
-      result = api_instance.inherit_property_from_project_post(inherit_property_from_project_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "lun mappings set to inherit for #{lun_name}"
-      else
-        puts "Error with TegileApi(lun_override_project_mappings_set)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(lun_override_project_mappings_set): #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_default_share_block_size_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      #puts result.record_size.value
-      return result.record_size.value
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-  
-  def project_default_share_block_size_set(block_size,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.record_size = block_size
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      puts result
-      if result == 0
-        puts "project_default_share_block_size set to #{block_size}"
-      else
-        puts "Error with project_default_share_block_size_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_default_thin_provisioning_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      #puts result.default_thin_provisioning
-      return result.default_thin_provisioning
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-  
-  def project_default_thin_provisioning_set(thin_provisioning,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.default_thin_provisioning = thin_provisioning
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      puts result
-      if result == 0
-        puts "project_default_thin_provisioning set to #{thin_provisioning}"
-      else
-        puts "Error with project_default_thin_provisioning_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_default_lun_block_size_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      #puts result.default_volume_block_size.value
-      return result.default_volume_block_size.value
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-  
-  def project_default_lun_block_size_set(block_size,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.default_volume_block_size = block_size
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      #puts result
-      if result == 0
-        puts "project_default_lun_block_size set to #{block_size}"
-      else
-        puts "Error with project_default_lun_block_size_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_dedup_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      #puts result.dedup
-      return result.dedup
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-  
-  def project_dedup_set(dedup,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.dedup = dedup
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      #puts result
-      if result == 0
-        puts "project_dedup set to #{dedup}"
-      else
-        puts "Error with project_dedup_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_quota_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      #puts result.quota_in_byte
-      return result.quota_in_byte
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-  
-  def project_quota_set(quota,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.quota_in_byte = quota
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      #puts result
-      if result.value == 0
-        puts "project_quota set to #{quota/1024/1024/1024}GB"
-      else
-        puts "Error with project_quota_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_compressed_log_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      #puts result.compressed_log
-      return result.compressed_log
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-  
-  def project_compressed_log_set(compressed_log,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.compressed_log = compressed_log
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      #puts result
-      if result == 0
-        puts "compressed_log set to #{compressed_log}"
-      else
-        puts "Error with project_compressed_log_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_compression_type_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      #puts result.compression
-      return result.compression
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-  
-  def project_compression_type_set(compression,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.compression = compression
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      #puts result
-      if result == 0
-        puts "compression_type set to #{compression}"
-      else
-        puts "Error with project_compression_type_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_intended_protocol_list_get(pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    get_project_param = IFClient::GetProjectParam.new
-    get_project_param.arg0_pool_name = pool_name
-    get_project_param.arg1_project_name = project_name
-    get_project_param.arg2_local = TRUE
-    begin
-      #Get the Project details.
-      result = api_instance.get_project_post(get_project_param)
-      # puts result.intended_protocol_list.inspect
-      return result.intended_protocol_list
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi: #{error["message"]}"
-    end
-  end
-  
-  def project_intended_protocol_list_set(intended_protocols,pool_name,project_name)
-    api_instance = IFClient::DataApi.new
-    project_properties = IFClient::ProjectV21.new
-    project_properties.intended_protocol_list = intended_protocols
-    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
-    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    modify_project_properties_param.arg1_project = project_properties
-    begin
-      #Modify value of a subset of Project properties
-      result = api_instance.modify_project_properties_post(modify_project_properties_param)
-      #puts result
-      if result.value == 0
-        puts "intended_protocol_list set to #{intended_protocols}"
-      else
-        puts "Error with project_intended_protocol_list_set"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi: #{error["message"]}"
-      fail
-    end
-  end
-
-  def project_lun_mapping_get(pool_name,project_name)
-    api_instance = IFClient::SANApi.new
-    get_project_default_iscsi_it_view_param = IFClient::GetProjectDefaultIscsiITViewParam.new
-    get_project_default_iscsi_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    begin
-      ##List all of the default iSCSI views of the project in Array<ITViewV21> format
-      result = api_instance.get_project_default_iscsi_it_view_post(get_project_default_iscsi_it_view_param)
-      return result
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(project_lun_mapping_get): #{error["message"]}"
-      fail
-    end 
-  end
-
-  def project_lun_mapping_set_add(pool_name,project_name,lun_mappings_array)
-    api_instance = IFClient::SANApi.new
-    create_mapping_for_project_param = IFClient::CreateMappingForProjectParam.new
-    create_mapping_for_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    create_mapping_for_project_param.arg1_initiator_group_name = lun_mappings_array[0]
-    create_mapping_for_project_param.arg2_target_group_name = lun_mappings_array[1]
-    create_mapping_for_project_param.arg3_read_only = lun_mappings_array[3]
-    begin
-      ##Create a project level default mapping
-      result = api_instance.create_mapping_for_project_post(create_mapping_for_project_param)
-      #puts result.inspect
-      if result.value == 0
-        puts "#{lun_mappings_array[0]}/#{lun_mappings_array[1]} mapping created"
-      else
-        puts "Error with project_lun_mapping_set_add"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(project_lun_mapping_set_add): #{error["message"]}"
-      fail
-    end 
-  end
-
-  def project_lun_mapping_set_delete(pool_name,project_name,lun_mappings_array)
-    api_instance = IFClient::SANApi.new
-    delete_mapping_from_project_param = IFClient::DeleteMappingFromProjectParam.new
-    delete_mapping_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    delete_mapping_from_project_param.arg1_initiator_group_name = lun_mappings_array[0]
-    delete_mapping_from_project_param.arg2_target_group_name = lun_mappings_array[1]
-    begin
-      ##Deletes the view (mapping) between the given project, initiator group, and target group.
-      result = api_instance.delete_mapping_from_project_post(delete_mapping_from_project_param)
-      #puts result.inspect
-      if result.value == 0
-        puts "#{lun_mappings_array[0]}/#{lun_mappings_array[1]} mapping removed"
-      else
-        puts "Error with project_lun_mapping_set_delete"
-      end
-      rescue IFClient::ApiError => e
-        error = JSON.parse("#{e.response_body}")
-        puts "Exception when calling TegileApi(project_lun_mapping_set_delete): #{error["message"]}"
-        fail
-    end
-  end
-
-  def project_nfs_network_acls_get(pool_name,project_name)
-    api_instance = IFClient::NasApi.new
-    get_nfs_network_ac_ls_on_project_param = IFClient::GetNFSNetworkACLsOnProjectParam.new
-    get_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    begin
-      ##Returns all the Network ACLs for the NFS Project as Array<NetworkACLV21>
-      result = api_instance.get_nfs_network_ac_ls_on_project_post(get_nfs_network_ac_ls_on_project_param)
-      # puts result.inspect
-      return result
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(project_nfs_network_acls_get): #{error["message"]}"
-      fail
-    end   
-  end
-
-  def project_nfs_network_acls_set_add(pool_name,project_name,net_acl_array)
-    api_instance = IFClient::NasApi.new
-    add_nfs_network_acl_on_project_param = IFClient::AddNFSNetworkACLOnProjectParam.new
-    add_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    add_nfs_network_acl_on_project_param.arg1_type = net_acl_array[0]
-    add_nfs_network_acl_on_project_param.arg2_host = net_acl_array[1]
-    add_nfs_network_acl_on_project_param.arg3_access_mode = net_acl_array[2]
-    add_nfs_network_acl_on_project_param.arg4_is_root = net_acl_array[3]
-    begin
-      ##Add network ACL to NFS Project
-      result = api_instance.add_nfs_network_acl_on_project_post(add_nfs_network_acl_on_project_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "network acl for #{net_acl_array[1]} created"
-      else
-        puts "Error with project_nfs_network_acls_set_add"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(project_nfs_network_acls_set_add): #{error["message"]}"
-    end 
-  end
-
-  def project_nfs_network_acls_set_delete(pool_name,project_name,net_acl_array)
-    api_instance = IFClient::NasApi.new
-    remove_nfs_network_acl_on_project_param = IFClient::RemoveNFSNetworkACLOnProjectParam.new
-    remove_nfs_network_acl_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    remove_nfs_network_acl_on_project_param.arg1_type = net_acl_array[0]
-    remove_nfs_network_acl_on_project_param.arg2_host = net_acl_array[1]
-    begin
-      ##Remove network ACL from NFS Project
-      result = api_instance.remove_nfs_network_acl_on_project_post(remove_nfs_network_acl_on_project_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "network acl for #{net_acl_array[1]} removed"
-      else
-        puts "Error with project_nfs_network_acls_set_delete"
-      end
-      rescue IFClient::ApiError => e
-        error = JSON.parse("#{e.response_body}")
-        puts "Exception when calling TegileApi(project_nfs_network_acls_set_delete): #{error["message"]}"
-        fail
-    end
-  end
-
-  def share_nfs_network_acls_get(pool_name,project_name,share_name)
-    api_instance = IFClient::NasApi.new
-    get_nfs_network_ac_ls_on_share_param = IFClient::GetNFSNetworkACLsOnShareParam.new
-    get_nfs_network_ac_ls_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    begin
-      ##Returns all the Network ACLs for the NFS share in Array<NetworkACLV21> format
-      result = api_instance.get_nfs_network_ac_ls_on_share_post(get_nfs_network_ac_ls_on_share_param)
-      # puts result.inspect
-      return result
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_nfs_network_acls_get): #{error["message"]}"
-      fail
-    end   
-  end
-
-  def share_nfs_network_acls_set_add(pool_name,project_name,share_name,net_acl_array)
-    api_instance = IFClient::NasApi.new
-    add_nfs_network_acl_on_param = IFClient::AddNFSNetworkACLOnParam.new
-    add_nfs_network_acl_on_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    add_nfs_network_acl_on_param.arg1_type = net_acl_array[0]
-    add_nfs_network_acl_on_param.arg2_host = net_acl_array[1]
-    add_nfs_network_acl_on_param.arg3_access_mode = net_acl_array[2]
-    add_nfs_network_acl_on_param.arg4_is_root = net_acl_array[3]
-    begin
-      ##Add network ACL to NFS share
-      result = api_instance.add_nfs_network_acl_on_share_post(add_nfs_network_acl_on_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "network acl for #{net_acl_array[1]} created"
-      else
-        puts "Error with TegileApi(share_nfs_network_acls_set_add)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_nfs_network_acls_set_add): #{error["message"]}"
-    end 
-  end
-
-  def share_nfs_network_acls_set_delete(pool_name,project_name,share_name,net_acl_array)
-    api_instance = IFClient::NasApi.new
-    remove_nfs_network_acl_on_share_param = IFClient::RemoveNFSNetworkACLOnShareParam.new
-    remove_nfs_network_acl_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    remove_nfs_network_acl_on_share_param.arg1_type = net_acl_array[0]
-    remove_nfs_network_acl_on_share_param.arg2_host = net_acl_array[1]
-    begin
-      ##Remove network ACL from NFS Project
-      result = api_instance.remove_nfs_network_acl_on_share_post(remove_nfs_network_acl_on_share_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "network acl for #{net_acl_array[1]} removed"
-      else
-        puts "Error with TegileApi(share_nfs_network_acls_set_delete)"
-      end
-      rescue IFClient::ApiError => e
-        error = JSON.parse("#{e.response_body}")
-        puts "Exception when calling TegileApi(share_nfs_network_acls_set_delete): #{error["message"]}"
-        fail
-    end
-  end
-
-  def lun_lun_mappings_get(pool_name,project_name,lun_name)
-    api_instance = IFClient::SANApi.new
-    get_volume_it_view_param = IFClient::GetVolumeITViewParam.new
-    get_volume_it_view_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    begin
-      ##List all of the existing views of the volume and return in Array<ITViewV21>
-      result = api_instance.get_volume_it_view_post(get_volume_it_view_param)
-      # puts "lun_mapping_get: #{result.inspect}"
-      return result
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(lun_lun_mappings_get): #{error["message"]}"
-      fail
-    end 
-  end
-
-  ## Used to create lun_mappings
-  ## "itviewv21_array" should be array of it_view_v21 objects
-  def lun_mappings_create(pool_name,project_name,lun_name,itviewv21_array)
-    api_instance = IFClient::SANApi.new
-    create_mapping_for_volume_param = IFClient::CreateMappingForVolumeParam.new
-    create_mapping_for_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    create_mapping_for_volume_param.arg1_initiator_group_name = itviewv21_array.host_group_name
-    create_mapping_for_volume_param.arg2_target_group_name = itviewv21_array.target_group_name
-    create_mapping_for_volume_param.arg3_lun_number = itviewv21_array.lun_nbr
-    create_mapping_for_volume_param.arg4_read_only = itviewv21_array.read_only
-    begin
-      ##Maps a volume to an initiator group and a target group.
-      result = api_instance.create_mapping_for_volume_post(create_mapping_for_volume_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name}/lun##{itviewv21_array.lun_nbr} created"
-      else
-        puts "Error with TegileApi(lun_lun_mappings_set_add)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(lun_mappings_create): #{error["message"]}"
-    end 
-  end
-
-  ## Used to delete lun_mappings
-  ## "itviewv21_array" should be array of it_view_v21 objects
-  def lun_mappings_delete(pool_name,project_name,lun_name,itviewv21_array)
-    api_instance = IFClient::SANApi.new
-    delete_mapping_from_volume_param = IFClient::DeleteMappingFromVolumeParam.new
-    delete_mapping_from_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    delete_mapping_from_volume_param.arg1_initiator_group_name = itviewv21_array.host_group_name
-    delete_mapping_from_volume_param.arg2_target_group_name = itviewv21_array.target_group_name
-    begin
-      ##Deletes the view (mapping) between the given volume, initiator group, and target group.
-      result = api_instance.delete_mapping_from_volume_post(delete_mapping_from_volume_param)
-      # puts result.inspect
-      if result.value == 0
-        puts "mapping for #{itviewv21_array.host_group_name}/#{itviewv21_array.target_group_name}/lun##{itviewv21_array.lun_nbr} deleted"
-      else
-        puts "Error with TegileApi(lun_mappings_delete)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(lun_mappings_delete): #{error["message"]}"
-    end 
-  end
-
-  def share_block_size_get(pool_name,project_name,share_name)
-    api_instance = IFClient::DataApi.new
-    get_share_param = IFClient::GetShareParam.new
-    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    begin
-      ##Get the Share details.
-      result = api_instance.get_share_post(get_share_param)
-      # puts result.record_size.value
-      return result.record_size.value
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(share_block_size_get): #{error["message"]}"
-    end 
-  end
-
-  def share_block_size_set(block_size,pool_name,project_name,share_name)
-    api_instance = IFClient::DataApi.new
-    modify_share = IFClient::ShareV21.new
-    modify_share.record_size = block_size
-    modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
-    modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    modify_share_properties_param.arg1_share = modify_share
-    begin
-      ##Modify value of a subset of project properties
-      result = api_instance.modify_share_properties_post(modify_share_properties_param)
-      puts result.inspect
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_block_size_set): #{error["message"]}"
-      fail
-    end 
-  end
-
-  ## Method using the tegile api to get all share property
-  ## Used by puppet share_property_get
-  def share_modify_get(pool_name,project_name,share_name)
-    api_instance = IFClient::DataApi.new
-    get_share_param = IFClient::GetShareParam.new
-    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    begin
-      ##Get the Share details.
-      result = api_instance.get_share_post(get_share_param)
-      # puts result.inspect
-      return result
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(share_modify_get): #{error["message"]}"
-    end 
-  end
-
-  ## Method using the tegile api to set any share property, case statement has to be updated for properties that need support
-  ## Used by puppet share_property_set
-  def share_modify_set(property,property_value,pool_name,project_name,share_name)
-    api_instance = IFClient::DataApi.new
-    modify_share = IFClient::ShareV21.new
-    case property
-    when "dedup"
-      modify_share.dedup = property_value
-    when "compression"
-      modify_share.compression = property_value
-    when "quota_in_byte"
-      modify_share.quota_in_byte = property_value
-    when "reservation_in_byte"
-      modify_share.reservation_in_byte = property_value
-    when "readonly"
-      modify_share.readonly = property_value
-    when "logbias"
-      modify_share.logbias = property_value
-    when "primary_cache"
-      modify_share.primary_cache = property_value
-    when "secondary_cache"
-      modify_share.secondary_cache = property_value
-    end
-    modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
-    modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    modify_share_properties_param.arg1_share = modify_share
-    begin
-      ##Modify value of a subset of project properties
-      result = api_instance.modify_share_properties_post(modify_share_properties_param)
-      if result.value == 0
-        # puts result.inspect
-        puts "changed #{property} to #{property_value}"
-      else
-        puts "Error with TegileApi(share_modify_set)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_block_size_set): #{error["message"]}"
-      fail
-    end 
-  end
-
-  ## Method using the tegile api to get all lun property
-  ## Used by puppet lun_property_get
-  def lun_get(pool_name,project_name,lun_name)
-    api_instance = IFClient::DataApi.new
-    get_volume_param = IFClient::GetVolumeParam.new
-    get_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    begin
-      ##Get the Volume details
-      result = api_instance.get_volume_post(get_volume_param)
-      # puts result.inspect
-      return result
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(lun_get): #{error["message"]}"
-    end 
-  end
-
-  ## Method using the tegile api to set any lun property, case statement has to be updated for properties that need support
-  ## Used by puppet lun_property_set
-  def lun_set(property,property_value,pool_name,project_name,lun_name)
-    api_instance = IFClient::DataApi.new
-    modify_lun = IFClient::VolumeV21.new
-    case property
-    when "compression"
-      modify_lun.compression = property_value
-    when "dedup"
-      modify_lun.dedup = property_value
-    when "primary_cache"
-      modify_lun.primary_cache = property_value
-    when "secondary_cache"
-      modify_lun.secondary_cache = property_value
-    when "readonly"
-      modify_lun.readonly = property_value
-    when "logbias"
-      modify_lun.logbias = property_value
-    end
-    modify_volume_properties_param = IFClient::ModifyVolumePropertiesParam.new
-    modify_volume_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
-    modify_volume_properties_param.arg1_volume = modify_lun
-    begin
-      #Modify value of a subset of Volume properties
-      result = api_instance.modify_volume_properties_post(modify_volume_properties_param)
-      if result.value == 0
-        # puts result.inspect
-        puts "changed #{property} to #{property_value}"
-      else
-        puts "Error with TegileApi(share_modify_set)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(lun_set): #{error["message"]}"
-      fail
-    end 
-  end
-
-
-
-
-
   ##
   def initiator_group_members_get(initiator_group_name)
     api_instance = IFClient::SANApi.new
@@ -1761,10 +1513,340 @@ class TegileApi
     end
   end
 
+  
+
+  
+  
+
+  def list_system_properties
+    api_instance = IFClient::SystemApi.new
+    list_system_properties_param = IFClient::ListSystemPropertiesParam.new
+    list_system_properties_param.arg0_properties = ["ZEBI_GUI_VERSION"]
+    begin
+      ##Lists values of the requested system properties for a Tegile array.
+      result = api_instance.list_system_properties_post(list_system_properties_param)
+      puts result
+    rescue IFClient::ApiError => e
+      puts "Exception when calling SystemApi->list_system_properties_post: #{e}"
+      fail
+    end
+  end
+
+  def set_nfs_sharing_on(project_name,pool_name)
+    api_instance = IFClient::NasApi.new
+    set_nfs_sharing_on_project_param = IFClient::SetNFSSharingOnProjectParam.new
+    set_nfs_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    set_nfs_sharing_on_project_param.arg1_turn_on = true
+    begin
+      ##Enable/Disable NFS protocol for a Project
+      result = api_instance.set_nfs_sharing_on_project_post(set_nfs_sharing_on_project_param)
+      #puts result
+      if result.value == 0
+        puts "nfs enabled"
+      else
+        fail "Error with TegileApi(set_nfs_sharing_on)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(set_nfs_sharing_on): #{error["message"]}"
+    end 
+  end
+
+  def get_lun_size(lun_name,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_volume_param = IFClient::GetVolumeParam.new
+    get_volume_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
+    begin
+      ##Get the Volume details
+      result = api_instance.get_volume_post(get_volume_param)
+      #puts result.vol_size
+      return result.vol_size
+    rescue IFClient::ApiError => e
+      puts "Exception when calling DataApi->get_volume_post: #{e}"
+      fail
+    end
+  end
+
+  
+
 
 end
 
-
+=begin  ##No longer used, moved to project_get/set
+  def project_default_lun_block_size_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      #puts result.default_volume_block_size.value
+      return result.default_volume_block_size.value
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_default_lun_block_size_set(block_size,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.default_volume_block_size = block_size
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      #puts result
+      if result == 0
+        puts "project_default_lun_block_size set to #{block_size}"
+      else
+        puts "Error with project_default_lun_block_size_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_default_share_block_size_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      #puts result.record_size.value
+      return result.record_size.value
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_default_share_block_size_set(block_size,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.record_size = block_size
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      puts result
+      if result == 0
+        puts "project_default_share_block_size set to #{block_size}"
+      else
+        puts "Error with project_default_share_block_size_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_default_thin_provisioning_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      #puts result.default_thin_provisioning
+      return result.default_thin_provisioning
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_default_thin_provisioning_set(thin_provisioning,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.default_thin_provisioning = thin_provisioning
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      puts result
+      if result == 0
+        puts "project_default_thin_provisioning set to #{thin_provisioning}"
+      else
+        puts "Error with project_default_thin_provisioning_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_dedup_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      #puts result.dedup
+      return result.dedup
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_dedup_set(dedup,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.dedup = dedup
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      #puts result
+      if result == 0
+        puts "project_dedup set to #{dedup}"
+      else
+        puts "Error with project_dedup_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_quota_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      #puts result.quota_in_byte
+      return result.quota_in_byte
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_quota_set(quota,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.quota_in_byte = quota
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      #puts result
+      if result.value == 0
+        puts "project_quota set to #{quota/1024/1024/1024}GB"
+      else
+        puts "Error with project_quota_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_compressed_log_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      #puts result.compressed_log
+      return result.compressed_log
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_compressed_log_set(compressed_log,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.compressed_log = compressed_log
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      #puts result
+      if result == 0
+        puts "compressed_log set to #{compressed_log}"
+      else
+        puts "Error with project_compressed_log_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_compression_type_get(pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    get_project_param = IFClient::GetProjectParam.new
+    get_project_param.arg0_pool_name = pool_name
+    get_project_param.arg1_project_name = project_name
+    get_project_param.arg2_local = TRUE
+    begin
+      #Get the Project details.
+      result = api_instance.get_project_post(get_project_param)
+      #puts result.compression
+      return result.compression
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+  def project_compression_type_set(compression,pool_name,project_name)
+    api_instance = IFClient::DataApi.new
+    project_properties = IFClient::ProjectV21.new
+    project_properties.compression = compression
+    modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+    modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    modify_project_properties_param.arg1_project = project_properties
+    begin
+      #Modify value of a subset of Project properties
+      result = api_instance.modify_project_properties_post(modify_project_properties_param)
+      #puts result
+      if result == 0
+        puts "compression_type set to #{compression}"
+      else
+        puts "Error with project_compression_type_set"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi: #{error["message"]}"
+      fail
+    end
+  end
+=end
 
 
 

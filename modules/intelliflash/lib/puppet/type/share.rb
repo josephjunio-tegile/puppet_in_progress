@@ -89,4 +89,8 @@ Puppet::Type.newtype(:share) do
     Puppet.info("##Inside type_property_logbias")
   end
 
+  newproperty(:acl_inherit) do
+    Puppet.info("##Inside type_property_acl_inherit")
+  end
+
  end

@@ -46,12 +46,10 @@ Puppet::Type.newtype(:project) do
   
   newproperty(:compression_type) do
     Puppet.info("##Inside type_property_compression_type")
-    defaultto :lz4
   end
 
   newproperty(:compressed_log) do
     Puppet.info("##Inside type_property_compressed_log")
-    defaultto :lz4
   end
 
   newproperty(:intended_protocol_list, :array_matching => :all) do
@@ -75,23 +73,29 @@ Puppet::Type.newtype(:project) do
 
   newproperty(:dedup) do
     Puppet.info("##Inside type_property_dedup")
-    defaultto :on
   end
 
-  newparam(:primary_cache) do
-    Puppet.info("##Inside type_param_primary_cache")
+  newproperty(:primary_cache) do
+    Puppet.info("##Inside type_project_property_primary_cache")
   end
 
-  newparam(:secondary_cache) do
-    Puppet.info("##Inside type_param_secondary_cache")
+  newproperty(:secondary_cache) do
+    Puppet.info("##Inside type_project_property_secondary_cache")
   end
 
-  newparam(:acl_inherit) do
-    Puppet.info("##Inside type_param_acl_inherit")
+  newproperty(:acl_inherit) do
+    Puppet.info("##Inside type_project_property_acl_inherit")
   end
 
-  newparam(:default_lun_size) do
-    Puppet.info("##Inside type_param_default_lun_size")
+  newproperty(:readonly) do
+    Puppet.info("##Inside type_project_property_readonly")
+  end
+
+  newproperty(:default_lun_size) do
+    Puppet.info("##Inside type_property_default_lun_size")
+    munge do |value|
+      value*1024*1024*1024
+    end
   end
 
   newproperty(:default_lun_block_size) do

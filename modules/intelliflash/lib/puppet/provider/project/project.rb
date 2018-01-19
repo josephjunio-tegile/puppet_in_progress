@@ -42,72 +42,146 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def default_share_block_size
     Puppet.info("##Inside provider_project_default_share_block_size_get")
-    tegile_api_transport.project_default_share_block_size_get(resource[:pool_name],resource[:project_name])
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.record_size.inspect
+    returned.record_size.value
   end
 
-  def default_share_block_size=(value)
+  def default_share_block_size=(should)
     Puppet.info("##Inside provider_project_default_share_block_size_set")
-    tegile_api_transport.project_default_share_block_size_set(value,resource[:pool_name],resource[:project_name])
+    tegile_api_transport.project_set("record_size",should,resource[:pool_name],resource[:project_name])
   end
 
   def default_thin_provisioning
     Puppet.info("##Inside provider_project_default_thin_provisioning_get")
-    tegile_api_transport.project_default_thin_provisioning_get(resource[:pool_name],resource[:project_name])
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.default_thin_provisioning
+    returned.default_thin_provisioning
   end
 
-  def default_thin_provisioning=(value)
+  def default_thin_provisioning=(should)
     Puppet.info("##Inside provider_project_default_thin_provisioning_set")
-    tegile_api_transport.project_default_thin_provisioning_set(value,resource[:pool_name],resource[:project_name])
+    tegile_api_transport.project_set("default_thin_provisioning",should,resource[:pool_name],resource[:project_name])
+  end
+
+  def default_lun_size
+    Puppet.info("##Inside provider_project_default_lun_size_get")
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.default_volume_size_in_byte
+    returned.default_volume_size_in_byte
+  end
+  
+  def default_lun_size=(should)
+    Puppet.info("##Inside provider_project_default_lun_size_set")
+    tegile_api_transport.project_set("default_volume_size_in_byte",should,resource[:pool_name],resource[:project_name])
   end
 
   def default_lun_block_size
     Puppet.info("##Inside provider_project_default_lun_block_size_get")
-    tegile_api_transport.project_default_lun_block_size_get(resource[:pool_name],resource[:project_name])
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.default_volume_block_size.inspect
+    returned.default_volume_block_size.value
   end
 
-  def default_lun_block_size=(value)
+  def default_lun_block_size=(should)
     Puppet.info("##Inside provider_project_default_lun_block_size_set")
-    tegile_api_transport.project_default_lun_block_size_set(value,resource[:pool_name],resource[:project_name])
+    tegile_api_transport.project_set("default_volume_block_size",should,resource[:pool_name],resource[:project_name])
+  end
+
+  def primary_cache
+    Puppet.info("##Inside provider_project_primary_cache_get")
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.primary_cache
+    returned.primary_cache
+  end
+
+  def primary_cache=(should)
+    Puppet.info("##Inside provider_project_primary_cache_set")
+    tegile_api_transport.project_set("primary_cache",should,resource[:pool_name],resource[:project_name])
+  end
+
+  def secondary_cache
+    Puppet.info("##Inside provider_project_secondary_cache_get")
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.secondary_cache
+    returned.secondary_cache
+  end
+
+  def secondary_cache=(should)
+    Puppet.info("##Inside provider_project_secondary_cache_set")
+    tegile_api_transport.project_set("secondary_cache",should,resource[:pool_name],resource[:project_name])
+  end
+
+  def acl_inherit
+    Puppet.info("##Inside provider_project_acl_inherit_get")
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.acl_inherit
+    returned.acl_inherit
+  end
+
+  def acl_inherit=(should)
+    Puppet.info("##Inside provider_project_acl_inherit_set")
+    tegile_api_transport.project_set("acl_inherit",should,resource[:pool_name],resource[:project_name])
+  end
+
+  def readonly
+    Puppet.info("##Inside provider_project_readonly_get")
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.readonly
+    returned.readonly
+  end
+
+  def readonly=(should)
+    Puppet.info("##Inside provider_project_readonly_set")
+    tegile_api_transport.project_set("readonly",should,resource[:pool_name],resource[:project_name])
   end
 
   def dedup
     Puppet.info("##Inside provider_project_dedup_get")
-    tegile_api_transport.project_dedup_get(resource[:pool_name],resource[:project_name])
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.dedup
+    returned.dedup
   end
 
-  def dedup=(value)
+  def dedup=(should)
     Puppet.info("##Inside provider_project_dedup_set")
-    tegile_api_transport.project_dedup_set(value,resource[:pool_name],resource[:project_name])
+    tegile_api_transport.project_set("dedup",should,resource[:pool_name],resource[:project_name])
   end
 
   def quota
     Puppet.info("##Inside provider_project_quota_get")
-    tegile_api_transport.project_quota_get(resource[:pool_name],resource[:project_name])
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.quota_in_byte
+    returned.quota_in_byte
   end
 
-  def quota=(value)
+  def quota=(should)
     Puppet.info("##Inside provider_project_quota_set")
-    tegile_api_transport.project_quota_set(value,resource[:pool_name],resource[:project_name])
+    tegile_api_transport.project_set("quota",should,resource[:pool_name],resource[:project_name])
   end
 
   def compressed_log
     Puppet.info("##Inside provider_project_compressed_log_get")
-    tegile_api_transport.project_compressed_log_get(resource[:pool_name],resource[:project_name])
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.compressed_log
+    returned.compressed_log
   end
 
-  def compressed_log=(value)
+  def compressed_log=(should)
     Puppet.info("##Inside provider_project_compressed_log_set")
-    tegile_api_transport.project_compressed_log_set(value,resource[:pool_name],resource[:project_name])
+    tegile_api_transport.project_set("compressed_log",should,resource[:pool_name],resource[:project_name])
   end
 
   def compression_type
     Puppet.info("##Inside provider_project_compression_type_get")
-    tegile_api_transport.project_compression_type_get(resource[:pool_name],resource[:project_name])
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.compression
+    returned.compression
   end
 
-  def compression_type=(value)
+  def compression_type=(should)
     Puppet.info("##Inside provider_project_compression_type_set")
-    tegile_api_transport.project_compression_type_set(value,resource[:pool_name],resource[:project_name])
+    tegile_api_transport.project_set("compression_type",should,resource[:pool_name],resource[:project_name])
   end
 
   def intended_protocol_list
