@@ -511,8 +511,8 @@ class TegileApi
     ##Set share permissions params
     new_share_permissions = IFClient::SharePermissions.new
     #new_share_permissions.group_list = ##OPTIONAL
-    new_share_permissions.share_permission_enum = IFClient::PermissionTypeEnum::N0
-    new_share_permissions.share_permission_mode = IFClient::PermissionTypeEnum::N0
+    new_share_permissions.share_permission_enum = IFClient::Permission_type_enum::N0
+    new_share_permissions.share_permission_mode = IFClient::Permission_type_enum::N0
     #new_share_permissions.user_list = ##OPTIONAL
     ##Set share params
     create_share_param = IFClient::CreateShareParam.new

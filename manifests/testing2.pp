@@ -47,11 +47,11 @@ node 'tegile-3.7' {
 
   share { 'TestingResource2':
     ensure                            => present,
-    share_name                        => "puppet-share1",
+    share_name                        => "puppet-share2",
     project_name                      => "puppet-project1",
     pool_name                         => "pool-a",
     block_size                        => "32KB",
-    mount_point                       => "/export/custom-mounts/p-s1",
+    mount_point                       => "/export/custom-mounts/p-s2",
     dedup                             => "on",
     compression                       => "lz4",
     quota                             => 350,
@@ -67,7 +67,7 @@ node 'tegile-3.7' {
 
   project { 'TestingResource2.1':
     ensure                     => present,
-    project_name               => "puppet-project1",
+    project_name               => "puppet-project2",
     pool_name                  => "pool-a",
     compression_type           => "off",
     compressed_log             => "off",
