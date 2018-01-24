@@ -741,41 +741,6 @@ class TegileApi
     end
   end
 
-  ##once test with 3.7.0.1 move to share_get
-  def share_block_size_get(pool_name,project_name,share_name)
-    api_instance = IFClient::DataApi.new
-    get_share_param = IFClient::GetShareParam.new
-    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    begin
-      ##Get the Share details.
-      result = api_instance.get_share_post(get_share_param)
-      # puts result.record_size.value
-      return result.record_size.value
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(share_block_size_get): #{error["message"]}"
-    end 
-  end
-
-  ##once test with 3.7.0.1 move to share_set
-  def share_block_size_set(block_size,pool_name,project_name,share_name)
-    api_instance = IFClient::DataApi.new
-    modify_share = IFClient::Share_V2_1.new
-    modify_share.record_size = block_size
-    modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
-    modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
-    modify_share_properties_param.arg1_share = modify_share
-    begin
-      ##Modify value of a subset of project properties
-      result = api_instance.modify_share_properties_post(modify_share_properties_param)
-      puts result.inspect
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(share_block_size_set): #{error["message"]}"
-      fail
-    end 
-  end
-
   ## Method using the tegile api to get all share property
   ## Used by puppet share_property_get methods
   def share_get(pool_name,project_name,share_name)
@@ -817,6 +782,8 @@ class TegileApi
       modify_share.secondary_cache = property_value
     when "acl_inherit"
       modify_share.acl_inherit = property_value
+    when "block_size"
+      modify_share.record_size = property_value
     end
     modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
     modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
@@ -1845,6 +1812,39 @@ end
       puts "Exception when calling TegileApi: #{error["message"]}"
       fail
     end
+  end
+  ##once test with 3.7.0.1 move to share_get
+  def share_block_size_get(pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    get_share_param = IFClient::GetShareParam.new
+    get_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      ##Get the Share details.
+      result = api_instance.get_share_post(get_share_param)
+      # puts result.record_size.value
+      return result.record_size.value
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_block_size_get): #{error["message"]}"
+    end 
+  end
+  ##once test with 3.7.0.1 move to share_set
+  def share_block_size_set(block_size,pool_name,project_name,share_name)
+    api_instance = IFClient::DataApi.new
+    modify_share = IFClient::Share_V2_1.new
+    modify_share.record_size = block_size
+    modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
+    modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    modify_share_properties_param.arg1_share = modify_share
+    begin
+      ##Modify value of a subset of project properties
+      result = api_instance.modify_share_properties_post(modify_share_properties_param)
+      puts result.inspect
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(share_block_size_set): #{error["message"]}"
+      fail
+    end 
   end
 =end
 

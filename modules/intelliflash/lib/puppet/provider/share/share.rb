@@ -74,12 +74,14 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def block_size
     Puppet.info("##Inside provider_share_block_size_get")
-    tegile_api_transport.share_block_size_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.record_size
+    returned.record_size
   end
 
   def block_size=(should)
     Puppet.info("##Inside provider_share_block_size_set")
-    tegile_api_transport.share_block_size_set(should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    tegile_api_transport.share_set("block_size",should,resource[:pool_name],resource[:project_name],resource[:share_name])
   end
 
   def override_project_nfs_network_acls

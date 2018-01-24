@@ -25,7 +25,6 @@ Puppet::Type.newtype(:share) do
   newproperty(:block_size) do
     ##4KB,8KB,16KB,32KB,64KB,128KB
     Puppet.info("##Inside type_param_block_size")
-    defaultto :"32KB"
   end
 
   newparam(:mount_point) do
