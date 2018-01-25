@@ -1036,6 +1036,8 @@ class TegileApi
     case property
     when "compression"
       modify_lun.compression = property_value
+    when "compressed_log"
+      modify_lun.compressed_log = property_value
     when "dedup"
       modify_lun.dedup = property_value
     when "primary_cache"
@@ -1046,6 +1048,8 @@ class TegileApi
       modify_lun.readonly = property_value
     when "logbias"
       modify_lun.logbias = property_value
+    when "write_back_cache"
+      modify_lun.write_back_cache = property_value
     end
     modify_volume_properties_param = IFClient::ModifyVolumePropertiesParam.new
     modify_volume_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
@@ -1061,8 +1065,7 @@ class TegileApi
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(lun_set): #{error["message"]}"
-      fail
+      fail "Exception when calling TegileApi(lun_set): #{error["message"]}"
     end 
   end
 

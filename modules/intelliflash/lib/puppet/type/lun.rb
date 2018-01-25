@@ -52,7 +52,6 @@ Puppet::Type.newtype(:lun) do
   newparam(:block_size) do
     ##4KB,8KB,16KB,32KB,64KB,128KB
     Puppet.info("##Inside type_param_block_size")
-    defaultto :"32KB"
   end
 
   newparam(:lun_protocol) do
@@ -87,6 +86,10 @@ Puppet::Type.newtype(:lun) do
     Puppet.info("##Inside type_property_compression")
   end
 
+  newproperty(:compressed_log) do
+    Puppet.info("##Inside type_property_compressed_log")
+  end
+
   newproperty(:dedup) do
     Puppet.info("##Inside type_property_dedup")
   end
@@ -105,6 +108,10 @@ Puppet::Type.newtype(:lun) do
 
   newproperty(:logbias) do
     Puppet.info("##Inside type_property_logbias")
+  end
+
+  newproperty(:write_back_cache) do
+    Puppet.info("##Inside type_property_write_back_cache")
   end
 
  end

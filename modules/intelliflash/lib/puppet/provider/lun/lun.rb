@@ -33,6 +33,9 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     if resource[:compression] != nil
       tegile_api_transport.lun_set("compression",resource[:compression],resource[:pool_name],resource[:project_name],resource[:lun_name])
     end
+    if resource[:compressed_log] != nil
+      tegile_api_transport.lun_set("compressed_log",resource[:compression],resource[:pool_name],resource[:project_name],resource[:lun_name])
+    end
     if resource[:dedup] != nil
       tegile_api_transport.lun_set("dedup",resource[:dedup],resource[:pool_name],resource[:project_name],resource[:lun_name])
     end
@@ -47,6 +50,9 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     end
     if resource[:logbias] != nil
       tegile_api_transport.lun_set("logbias",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:lun_name])
+    end
+    if resource[:write_back_cache] != nil
+      tegile_api_transport.lun_set("write_back_cache",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:lun_name])
     end
   end
 
@@ -125,77 +131,100 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     end
   end
 
-def compression
-  Puppet.info("##Inside provider_lun_compression_get")
-  returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
-  # puts returned.compression
-  returned.compression
-end
+  def compression
+    Puppet.info("##Inside provider_lun_compression_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    puts returned.compression
+    returned.compression
+  end
 
-def compression=(should)
-  Puppet.info("##Inside provider_lun_compression_set")
-  tegile_api_transport.lun_set("compression",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
-end
+  def compression=(should)
+    Puppet.info("##Inside provider_lun_compression_set")
+    tegile_api_transport.lun_set("compression",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
 
-def dedup
-  Puppet.info("##Inside provider_lun_dedup_get")
-  returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
-  # puts returned.dedup
-  returned.dedup
-end
+  def compressed_log
+    Puppet.info("##Inside provider_lun_compressed_log_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    puts returned.compressed_log
+    returned.compressed_log
+  end
 
-def dedup=(should)
-  Puppet.info("##Inside provider_lun_dedup_set")
-  tegile_api_transport.lun_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
-end
+  def compressed_log=(should)
+    Puppet.info("##Inside provider_lun_compressed_log_set")
+    tegile_api_transport.lun_set("compressed_log",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
 
-def primary_cache
-  Puppet.info("##Inside provider_lun_primary_cache_get")
-  returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
-  # puts returned.primary_cache
-  returned.primary_cache
-end
+  def dedup
+    Puppet.info("##Inside provider_lun_dedup_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    # puts returned.dedup
+    returned.dedup
+  end
 
-def primary_cache=(should)
-  Puppet.info("##Inside provider_lun_primary_cache_set")
-  tegile_api_transport.lun_set("primary_cache",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
-end
+  def dedup=(should)
+    Puppet.info("##Inside provider_lun_dedup_set")
+    tegile_api_transport.lun_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
 
-def secondary_cache
-  Puppet.info("##Inside provider_lun_secondary_cache_get")
-  returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
-  # puts returned.secondary_cache
-  returned.secondary_cache
-end
+  def primary_cache
+    Puppet.info("##Inside provider_lun_primary_cache_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    # puts returned.primary_cache
+    returned.primary_cache
+  end
 
-def secondary_cache=(should)
-  Puppet.info("##Inside provider_lun_secondary_cache_set")
-  tegile_api_transport.lun_set("secondary_cache",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
-end
+  def primary_cache=(should)
+    Puppet.info("##Inside provider_lun_primary_cache_set")
+    tegile_api_transport.lun_set("primary_cache",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
 
-def readonly
-  Puppet.info("##Inside provider_lun_readonly_get")
-  returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
-  # puts returned.readonly
-  returned.readonly
-end
+  def secondary_cache
+    Puppet.info("##Inside provider_lun_secondary_cache_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    # puts returned.secondary_cache
+    returned.secondary_cache
+  end
 
-def readonly=(should)
-  Puppet.info("##Inside provider_lun_readonly_set")
-  tegile_api_transport.lun_set("readonly",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
-end
+  def secondary_cache=(should)
+    Puppet.info("##Inside provider_lun_secondary_cache_set")
+    tegile_api_transport.lun_set("secondary_cache",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
 
-def logbias
-  Puppet.info("##Inside provider_lun_logbias_get")
-  returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
-  # puts returned.logbias
-  returned.logbias
-end
+  def readonly
+    Puppet.info("##Inside provider_lun_readonly_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    # puts returned.readonly
+    returned.readonly
+  end
 
-def logbias=(should)
-  Puppet.info("##Inside provider_lun_logbias_set")
-  tegile_api_transport.lun_set("logbias",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
-end
+  def readonly=(should)
+    Puppet.info("##Inside provider_lun_readonly_set")
+    tegile_api_transport.lun_set("readonly",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
 
+  def logbias
+    Puppet.info("##Inside provider_lun_logbias_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    # puts returned.logbias
+    returned.logbias
+  end
+
+  def logbias=(should)
+    Puppet.info("##Inside provider_lun_logbias_set")
+    tegile_api_transport.lun_set("logbias",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
+
+  def write_back_cache
+    Puppet.info("##Inside provider_lun_write_back_cache_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    # puts returned.write_back_cache
+    returned.write_back_cache
+  end
+
+  def write_back_cache=(should)
+    Puppet.info("##Inside provider_lun_write_back_cache_set")
+    tegile_api_transport.lun_set("write_back_cache",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+  end
 
 end

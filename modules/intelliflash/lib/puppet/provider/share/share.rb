@@ -60,6 +60,9 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     if resource[:logbias] != nil
       tegile_api_transport.share_set("logbias",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:share_name])
     end
+    if resource[:acl_inherit] != nil
+      tegile_api_transport.share_set("acl_inherit",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
   end
 
   def destroy
@@ -75,8 +78,8 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def block_size
     Puppet.info("##Inside provider_share_block_size_get")
     returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
-    # puts returned.record_size
-    returned.record_size
+    # puts returned.record_size.value
+    returned.record_size.value
   end
 
   def block_size=(should)
@@ -169,7 +172,7 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def compression
     Puppet.info("##Inside provider_share_compression_get")
     returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
-    # puts returned.compression
+    puts returned.compression
     returned.compression
   end
 
@@ -193,7 +196,7 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def reservation
     Puppet.info("##Inside provider_share_reservation_get")
     returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
-    # puts returned.reservation_in_byte
+    puts returned.reservation_in_byte
     returned.reservation_in_byte
   end
 
