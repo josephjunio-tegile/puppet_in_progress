@@ -88,7 +88,45 @@ node 'tegile-3.7' {
 
 }
 
-# node 'tegile-3.7.1.x' {
+node 'tegile-3.7.1.x' {
+
+  
+
+  # initiator { 'TestingResource6':
+  #  ensure                    => present,
+  #  initiator_name            => "iqn.2017-07.com.test:puppet-host3",
+  # #  initiator_chap_user_name  => "",
+  # #  initiator_chap_secret     => "",
+  # }
+  
+  initiator_group { 'TestingResource6.1':
+   ensure               => present,
+   initiator_group_name => "puppet-initiator-group1",
+   members              => ["iqn.2017-07.com.test:puppet-host1"],
+  }
+
+  # iscsi_target { 'TestingResource3':
+  #  ensure                    => present,
+  #  iscsi_target_name         => "puppet-iscsi-target1",
+  #  iscsi_target_alias        => "puppet-iscsi-target1",
+  # #  iscsi_target_group        => "iscsi-target-group1",
+  #  pool_name                 => "pool-a",
+  # #  iscsi_target_auth         => "none",
+  # #  iscsi_target_chap_name    => "",
+  # #  iscsi_target_chap_secret  => "",
+  #  iscsi_target_ip           => "10.65.3.33",
+  #  iscsi_target_port         => "3260",
+  # }
+
+  # iscsi_target_group { 'TestingResource3.1':
+  #   ensure                  => present,
+  #   iscsi_target_group_name => "puppet-iscsi-target-group1",
+  #   pool_name               => "pool-a",
+  #   members                 => ["iqn.2012-02.com.tegile:holder-target","iqn.2012-02.com.tegile:iscsi-target1","iqn.2012-02.com.tegile:iscsi-target2"],
+  # }
+
+
+
 #   lun { 'TestingResource1':
 #     ensure                    => present,
 #     lun_name                  => "puppet-lun2",

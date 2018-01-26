@@ -1080,7 +1080,7 @@ class TegileApi
     begin
       ##Lists all the iSCSI initiator groups available on a Tegile array.
       result = api_instance.list_initiator_groups_get
-      #puts result
+      # puts result.inspect
       exists = nil
       result.each do |x|
         if x.initiator_group_name == initiator_group_name
@@ -1090,8 +1090,7 @@ class TegileApi
       end
       return exists
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->list_iscsi_initiator_groups_get: #{e}"
-      fail
+      fail "Exception when calling SANApi->list_iscsi_initiator_groups_get: #{e}"
     end
   end
 
@@ -1138,7 +1137,7 @@ class TegileApi
     begin
       ##List iSCSI Initiators with name matching specified pattern
       result = api_instance.list_iscsi_initiators_post(list_iscsi_initiators_param)
-      #puts result
+      # puts result.inspect
       exists = nil
       result.each do |x|
         if x.initiator_name == initiator_name
@@ -1148,8 +1147,7 @@ class TegileApi
       end
       return exists
     rescue IFClient::ApiError => e
-      puts "Exception when calling SANApi->list_iscsi_initiators_post: #{e}"
-      fail
+      fail "Exception when calling SANApi->list_iscsi_initiators_post: #{e}"
     end
   end
 
@@ -1168,7 +1166,7 @@ class TegileApi
       if result.value == 0
         puts "#{initiator_name} created"
       else
-        puts "Error with TegileApi(initiator_create)"
+        fail "Error with TegileApi(initiator_create)"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
@@ -1422,7 +1420,7 @@ class TegileApi
       if result.value == 0
         puts "initiator:#{initiator_name} added to initiator_group:#{initiator_group_name}"
       else
-        puts "Error with TegileApi(initiator_group_members_set_add_to_group)"
+        fail "Error with TegileApi(initiator_group_members_set_add_to_group)"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")

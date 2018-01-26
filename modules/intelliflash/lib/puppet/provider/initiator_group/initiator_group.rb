@@ -28,10 +28,15 @@ Puppet::Type.type(:initiator_group).provide(:lun,:parent => Puppet::Provider::Te
     Puppet.info("##Inside provider_initiator_group_members_set")
   
     should.each do |x|
-      puts x
+      puts x.inspect
+
+      ##need to check here if in a group
       tegile_api_transport.initiator_group_members_set_list_in_group(x)
+
+      ##this adds and will be switched for the move once in the sdk
+      tegile_api_transport.initiator_group_members_set_add_to_group(resource[:initiator_group_name],x)
     end
-    # tegile_api_transport.initiator_group_members_set_add_to_group(resource[:initiator_group_name],x)
+    
     
   end
 

@@ -7,7 +7,6 @@ Puppet::Type.type(:initiator).provide(:lun,:parent => Puppet::Provider::Tegile) 
   def create
     Puppet.info("##Inside provider_initiator_create")
     tegile_api_transport.initiator_create(resource[:initiator_name],resource[:initiator_chap_user_name],resource[:initiator_chap_secret])
-    tegile_api_transport.add_initiator_to_initiator_group(resource[:initiator_name],resource[:initiator_group_name])
   end
 
   def destroy
@@ -19,11 +18,5 @@ Puppet::Type.type(:initiator).provide(:lun,:parent => Puppet::Provider::Tegile) 
     Puppet.info("##Inside provider_initiator_exists")
     tegile_api_transport.initiator_exists(resource[:initiator_name])
   end
-
-
-
-
-
-
 
 end
