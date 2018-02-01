@@ -1,4 +1,4 @@
-node 'tegile-3.7' {
+node 'tegile-3.7_off' {
 
   # iscsi_target { 'TestingResource3':
   #  ensure                    => present,
@@ -90,63 +90,98 @@ node 'tegile-3.7' {
 
 node 'tegile-3.7.1.x' {
 
-  
+  initiator_group { 'TestingResource5':
+   ensure               => present,
+   initiator_group_name => "puppet-initiator-group1",
+   members              => ["iqn.2017-07.com.test:puppet-host1","iqn.2017-07.com.test:puppet-host4"],
+  }
 
-  # initiator { 'TestingResource6':
+  # initiator { 'TestingResource4':
   #  ensure                    => present,
-  #  initiator_name            => "iqn.2017-07.com.test:puppet-host3",
+  #  initiator_name            => "iqn.2017-07.com.test:puppet-host1",
   # #  initiator_chap_user_name  => "",
   # #  initiator_chap_secret     => "",
   # }
-  
-  initiator_group { 'TestingResource6.1':
-   ensure               => present,
-   initiator_group_name => "puppet-initiator-group1",
-   members              => ["iqn.2017-07.com.test:puppet-host1"],
-  }
 
-  # iscsi_target { 'TestingResource3':
-  #  ensure                    => present,
-  #  iscsi_target_name         => "puppet-iscsi-target1",
-  #  iscsi_target_alias        => "puppet-iscsi-target1",
-  # #  iscsi_target_group        => "iscsi-target-group1",
-  #  pool_name                 => "pool-a",
-  # #  iscsi_target_auth         => "none",
-  # #  iscsi_target_chap_name    => "",
-  # #  iscsi_target_chap_secret  => "",
-  #  iscsi_target_ip           => "10.65.3.33",
-  #  iscsi_target_port         => "3260",
-  # }
 
-  # iscsi_target_group { 'TestingResource3.1':
+  # iscsi_target_group { 'TestingResource7':
   #   ensure                  => present,
   #   iscsi_target_group_name => "puppet-iscsi-target-group1",
   #   pool_name               => "pool-a",
-  #   members                 => ["iqn.2012-02.com.tegile:holder-target","iqn.2012-02.com.tegile:iscsi-target1","iqn.2012-02.com.tegile:iscsi-target2"],
+  #   members                 => ["puppet-iscsi-target2","puppet-iscsi-target1"],
+  # }
+
+  # iscsi_target_group { 'TestingResource7.2':
+  #   ensure                  => present,
+  #   iscsi_target_group_name => "puppet-iscsi-target-group2",
+  #   pool_name               => "pool-a",
+  #   members                 => [],
+  # }
+
+  # iscsi_target_group { 'TestingResource7.3':
+  #   ensure                  => present,
+  #   iscsi_target_group_name => "puppet-iscsi-target-group3",
+  #   pool_name               => "pool-a",
+  #   members                 => [],
   # }
 
 
+  # iscsi_target { 'TestingResource6':
+  #  ensure                    => present,
+  #  iscsi_target_name         => "puppet-iscsi-target1",
+  #  iscsi_target_alias        => "puppet-iscsi-target1",
+  #  pool_name                 => "pool-a",
+  #  iscsi_target_auth         => "none",
+  # #  iscsi_target_chap_name    => "",
+  # #  iscsi_target_chap_secret  => "",
+  #  iscsi_target_ip           => "10.65.103.83",
+  #  iscsi_target_port         => "3260",
+  # }
 
-#   lun { 'TestingResource1':
-#     ensure                    => present,
-#     lun_name                  => "puppet-lun2",
-#     project_name              => "puppet-project1",
-#     pool_name                 => "pool-a",
-#     lun_size                  => 112,
-#     block_size                => "16KB",
-#     thin_provision            => "true",
-#     lun_protocol              => "iSCSI",
-#     compression               => "lz4",
-#     compressed_log            => "lz4",
-#     dedup                     => "off",
-#     primary_cache             => "all",
-#     secondary_cache           => "all",
-#     readonly                  => "off",
-#     logbias                   => "latency",
-#     write_back_cache          => "enable",
-#   #  override_project_mappings  => "yes",
-#   #  lun_mappings               => [["initiator-group3", "iscsi-target-group3", 3, false],["puppet-initiator-group1", "puppet-iscsi-target-group1", 4, false]],
-#   }
+  # iscsi_target { 'TestingResource6.2':
+  #  ensure                    => present,
+  #  iscsi_target_name         => "puppet-iscsi-target2",
+  #  iscsi_target_alias        => "puppet-iscsi-target2",
+  #  pool_name                 => "pool-a",
+  #  iscsi_target_auth         => "none",
+  # #  iscsi_target_chap_name    => "",
+  # #  iscsi_target_chap_secret  => "",
+  #  iscsi_target_ip           => "10.65.103.83",
+  #  iscsi_target_port         => "3260",
+  # }
+
+  # iscsi_target { 'TestingResource6.3':
+  #  ensure                    => present,
+  #  iscsi_target_name         => "puppet-iscsi-target3",
+  #  iscsi_target_alias        => "puppet-iscsi-target3",
+  #  pool_name                 => "pool-a",
+  #  iscsi_target_auth         => "none",
+  # #  iscsi_target_chap_name    => "",
+  # #  iscsi_target_chap_secret  => "",
+  #  iscsi_target_ip           => "10.65.103.83",
+  #  iscsi_target_port         => "3260",
+  # }
+
+  # lun { 'TestingResource1':
+  #   ensure                    => present,
+  #   lun_name                  => "puppet-lun2",
+  #   project_name              => "puppet-project1",
+  #   pool_name                 => "pool-a",
+  #   lun_size                  => 112,
+  #   block_size                => "16KB",
+  #   thin_provision            => "true",
+  #   lun_protocol              => "iSCSI",
+  #   compression               => "lz4",
+  #   compressed_log            => "lz4",
+  #   dedup                     => "off",
+  #   primary_cache             => "all",
+  #   secondary_cache           => "all",
+  #   readonly                  => "off",
+  #   logbias                   => "latency",
+  #   write_back_cache          => "enable",
+  # #  override_project_mappings  => "yes",
+  # #  lun_mappings               => [["initiator-group3", "iscsi-target-group3", 3, false],["puppet-initiator-group1", "puppet-iscsi-target-group1", 4, false]],
+  # }
 
   # share { 'TestingResource2':
   #   ensure                            => present,
@@ -168,7 +203,7 @@ node 'tegile-3.7.1.x' {
   #   # nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.5", "rw", false]],
   # }
 
-  # project { 'TestingResource2.1':
+  # project { 'TestingResource3':
   #   ensure                     => present,
   #   project_name               => "puppet-project1",
   #   pool_name                  => "pool-a",

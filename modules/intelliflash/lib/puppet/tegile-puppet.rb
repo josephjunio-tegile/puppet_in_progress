@@ -1108,7 +1108,7 @@ class TegileApi
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(initiator_group_create): #{error["message"]}"
+      fail "Exception when calling TegileApi(initiator_group_create): #{error["message"]}"
     end 
   end
 
@@ -1233,6 +1233,7 @@ class TegileApi
     end
   end
 
+  #!not needed exists anymore, using just list method
   def iscsi_target_group_exists(iscsi_target_group_name) ##Not returning unused groups
     api_instance = IFClient::SANApi.new
     begin
@@ -1265,7 +1266,7 @@ class TegileApi
       if result.value == 0
         puts "#{iscsi_target_group_name} created"
       else
-        puts "Error with TegileApi(iscsi_target_group_create)"
+        fail "Error with TegileApi(iscsi_target_group_create)"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
@@ -1273,6 +1274,7 @@ class TegileApi
     end 
   end
 
+  #!shouldnt be needed with list all avilable
   def iscsi_target_group_create_fix(iscsi_target_group_name,pool_name)
     api_instance = IFClient::SANApi.new
     create_target_group_param = IFClient::CreateTargetGroupParam.new
@@ -1399,7 +1401,7 @@ class TegileApi
     begin
       ##Lists all initiators belonging to the specified initiator group
       result = api_instance.list_initiators_in_initiator_group_post(list_initiators_in_initiator_group_param)
-      puts result.inspect
+      # puts result.inspect
       return result
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
@@ -1407,7 +1409,7 @@ class TegileApi
     end
   end
 
-  ##
+  #*
   def initiator_group_members_set_add_to_group(initiator_group_name,initiator_name)
     api_instance = IFClient::SANApi.new
     add_initiator_to_initiator_group_param = IFClient::AddInitiatorToInitiatorGroupParam.new
@@ -1428,19 +1430,88 @@ class TegileApi
     end
   end
 
-  ##
+  #*basic method from sdk to move initiator into new group
+  def move_initiator_to_initiator_group(initiator_name,new_initiator_group_name,force)
+    api_instance = IFClient::SANApi.new
+    move_initiator_to_initiator_group_param = IFClient::MoveInitiatorToInitiatorGroupParam.new
+    move_initiator_to_initiator_group_param.arg0_initiator_name = initiator_name
+    move_initiator_to_initiator_group_param.arg1_new_initiator_group_name = new_initiator_group_name
+    move_initiator_to_initiator_group_param.arg2_force = force
+    begin
+      #*Move an iSCSI or Fibre Channel Initiator to an existing Initiator Group.
+      result = api_instance.move_initiator_to_initiator_group_post(move_initiator_to_initiator_group_param)
+      if result.value == 0
+        puts "#{initiator_name} moved to #{new_initiator_group_name}"
+      else
+        fail "Error with TegileApi(move_initiator_to_initiator_group)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(move_initiator_to_initiator_group) #{error["message"]}"
+    end
+  end
+
+  #*Custom method to remove initiator from group. creates temp group, moves initiator to it, and removes group
+  def remove_initiator_from_group(initiator_name)
+    #*setup params
+    api_instance = IFClient::SANApi.new
+    ran_num = rand(1000)
+    create_initiator_group_param = IFClient::CreateInitiatorGroupParam.new
+    create_initiator_group_param.arg0_initiator_group_name = "temp-group-#{ran_num}"
+    move_initiator_to_initiator_group_param = IFClient::MoveInitiatorToInitiatorGroupParam.new
+    move_initiator_to_initiator_group_param.arg0_initiator_name = initiator_name
+    move_initiator_to_initiator_group_param.arg1_new_initiator_group_name = "temp-group-#{ran_num}"
+    move_initiator_to_initiator_group_param.arg2_force = true
+    delete_initiator_group_param = IFClient::DeleteInitiatorGroupParam.new
+    delete_initiator_group_param.arg0_initiator_group_name = "temp-group-#{ran_num}"
+    begin
+      #*Creates an initiator group on a Tegile array.
+      result1 = api_instance.create_initiator_group_post(create_initiator_group_param)
+      result2 = api_instance.move_initiator_to_initiator_group_post(move_initiator_to_initiator_group_param)
+      result3 = api_instance.delete_initiator_group_post(delete_initiator_group_param)
+      if result1.value != 0
+        fail "Error with TegileApi(remove_initiator_from_group_1)"
+      elsif result2.value != 0
+        fail "Error with TegileApi(remove_initiator_from_group_2)"
+      elsif result3.value != 0
+        fail "Error with TegileApi(remove_initiator_from_group_3)"
+      else
+        puts "#{initiator_name} removed from initiator_group"
+      end
+      #*output used to watch full method progress
+      # if result1.value == 0
+      #   puts "temp-group-#{ran_num} created"
+      # else
+      #   fail "Error with TegileApi(remove_initiator_from_group_1)"
+      # end
+      # if result2.value == 0
+      #   puts "#{initiator_name} moved to temp-group-#{ran_num}"
+      # else
+      #   fail "Error with TegileApi(remove_initiator_from_group_2)"
+      # end
+      # if result3.value == 0
+      #   puts "temp-group-#{ran_num} deleted"
+      # else
+      #   fail "Error with TegileApi(remove_initiator_from_group_3)"
+      # end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(remove_initiator_from_group): #{error["message"]}"
+    end
+  end
+
+  #!Returning with error undefined method `map'
   def initiator_group_members_set_list_in_group(initiator_name)
     api_instance = IFClient::SANApi.new
     get_initiator_group_param = IFClient::GetInitiatorGroupParam.new
     get_initiator_group_param.arg0_initiator_name = initiator_name
     begin
-      ##Gets the name of the initiator group to which the initiator belongs.
+      #*Gets the name of the initiator group to which the initiator belongs.
       result = api_instance.get_initiator_group_post(get_initiator_group_param)
-      puts result.inspect
-      # return result
+      p result.inspect
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(initiator_group_members_set_list_in_group) #{error["message"]}"
+      fail "Exception when calling TegileApi(move_initiator_to_initiator_group) #{error["message"]}"
     end
   end
 
@@ -1452,7 +1523,7 @@ class TegileApi
     begin
       ##Lists all targets associated with the target group.
       result = api_instance.list_targets_in_target_group_post(list_targets_in_target_group_param)
-      puts result.inspect
+      # puts result.inspect
       return result
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
@@ -1461,11 +1532,12 @@ class TegileApi
   end
 
   ##
-  def move_target_to_target_group(target_name,new_target_group_name)
+  def move_target_to_target_group(target_name,new_target_group_name,force)
     api_instance = IFClient::SANApi.new
     move_target_to_target_group_param = IFClient::MoveTargetToTargetGroupParam.new
     move_target_to_target_group_param.arg0_target_name = target_name
     move_target_to_target_group_param.arg1_new_target_group_name = new_target_group_name
+    move_target_to_target_group_param.arg2_force = force
     begin
       ##Move a target specified with targetName to a new target group specified with newTargetGroupName
       result = api_instance.move_target_to_target_group_post(move_target_to_target_group_param)
@@ -1473,11 +1545,25 @@ class TegileApi
       if result.value == 0
         puts "target:#{target_name} moved to target_group:#{new_target_group_name}"
       else
-        puts "Error with TegileApi(move_target_to_target_group)"
+        fail "Error with TegileApi(move_target_to_target_group)"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
       fail "Exception when calling TegileApi(move_target_to_target_group) #{error["message"]}"
+    end
+  end
+
+  #*returns all target groups, used by iscsi_target_group exists? method
+  def list_target_groups
+    api_instance = IFClient::SANApi.new
+    begin
+      #*List all target groups available on IntelliFlash Array
+      result = api_instance.list_target_groups_get
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(list_target_groups) #{error["message"]}"
     end
   end
 

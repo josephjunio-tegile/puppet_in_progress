@@ -17,6 +17,14 @@ Puppet::Type.newtype(:iscsi_target_group) do
 
   newproperty(:members, :array_matching => :all) do
     Puppet.info("##Inside type_param_iscsi_target_group_members")
+    #*add the prefix to defined target names
+    munge do |each|
+      "iqn.2012-02.com.tegile:" + each
+    end
+    #*Custom sync method to compare sorted values
+    def insync?(is)
+      is.sort! == should.sort!
+    end
   end
 
 end

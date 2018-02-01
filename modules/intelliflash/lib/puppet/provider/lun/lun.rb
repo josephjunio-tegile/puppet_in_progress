@@ -113,8 +113,8 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     is = tegile_api_transport.lun_lun_mappings_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
     should_itview = RubyMethods.array_of_arrays_to_it_view_v21(should)
 
-    ##Use custom compare methods for should/is values to get create/delete
-    ##If lun_num is not -1 then compares full mapping value
+    #*Use custom compare methods for should/is values to get create/delete
+    #*If lun_num is not -1 then compares full mapping value
     lun_mappings_delete = RubyMethods.find_it_view_v21_to_delete_lun(should_itview,is)
     lun_mappings_create = RubyMethods.find_it_view_v21_to_create_lun(should_itview,is)
 

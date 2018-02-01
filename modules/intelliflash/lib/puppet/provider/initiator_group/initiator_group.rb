@@ -24,20 +24,36 @@ Puppet::Type.type(:initiator_group).provide(:lun,:parent => Puppet::Provider::Te
     tegile_api_transport.initiator_group_members_get(resource[:initiator_group_name])
   end
 
+  #*Define "is", find diff, use method to remove/add
   def members=(should)
     Puppet.info("##Inside provider_initiator_group_members_set")
-  
-    should.each do |x|
-      puts x.inspect
 
-      ##need to check here if in a group
-      tegile_api_transport.initiator_group_members_set_list_in_group(x)
+    is = tegile_api_transport.initiator_group_members_get(resource[:initiator_group_name])
 
-      ##this adds and will be switched for the move once in the sdk
-      tegile_api_transport.initiator_group_members_set_add_to_group(resource[:initiator_group_name],x)
+    # puts "is: #{is}"
+    # puts "should: #{should}"
+
+    to_remove = is - should
+    # puts "remove:#{to_remove}"
+    to_add = should - is
+    # puts "add:#{to_add}"
+    
+    if to_remove.length != 0
+      to_remove.each do |string|
+        tegile_api_transport.remove_initiator_from_group(string)
+      end
     end
-    
-    
+
+    #2do once list is fixed add warning for add vs. move
+    if to_add.length != 0
+      to_add.each do |string|
+        tegile_api_transport.move_initiator_to_initiator_group(string,resource[:initiator_group_name],true)
+      end
+    end
+
+    #!method in SDK is messed up
+    # current_group = tegile_api_transport.initiator_group_members_set_list_in_group(x)
+   
   end
 
 end

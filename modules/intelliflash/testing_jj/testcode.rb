@@ -1,22 +1,10 @@
 require "tegile-api"
-#require 'json'
 
-#Request access info for array
-#puts "IntelliFlash Array IP?:"
-#host = gets.chomp
-#puts "IntelliFlash Array Username?:"
-#username = gets.chomp
-#puts "IntelliFlash Array Password?:"
-#password = gets.chomp
-#puts "Pool Name?"
-#pool = gets.chomp
-
-
-host = "10.65.3.30"
+host = "10.65.103.80"
 username = "admin"
-password = "tegile1"
-pool_name = "pool-a"
-iscsi_target_group_name = "test-test"
+password = "tegile"
+# pool_name = "pool-a"
+# project_name = "project1"
 
 # Setup authorization
 IFClient.configure do |config|
@@ -28,48 +16,36 @@ IFClient.configure do |config|
   #config.debugging = true
 end
 
+puts "get_initiator_group"
+api_instance = IFClient::SANApi.new
+get_initiator_group_param = IFClient::GetInitiatorGroupParam.new # GetInitiatorGroupParam | 
+get_initiator_group_param.arg0_initiator_name = "iqn.2017-07.com.test:puppet-host1"
+begin
+  #Gets the name of the initiator group to which the initiator belongs.
+  result = api_instance.get_initiator_group_post(get_initiator_group_param)
+  puts result.inspect
+rescue IFClient::ApiError => e
+  puts "Exception when calling SANApi->get_initiator_group_post: #{e}"
+end
 
-
-
-
-# api_instance = IFClient::DataApi.new
-# get_volume_param = IFClient::GetVolumeParam.new
-# get_volume_param.arg0_dataset_path = "pool-a/Local/project1/lun1"
+# puts "list_iscsi_initiators_post"
+# api_instance = IFClient::SANApi.new
+# list_iscsi_initiators_param = IFClient::ListISCSIInitiatorsParam.new # ListISCSIInitiatorsParam | 
+# list_iscsi_initiators_param.arg0_initiator_name_pattern = ".*"
 # begin
-#   #Get the Volume details.
-#   result = api_instance.get_volume_post(get_volume_param)
-#   #puts result
-#   status = result.override_views == false ? "no" : "yes"
-#   puts "Override project mappings? #{status}"
-# rescue IFClient::ApiError => e
-#   error = JSON.parse("#{e.response_body}")
-#   puts "Exception when calling TegileApi: #{error["message"]}"
-# end
-
-# api_instance = IFClient::DataApi.new
-# inherit_property_from_project_param = IFClient::InheritPropertyFromProjectParam.new
-# inherit_property_from_project_param.arg0_dataset_path = "pool-a/Local/project1/share1"
-# inherit_property_from_project_param.arg1_prop_name = "AclInherit"
-# begin
-#   #Inherit properties from parent project settings (revert/rollback to parent setting)
-#   result = api_instance.inherit_property_from_project_post(inherit_property_from_project_param)
+#   #List iSCSI Initiators with name matching specified pattern
+#   result = api_instance.list_iscsi_initiators_post(list_iscsi_initiators_param)
 #   puts result
 # rescue IFClient::ApiError => e
-#   error = JSON.parse("#{e.response_body}")
-#   puts "Exception when calling TegileApi: #{error["message"]}"
+#   puts "Exception when calling SANApi->list_iscsi_initiators_post: #{e}"
 # end
 
 
 # api_instance = IFClient::SANApi.new
-# create_target_group_param = IFClient::CreateTargetGroupParam.new
-# create_target_group_param.arg0_target_group_name = iscsi_target_group_name
-# create_target_group_param.arg1_pool_name = pool_name
 # begin
-#   ##Create a target group with the specified target group name in the resource group containing the named pool with the intended protocol
-#   result = api_instance.create_target_group_post(create_target_group_param)
+#   #List all initiator groups available on IntelliFlash Array
+#   result = api_instance.list_initiator_groups_get
 #   puts result
-
 # rescue IFClient::ApiError => e
-#   error = JSON.parse("#{e.response_body}")
-#   puts "Exception when calling TegileApi: #{error["message"]}"
-# end 
+#   puts "Exception when calling SANApi->list_initiator_groups_get: #{e}"
+# end
