@@ -4,15 +4,16 @@ Puppet::Type.type(:iscsi_target).provide(:lun,:parent => Puppet::Provider::Tegil
   desc "Provider for iscsi target create/delete"
   Puppet.info("##Inside provider_root_iscsi_target")
 
+  #2do make new method that does all this
   def create
     Puppet.info("##Inside provider_iscsi_target_create")
     #*create temp target group. api doesnt allow target creation without a group
     temp_target_group = "temp-tg"
-      #*api to create temp target group
+    #*api to create temp target group
     tegile_api_transport.iscsi_target_group_create(temp_target_group,resource[:pool_name])
-      #*api call to create iscsi target with temp target group
+    #*api call to create iscsi target with temp target group
     tegile_api_transport.iscsi_target_create(resource[:iscsi_target_name],resource[:iscsi_target_alias],temp_target_group,resource[:iscsi_target_auth],resource[:iscsi_target_chap_name],resource[:iscsi_target_chap_secret],resource[:iscsi_target_ip],resource[:iscsi_target_port])
-      #*api call to delete temp target group
+    #*api call to delete temp target group
     tegile_api_transport.iscsi_target_group_delete(temp_target_group)
   end
 

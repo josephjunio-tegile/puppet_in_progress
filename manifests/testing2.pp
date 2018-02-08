@@ -90,11 +90,11 @@ node 'tegile-3.7_off' {
 
 node 'tegile-3.7.1.x' {
 
-  initiator_group { 'TestingResource5':
-   ensure               => present,
-   initiator_group_name => "puppet-initiator-group1",
-   members              => ["iqn.2017-07.com.test:puppet-host1","iqn.2017-07.com.test:puppet-host4"],
-  }
+  # initiator_group { 'TestingResource5':
+  #  ensure               => present,
+  #  initiator_group_name => "puppet-initiator-group1",
+  #  members              => ["iqn.2017-07.com.test:puppet-host3","iqn.2017-07.com.test:puppet-host1"],
+  # }
 
   # initiator { 'TestingResource4':
   #  ensure                    => present,
@@ -103,64 +103,24 @@ node 'tegile-3.7.1.x' {
   # #  initiator_chap_secret     => "",
   # }
 
-
-  # iscsi_target_group { 'TestingResource7':
-  #   ensure                  => present,
-  #   iscsi_target_group_name => "puppet-iscsi-target-group1",
-  #   pool_name               => "pool-a",
-  #   members                 => ["puppet-iscsi-target2","puppet-iscsi-target1"],
-  # }
-
-  # iscsi_target_group { 'TestingResource7.2':
-  #   ensure                  => present,
-  #   iscsi_target_group_name => "puppet-iscsi-target-group2",
-  #   pool_name               => "pool-a",
-  #   members                 => [],
-  # }
-
-  # iscsi_target_group { 'TestingResource7.3':
-  #   ensure                  => present,
-  #   iscsi_target_group_name => "puppet-iscsi-target-group3",
-  #   pool_name               => "pool-a",
-  #   members                 => [],
-  # }
-
-
-  # iscsi_target { 'TestingResource6':
-  #  ensure                    => present,
-  #  iscsi_target_name         => "puppet-iscsi-target1",
-  #  iscsi_target_alias        => "puppet-iscsi-target1",
-  #  pool_name                 => "pool-a",
-  #  iscsi_target_auth         => "none",
-  # #  iscsi_target_chap_name    => "",
-  # #  iscsi_target_chap_secret  => "",
-  #  iscsi_target_ip           => "10.65.103.83",
-  #  iscsi_target_port         => "3260",
-  # }
-
-  # iscsi_target { 'TestingResource6.2':
-  #  ensure                    => present,
-  #  iscsi_target_name         => "puppet-iscsi-target2",
-  #  iscsi_target_alias        => "puppet-iscsi-target2",
-  #  pool_name                 => "pool-a",
-  #  iscsi_target_auth         => "none",
-  # #  iscsi_target_chap_name    => "",
-  # #  iscsi_target_chap_secret  => "",
-  #  iscsi_target_ip           => "10.65.103.83",
-  #  iscsi_target_port         => "3260",
-  # }
-
-  # iscsi_target { 'TestingResource6.3':
-  #  ensure                    => present,
-  #  iscsi_target_name         => "puppet-iscsi-target3",
-  #  iscsi_target_alias        => "puppet-iscsi-target3",
-  #  pool_name                 => "pool-a",
-  #  iscsi_target_auth         => "none",
-  # #  iscsi_target_chap_name    => "",
-  # #  iscsi_target_chap_secret  => "",
-  #  iscsi_target_ip           => "10.65.103.83",
-  #  iscsi_target_port         => "3260",
-  # }
+  iscsi_target_group { 'TestingResource7':
+    ensure                  => present,
+    iscsi_target_group_name => "puppet-iscsi-target-group1",
+    pool_name               => "pool-a",
+    members                 => ["puppet-iscsi-target1"],
+  }
+  
+  iscsi_target { 'TestingResource6':
+   ensure                    => present,
+   iscsi_target_name         => "puppet-iscsi-target1",
+   iscsi_target_alias        => "puppet-iscsi-target1",
+   pool_name                 => "pool-a",
+   iscsi_target_auth         => "none",
+  #  iscsi_target_chap_name    => "",
+  #  iscsi_target_chap_secret  => "",
+   iscsi_target_ip           => "10.65.103.83",
+   iscsi_target_port         => "3260",
+  }
 
   # lun { 'TestingResource1':
   #   ensure                    => present,

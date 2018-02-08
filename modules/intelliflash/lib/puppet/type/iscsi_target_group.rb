@@ -5,6 +5,19 @@ Puppet::Type.newtype(:iscsi_target_group) do
   apply_to_device
   ensurable
 
+  #*need to require any targets that are listed in members. Need to drop the iscsi prefix added via munge
+  autorequire(:iscsi_target) do
+    if self[:members] != nil
+      required = []
+      self[:members].each do |string|
+        no_suffix = string.reverse.chomp("iqn.2012-02.com.tegile:".reverse)
+        required << no_suffix.reverse
+      end
+      # puts required.inspect
+      required
+    end
+  end
+
   newparam(:iscsi_target_group_name) do
     #desc "The name of the host. "
     isnamevar

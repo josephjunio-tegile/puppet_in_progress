@@ -1193,6 +1193,7 @@ class TegileApi
     end
   end
 
+  #*Used by initiator_group provider member= & create method
   def add_initiator_to_initiator_group(initiator_name,initiator_group_name)
     api_instance = IFClient::SANApi.new
     add_initiator_to_initiator_group_param = IFClient::AddInitiatorToInitiatorGroupParam.new
@@ -1205,7 +1206,7 @@ class TegileApi
       if result.value == 0
         puts "#{initiator_name} added to #{initiator_group_name}"
       else
-        puts "Error with TegileApi(add_initiator_to_initiator_group)"
+        fail "Error with TegileApi(add_initiator_to_initiator_group)"
       end
     rescue IFClient::ApiError => e
         error = JSON.parse("#{e.response_body}")
@@ -1302,7 +1303,7 @@ class TegileApi
       if result.value == 0
         puts "#{iscsi_target_group_name} deleted"
       else
-        puts "Error with TegileApi(iscsi_target_group_delete)"
+        fail "Error with TegileApi(iscsi_target_group_delete)"
       end
     rescue IFClient::ApiError => e
         error = JSON.parse("#{e.response_body}")
@@ -1310,6 +1311,7 @@ class TegileApi
     end
   end
 
+  #!what is this fix for??
   def iscsi_target_group_delete_fix(iscsi_target_group_name)
     api_instance = IFClient::SANApi.new
     delete_target_group_param = IFClient::DeleteTargetGroupParam.new
@@ -1337,7 +1339,7 @@ class TegileApi
         #puts x.target_name + iscsi_target_name
         if x.target_name == "iqn.2012-02.com.tegile:#{iscsi_target_name}"
           exists = true
-          puts "found iscsi target: #{x.target_name}"
+          puts "found: #{x.target_name}"
         end
       end
       return exists
@@ -1500,7 +1502,61 @@ class TegileApi
     end
   end
 
-  #!Returning with error undefined method `map'
+  #*Custom method to remove target from group. creates temp group, moves target to it, and removes group
+  #*used by iscsi_target_group members method
+  def remove_target_from_group(iscsi_target_name,pool_name)
+    #*setup params for all api calls
+    api_instance = IFClient::SANApi.new
+    ran_num = rand(1000)
+    create_target_group_param = IFClient::CreateTargetGroupParam.new
+    create_target_group_param.arg0_target_group_name = "temp-group-#{ran_num}"
+    create_target_group_param.arg1_pool_name = pool_name
+    move_target_to_target_group_param = IFClient::MoveTargetToTargetGroupParam.new
+    move_target_to_target_group_param.arg0_target_name = iscsi_target_name
+    move_target_to_target_group_param.arg1_new_target_group_name = "temp-group-#{ran_num}"
+    move_target_to_target_group_param.arg2_force = true
+    delete_target_group_param = IFClient::DeleteTargetGroupParam.new
+    delete_target_group_param.arg0_target_group_name = "temp-group-#{ran_num}"
+    begin
+      #*create temp group
+      result1 = api_instance.create_target_group_post(create_target_group_param)
+      #*move the target to temp group
+      result2 = api_instance.move_target_to_target_group_post(move_target_to_target_group_param)
+      #*delete the temp group
+      result3 = api_instance.delete_target_group_post(delete_target_group_param)
+      if result1.value != 0
+        fail "Error with TegileApi(remove_target_from_group_1)"
+      elsif result2.value != 0
+        fail "Error with TegileApi(remove_target_from_group_2)"
+      elsif result3.value != 0
+        fail "Error with TegileApi(remove_target_from_group_3)"
+      else
+        puts "#{iscsi_target_name} removed from target_group"
+      end
+      #*Detailed logging for full method
+      # if result1.value == 0
+      #   puts "temp-group-#{ran_num} created"
+      # else
+      #   fail "Error with TegileApi(remove_target_from_group_1)"
+      # end
+      # if result2.value == 0
+      #   puts "#{iscsi_target_name} moved to temp-group-#{ran_num}"
+      # else
+      #   fail "Error with TegileApi(remove_target_from_group_2)"
+      # end
+      # if result3.value == 0
+      #   puts "temp-group-#{ran_num} deleted"
+      # else
+      #   fail "Error with TegileApi(remove_target_from_group_3)"
+      # end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(remove_target_from_group): #{error["message"]}"
+    end 
+    
+  end
+
+  #*Used by initiator_group provider member= & create method
   def initiator_group_members_set_list_in_group(initiator_name)
     api_instance = IFClient::SANApi.new
     get_initiator_group_param = IFClient::GetInitiatorGroupParam.new
@@ -1508,10 +1564,11 @@ class TegileApi
     begin
       #*Gets the name of the initiator group to which the initiator belongs.
       result = api_instance.get_initiator_group_post(get_initiator_group_param)
-      p result.inspect
+      # puts result.inspect
+      return result
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(move_initiator_to_initiator_group) #{error["message"]}"
+      fail "Exception when calling TegileApi(initiator_group_members_set_list_in_group) #{error["message"]}"
     end
   end
 
