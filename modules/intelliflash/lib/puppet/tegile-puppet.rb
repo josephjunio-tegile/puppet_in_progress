@@ -38,9 +38,9 @@ class TegileApi
         return exists
       end
     rescue IFClient::ApiError => e
-      puts "Exception when calling DataApi->get_project_post: #{e}"
-      fail
-    end
+      error = JSON.parse("#{e.response_body}")
+      puts "Exception when calling TegileApi(project_exists): #{error["message"]}"
+    end 
   end
 
   def project_create(project_name,pool_name,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size)

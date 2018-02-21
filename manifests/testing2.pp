@@ -103,24 +103,24 @@ node 'tegile-3.7.1.x' {
   # #  initiator_chap_secret     => "",
   # }
 
-  iscsi_target_group { 'TestingResource7':
-    ensure                  => present,
-    iscsi_target_group_name => "puppet-iscsi-target-group1",
-    pool_name               => "pool-a",
-    members                 => ["puppet-iscsi-target1"],
-  }
+  # iscsi_target_group { 'TestingResource7':
+  #   ensure                  => present,
+  #   iscsi_target_group_name => "puppet-iscsi-target-group1",
+  #   pool_name               => "pool-a",
+  #   members                 => ["puppet-iscsi-target1"],
+  # }
   
-  iscsi_target { 'TestingResource6':
-   ensure                    => present,
-   iscsi_target_name         => "puppet-iscsi-target1",
-   iscsi_target_alias        => "puppet-iscsi-target1",
-   pool_name                 => "pool-a",
-   iscsi_target_auth         => "none",
-  #  iscsi_target_chap_name    => "",
-  #  iscsi_target_chap_secret  => "",
-   iscsi_target_ip           => "10.65.103.83",
-   iscsi_target_port         => "3260",
-  }
+  # iscsi_target { 'TestingResource6':
+  #  ensure                    => present,
+  #  iscsi_target_name         => "puppet-iscsi-target1",
+  #  iscsi_target_alias        => "puppet-iscsi-target1",
+  #  pool_name                 => "pool-a",
+  #  iscsi_target_auth         => "none",
+  # #  iscsi_target_chap_name    => "",
+  # #  iscsi_target_chap_secret  => "",
+  #  iscsi_target_ip           => "10.65.103.83",
+  #  iscsi_target_port         => "3260",
+  # }
 
   # lun { 'TestingResource1':
   #   ensure                    => present,

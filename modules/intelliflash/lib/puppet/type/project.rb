@@ -1,5 +1,3 @@
-# require 'puppet/tegile-puppet'
-
 Puppet::Type.newtype(:project) do
   @doc = "Type for create/delete project"
   Puppet.info("##Inside type_root_project")
