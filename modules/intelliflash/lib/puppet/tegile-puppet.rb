@@ -43,11 +43,14 @@ class TegileApi
     end 
   end
 
-  def project_create(project_name,pool_name,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size)
+  def project_create(project_name,pool_name,compression_class,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size)
     api_instance = IFClient::DataApi.new
+    compression_class_inst = IFClient::CompressionClass.new
+    compression_class_inst.value = compression_class
     new_project = IFClient::Project_V2_1.new
     new_project.project_name = project_name
     new_project.pool_name = pool_name
+    new_project.compression_class = compression_class_inst
     new_project.compression = compression_type
     new_project.compressed_log = compressed_log
     new_project.intended_protocol_list = intended_protocol_list
@@ -476,6 +479,8 @@ class TegileApi
       modify_project.compressed_log = property_value
     when "compression_type"
       modify_project.compression = property_value
+    when "compression_class"
+      modify_project.compression_class = property_value
     end
     modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
     modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
@@ -493,6 +498,42 @@ class TegileApi
       error = JSON.parse("#{e.response_body}")
       fail "Exception when calling TegileApi(project_set): #{error["message"]}"
     end 
+  end
+
+  ## Method to check status of nfs sharing on a project
+  ## used by intended_protocol_list get method to check if nfs is enabled
+  def project_exposed_over_nfs(pool_name,project_name)
+    api_instance = IFClient::NasApi.new
+    is_project_exposed_over_nfs_param = IFClient::IsProjectExposedOverNFSParam.new
+    is_project_exposed_over_nfs_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      #Returns whether the NFS protocol is enabled for the Project
+      result = api_instance.is_project_exposed_over_nfs_post(is_project_exposed_over_nfs_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(project_exposed_over_nfs): #{error["message"]}"
+    end
+    
+  end
+
+   ## Method to check status of smb sharing on a project
+  ## used by intended_protocol_list get method to check if nfs is enabled
+  def project_exposed_over_smb(pool_name,project_name)
+    api_instance = IFClient::NasApi.new
+    is_project_exposed_over_smb_param = IFClient::IsProjectExposedOverSMBParam.new
+    is_project_exposed_over_smb_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    begin
+      #Returns whether the SMB protocol is enabled for the Project
+      result = api_instance.is_project_exposed_over_smb_post(is_project_exposed_over_smb_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(project_exposed_over_smb): #{error["message"]}"
+    end
+    
   end
 
 

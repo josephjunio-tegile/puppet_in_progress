@@ -42,6 +42,10 @@ Puppet::Type.newtype(:project) do
     Puppet.info("##Inside type_param_pool_name")
   end
   
+  newproperty(:compression_class) do
+    Puppet.info("##Inside type_property_compression_class")
+  end
+  
   newproperty(:compression_type) do
     Puppet.info("##Inside type_property_compression_type")
   end

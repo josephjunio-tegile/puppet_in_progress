@@ -93,7 +93,7 @@ node 'tegile-3.7.1.x' {
   # initiator_group { 'TestingResource5':
   #  ensure               => present,
   #  initiator_group_name => "puppet-initiator-group1",
-  #  members              => ["iqn.2017-07.com.test:puppet-host3","iqn.2017-07.com.test:puppet-host1"],
+  #  members              => ["iqn.2017-07.com.test:puppet-host1"],
   # }
 
   # initiator { 'TestingResource4':
@@ -143,45 +143,53 @@ node 'tegile-3.7.1.x' {
   # #  lun_mappings               => [["initiator-group3", "iscsi-target-group3", 3, false],["puppet-initiator-group1", "puppet-iscsi-target-group1", 4, false]],
   # }
 
-  # share { 'TestingResource2':
-  #   ensure                            => present,
-  #   share_name                        => "puppet-share3",
-  #   project_name                      => "puppet-project1",
-  #   pool_name                         => "pool-a",
-  #   block_size                        => "16KB",
-  #   mount_point                       => "/export/custom-mounts/p-s3",
-  #   dedup                             => "on",
-  #   compression                       => "lz4",
-  #   quota                             => 350,
-  #   reservation                       => 120,
-  #   readonly                          => "off",
-  #   logbias                           => "latency",
-  #   primary_cache                     => "all",
-  #   secondary_cache                   => "all",
-  #   acl_inherit                       => "on",
-  #   # override_project_nfs_network_acls => "yes",
-  #   # nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.5", "rw", false]],
-  # }
+  share { 'TestingResource2':
+    ensure                            => present,
+    share_name                        => "puppet-share1",
+    project_name                      => "puppet-project1",
+    pool_name                         => "pool-a",
+    block_size                        => "4KB",
+    # mount_point                       => "/export/custom-mounts/p-s3",
+    # dedup                             => "on",
+    compression                       => "lz4",
+    # quota                             => 350,
+    # reservation                       => 120,
+    # readonly                          => "off",
+    # logbias                           => "latency",
+    # primary_cache                     => "all",
+    # secondary_cache                   => "all",
+    # acl_inherit                       => "on",
+    # override_project_nfs_network_acls => "yes",
+    # nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.5", "rw", false]],
+  }
 
   # project { 'TestingResource3':
   #   ensure                     => present,
-  #   project_name               => "puppet-project1",
+  #   project_name               => "puppet-proj-yestp",
   #   pool_name                  => "pool-a",
-  #   compression_type           => "off",
-  #   compressed_log             => "off",
-  #   # intended_protocol_list     => ["iscsi", "nfs"],
-  #   quota                      => 0,
-  #   dedup                      => "on",
-  #   primary_cache              => "all",
-  #   secondary_cache            => "all",
-  #   default_lun_block_size     => "8KB",
-  #   default_share_block_size   => "4KB",
-  #   default_thin_provisioning  => true,
-  #   default_lun_size           => 322,
-  #   acl_inherit                => "off",
-  #   readonly                   => "off",
+  #   # compression_class          => "Optimal Performance",
+  #   # compression_type           => "off",
+  #   # compressed_log             => "off",
+  #   # intended_protocol_list     => ["nfs","smb"],
+  #   # quota                      => 0,
+  #   # dedup                      => "on",
+  #   # primary_cache              => "all",
+  #   # secondary_cache            => "all",
+  #   # default_lun_block_size     => "8KB",
+  #   # default_share_block_size   => "4KB",
+  #   # default_thin_provisioning  => true,
+  #   # default_lun_size           => 322,
+  #   # acl_inherit                => "off",
+  #   # readonly                   => "off",
   #   # lun_mappings               => [["initiator-group1", "iscsi-target-group1", -1, false],["initiator-group2", "iscsi-target-group2", -1, false]],
   #   # nfs_network_acls           => [["IP", "1.1.1.1", "rw", false],["IP", "2.2.2.2", "rw", false]],
   # }
+  
+
+
+
+
+
+
 }
 

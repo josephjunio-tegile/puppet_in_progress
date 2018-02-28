@@ -172,14 +172,14 @@ def lun_get(pool_name,project_name,lun_name)
 end
 
 # project_create("api-project1","pool-a")
-project_get("pool-a","api-project1")
-project_get("pool-a","ui-project1")
+# project_get("pool-a","vs-proj")
+# project_get("pool-a","gen-proj")
 # share_create("pool-a","api-project1","share1","")
-share_get("pool-a","api-project1","share1")
-share_get("pool-a","ui-project1","share1")
+share_get("pool-a","gen-proj","gen-share")
+# share_get("pool-a","puppet-proj-notp","puppet-share")
 # lun_create("lun1","pool-a","api-project1","iSCSI",119185342464)
-lun_get("pool-a","api-project1","lun1")
-lun_get("pool-a","ui-project1","lun1")
+lun_get("pool-a","gen-proj","gen-lun")
+# lun_get("pool-a","puppet-proj-notp","lun1-2")
 
 # puts "get_initiator_group"
 # api_instance = IFClient::SANApi.new

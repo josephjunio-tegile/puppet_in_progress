@@ -6,7 +6,7 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def create
     Puppet.info("##Inside provider_project_create")
-    tegile_api_transport.project_create(resource[:project_name],resource[:pool_name],resource[:compression_type],resource[:compressed_log],resource[:intended_protocol_list],resource[:quota],resource[:dedup],resource[:primary_cache],resource[:secondary_cache],resource[:acl_inherit],resource[:default_lun_size],resource[:default_lun_block_size],resource[:default_thin_provisioning],resource[:default_share_block_size])
+    tegile_api_transport.project_create(resource[:project_name],resource[:pool_name],resource[:compression_class],resource[:compression_type],resource[:compressed_log],resource[:intended_protocol_list],resource[:quota],resource[:dedup],resource[:primary_cache],resource[:secondary_cache],resource[:acl_inherit],resource[:default_lun_size],resource[:default_lun_block_size],resource[:default_thin_provisioning],resource[:default_share_block_size])
     if resource[:intended_protocol_list] != nil
       enabled_protocols = resource[:intended_protocol_list]
       if enabled_protocols.include?("NFS")
@@ -184,22 +184,49 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
     tegile_api_transport.project_set("compression_type",should,resource[:pool_name],resource[:project_name])
   end
 
-  def intended_protocol_list
-    Puppet.info("##Inside provider_project_intended_protocol_list_get")
-    tegile_api_transport.project_intended_protocol_list_get(resource[:pool_name],resource[:project_name])
+  def compression_class
+    Puppet.info("##Inside provider_project_compression_class_get")
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    # puts returned.compression_class.inspect
+    returned.compression_class.value
   end
 
-  def intended_protocol_list=(value)
+  def compression_class=(should)
+    Puppet.info("##Inside provider_project_compression_class_set")
+    tegile_api_transport.project_set("compression_class",should,resource[:pool_name],resource[:project_name])
+  end
+
+  def intended_protocol_list
+    Puppet.info("##Inside provider_project_intended_protocol_list_get")
+    # tegile_api_transport.project_intended_protocol_list_get(resource[:pool_name],resource[:project_name])
+    is = resource[:intended_protocol_list]
+    if is.include?("NFS")
+      if tegile_api_transport.project_exposed_over_nfs(resource[:pool_name],resource[:project_name]) != true
+        is.delete("NFS")
+      end
+    end
+    if is.include?("SMB")
+      if tegile_api_transport.project_exposed_over_smb(resource[:pool_name],resource[:project_name]) != true
+        is.delete("SMB")
+      end
+    end
+    # puts is.inspect
+    return is
+  end
+
+  def intended_protocol_list=(should)
     Puppet.info("##Inside provider_project_intended_protocol_list_set")
-    tegile_api_transport.project_intended_protocol_list_set(value,resource[:pool_name],resource[:project_name])
-    if value.include?("NFS")
-      puts "enabling nfs"
-      tegile_api_transport.set_nfs_sharing_on(resource[:project_name],resource[:pool_name])
+    if should.include?("NFS")
+      if tegile_api_transport.project_exposed_over_nfs(resource[:pool_name],resource[:project_name]) != true
+        tegile_api_transport.set_nfs_sharing_on(resource[:project_name],resource[:pool_name])
+      end
     end
-    if value.include?("SMB")
-      puts "enabling smb"
-      tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
+    if should.include?("SMB")
+      if tegile_api_transport.project_exposed_over_smb(resource[:pool_name],resource[:project_name]) != true
+        tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
+      end
     end
+    # puts should.inspect
   end
 
   def lun_mappings
