@@ -247,23 +247,27 @@ class TegileApi
     end
   end
 
-  def project_set_smb_sharing_on(project_name,pool_name)
+  ## Method to enable/disable SMB on project
+  ## Used by share_protocol property "=" method 
+  def project_set_smb_sharing(project_name,pool_name,enabled)
     api_instance = IFClient::NasApi.new
     set_smb_sharing_on_project_param = IFClient::SetSMBSharingOnProjectParam.new
     set_smb_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    set_smb_sharing_on_project_param.arg1_turn_on = true
+    set_smb_sharing_on_project_param.arg1_turn_on = enabled
     begin
       ##Enable/Disable SMB protocol for a Project, If the dataset contains any network ACLs, they are removed as well.
       result = api_instance.set_smb_sharing_on_project_post(set_smb_sharing_on_project_param)
       # puts result.inspect
-      if result.value == 0
+      if result.value == 0 && enabled == true
         puts "smb enabled"
+      elsif result.value == 0 && enabled == false
+        puts "smb disabled"
       else
-        puts "Error with TegileApi(project_set_smb_sharing_on)"
+        fail "Error with TegileApi(project_set_smb_sharing)"
       end
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
-      puts "Exception when calling TegileApi(project_set_smb_sharing_on): #{error["message"]}"
+      fail "Exception when calling TegileApi(project_set_smb_sharing): #{error["message"]}"
     end 
   end
 
@@ -534,6 +538,30 @@ class TegileApi
       fail "Exception when calling TegileApi(project_exposed_over_smb): #{error["message"]}"
     end
     
+  end
+
+  ## Method to enable/disable NFS on project
+  ## Used by share_protocol property "=" method 
+  def project_set_nfs_sharing(project_name,pool_name,enabled)
+    api_instance = IFClient::NasApi.new
+    set_nfs_sharing_on_project_param = IFClient::SetNFSSharingOnProjectParam.new
+    set_nfs_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+    set_nfs_sharing_on_project_param.arg1_turn_on = enabled
+    begin
+      ##Enable/Disable NFS protocol for a Project
+      result = api_instance.set_nfs_sharing_on_project_post(set_nfs_sharing_on_project_param)
+      #puts result
+      if result.value == 0 && enabled == true
+        puts "nfs enabled"
+      elsif result.value == 0 && enabled == false
+        puts "nfs disabled"
+      else
+        fail "Error with TegileApi(project_set_nfs_sharing)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(project_set_nfs_sharing): #{error["message"]}"
+    end 
   end
 
 
@@ -1684,25 +1712,7 @@ class TegileApi
     end
   end
 
-  def set_nfs_sharing_on(project_name,pool_name)
-    api_instance = IFClient::NasApi.new
-    set_nfs_sharing_on_project_param = IFClient::SetNFSSharingOnProjectParam.new
-    set_nfs_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
-    set_nfs_sharing_on_project_param.arg1_turn_on = true
-    begin
-      ##Enable/Disable NFS protocol for a Project
-      result = api_instance.set_nfs_sharing_on_project_post(set_nfs_sharing_on_project_param)
-      #puts result
-      if result.value == 0
-        puts "nfs enabled"
-      else
-        fail "Error with TegileApi(set_nfs_sharing_on)"
-      end
-    rescue IFClient::ApiError => e
-      error = JSON.parse("#{e.response_body}")
-      fail "Exception when calling TegileApi(set_nfs_sharing_on): #{error["message"]}"
-    end 
-  end
+  
 
   def get_lun_size(lun_name,pool_name,project_name)
     api_instance = IFClient::DataApi.new

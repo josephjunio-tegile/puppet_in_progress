@@ -54,6 +54,7 @@ Puppet::Type.newtype(:project) do
     Puppet.info("##Inside type_property_compressed_log")
   end
 
+  #! going away
   newproperty(:intended_protocol_list, :array_matching => :all) do
     Puppet.info("##Inside type_property_intended_protocol_list")
     ##Make sure value in manifest is all uppercase
@@ -62,6 +63,15 @@ Puppet::Type.newtype(:project) do
       if upcase == "ISCSI"
         return "iSCSI"
       end
+      return upcase
+    end
+  end
+
+  newproperty(:share_protocol) do
+    Puppet.info("##Inside type_property_share_protocol")
+    ## Upcase so that we can compare
+    munge do |value|
+      upcase = value.upcase
       return upcase
     end
   end

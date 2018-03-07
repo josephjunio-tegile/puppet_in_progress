@@ -171,46 +171,50 @@ def lun_get(pool_name,project_name,lun_name)
   end 
 end
 
+def set_nfs_network_ac_ls_on_project(pool_name,project_name)
+  api_instance = IFClient::NasApi.new
+  net_acl = IFClient::NetworkACL_V2_1.new
+  net_acl.host_type = "IP"
+  net_acl.host = "1.1.1.1"
+  net_acl.access_mode = "rw"
+  net_acl.root_access_for_nfs = false
+  set_nfs_network_ac_ls_on_project_param = IFClient::SetNFSNetworkACLsOnProjectParam.new
+  set_nfs_network_ac_ls_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+  set_nfs_network_ac_ls_on_project_param.arg1_network_ac_ls = [net_acl]
+  begin
+    #Set the network ACLS on the NFS Project If the dataset contains any network ACLs, they will be removed as well.
+    result = api_instance.set_nfs_network_ac_ls_on_project_post(set_nfs_network_ac_ls_on_project_param)
+    puts result.inspect
+  rescue IFClient::ApiError => e
+    error = JSON.parse("#{e.response_body}")
+    fail "Exception when calling TegileApi(set_nfs_network_ac_ls_on_project): #{error["message"]}"
+  end
+end
+
+def set_nfs_sharing_on_project(pool_name,project_name)
+  api_instance = IFClient::NasApi.new
+  set_nfs_sharing_on_project_param = IFClient::SetNFSSharingOnProjectParam.new
+  set_nfs_sharing_on_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+  set_nfs_sharing_on_project_param.arg1_turn_on = true
+  begin
+    #Enable/Disable NFS protocol for a Project
+    result = api_instance.set_nfs_sharing_on_project_post(set_nfs_sharing_on_project_param)
+    puts result.inspect
+  rescue IFClient::ApiError => e
+    error = JSON.parse("#{e.response_body}")
+    fail "Exception when calling TegileApi(set_nfs_sharing_on_project): #{error["message"]}"
+  end
+end
+
 # project_create("api-project1","pool-a")
 # project_get("pool-a","vs-proj")
 # project_get("pool-a","gen-proj")
 # share_create("pool-a","api-project1","share1","")
-share_get("pool-a","gen-proj","gen-share")
+# share_get("pool-a","gen-proj","gen-share")
 # share_get("pool-a","puppet-proj-notp","puppet-share")
 # lun_create("lun1","pool-a","api-project1","iSCSI",119185342464)
-lun_get("pool-a","gen-proj","gen-lun")
+# lun_get("pool-a","gen-proj","gen-lun")
 # lun_get("pool-a","puppet-proj-notp","lun1-2")
+set_nfs_network_ac_ls_on_project("pool-a","api-project1")
+# set_nfs_sharing_on_project("pool-a","api-project1")
 
-# puts "get_initiator_group"
-# api_instance = IFClient::SANApi.new
-# get_initiator_group_param = IFClient::GetInitiatorGroupParam.new # GetInitiatorGroupParam | 
-# get_initiator_group_param.arg0_initiator_name = "iqn.2017-07.com.test:puppet-host1"
-# begin
-#   #Gets the name of the initiator group to which the initiator belongs.
-#   result = api_instance.get_initiator_group_post(get_initiator_group_param)
-#   puts result.inspect
-# rescue IFClient::ApiError => e
-#   puts "Exception when calling SANApi->get_initiator_group_post: #{e}"
-# end
-
-# puts "list_iscsi_initiators_post"
-# api_instance = IFClient::SANApi.new
-# list_iscsi_initiators_param = IFClient::ListISCSIInitiatorsParam.new # ListISCSIInitiatorsParam | 
-# list_iscsi_initiators_param.arg0_initiator_name_pattern = ".*"
-# begin
-#   #List iSCSI Initiators with name matching specified pattern
-#   result = api_instance.list_iscsi_initiators_post(list_iscsi_initiators_param)
-#   puts result
-# rescue IFClient::ApiError => e
-#   puts "Exception when calling SANApi->list_iscsi_initiators_post: #{e}"
-# end
-
-
-# api_instance = IFClient::SANApi.new
-# begin
-#   #List all initiator groups available on IntelliFlash Array
-#   result = api_instance.list_initiator_groups_get
-#   puts result
-# rescue IFClient::ApiError => e
-#   puts "Exception when calling SANApi->list_initiator_groups_get: #{e}"
-# end

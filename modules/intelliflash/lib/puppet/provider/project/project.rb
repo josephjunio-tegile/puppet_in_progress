@@ -18,6 +18,24 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
         tegile_api_transport.project_set_smb_sharing_on(resource[:project_name],resource[:pool_name])
       end
     end
+    if resource[:share_protocol] != nil
+      if resource[:share_protocol] == "SMB+NFS"
+        #! NEED TO CHECK FOR v3 right here
+        tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],true)
+        tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],true)
+      elsif resource[:share_protocol] == "NFS"
+        tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],true)
+        tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],false)
+      elsif resource[:share_protocol] == "SMB"
+        tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],true)
+        tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],false)
+      elsif resource[:share_protocol] == "NONE"
+        tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],false)
+        tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],false)
+      else
+        fail "issue finding share_protocol value to set"
+      end
+    end
     if resource[:lun_mappings] != nil
       resource[:lun_mappings].each do |sub_array|
         tegile_api_transport.project_lun_mapping_set_add(resource[:pool_name],resource[:project_name],sub_array)
@@ -227,6 +245,43 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
       end
     end
     # puts should.inspect
+  end
+
+  def share_protocol
+    nfs_on = tegile_api_transport.project_exposed_over_nfs(resource[:pool_name],resource[:project_name])
+    smb_on = tegile_api_transport.project_exposed_over_smb(resource[:pool_name],resource[:project_name])
+    if nfs_on && smb_on == true
+      puts "nfs & smb enabled"
+      return "SMB+NFS"
+    elsif nfs_on == true
+      puts "nfs is enabled"
+      return "NFS"
+    elsif smb_on == true
+      puts "smb is enabled"
+      return "SMB"
+    else 
+      puts "no sharing enabled"
+      return "NONE"
+    end
+  end
+
+  def share_protocol=(should)
+    if should == "SMB+NFS"
+      #! NEED TO CHECK FOR v3 right here
+      tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],true)
+      tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],true)
+    elsif should == "NFS"
+      tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],true)
+      tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],false)
+    elsif should == "SMB"
+      tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],true)
+      tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],false)
+    elsif should == "NONE"
+      tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],false)
+      tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],false)
+    else
+      fail "issue finding share_protocol value to set"
+    end
   end
 
   def lun_mappings
