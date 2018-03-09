@@ -519,11 +519,10 @@ class TegileApi
       error = JSON.parse("#{e.response_body}")
       fail "Exception when calling TegileApi(project_exposed_over_nfs): #{error["message"]}"
     end
-    
   end
 
    ## Method to check status of smb sharing on a project
-  ## used by intended_protocol_list get method to check if nfs is enabled
+   ## used by intended_protocol_list get method to check if nfs is enabled
   def project_exposed_over_smb(pool_name,project_name)
     api_instance = IFClient::NasApi.new
     is_project_exposed_over_smb_param = IFClient::IsProjectExposedOverSMBParam.new
@@ -568,12 +567,11 @@ class TegileApi
 
 
 
-  def share_create(pool_name,project_name,share_name,block_size,mount_point)
+  def share_create(pool_name,project_name,share_name,mount_point) #,block_size
     api_instance = IFClient::DataApi.new
     ##Set share option params
     new_share_options = IFClient::ShareOptions.new
-    #new_share_options.block_size = IFClient::BlockSizeEnum::N32_KB
-    new_share_options.block_size = block_size
+    new_share_options.block_size = ""
     new_share_options.mount_point = mount_point
     new_share_options.quota = -1
     new_share_options.reservation = -1
@@ -870,6 +868,90 @@ class TegileApi
       error = JSON.parse("#{e.response_body}")
       fail "Exception when calling TegileApi(share_set): #{error["message"]}"
     end 
+  end
+
+  ## Method to check status of nfs sharing on a share
+  ## used by share_protocol is method to check if nfs is enabled
+  def share_exposed_over_nfs(pool_name,project_name,share_name)
+    api_instance = IFClient::NasApi.new
+    is_share_exposed_over_nfs_param = IFClient::IsShareExposedOverNFSParam.new
+    is_share_exposed_over_nfs_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      #Returns whether the NFS protocol is enabled for the share
+      result = api_instance.is_share_exposed_over_nfs_post(is_share_exposed_over_nfs_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_exposed_over_nfs): #{error["message"]}"
+    end
+  end
+
+  ## Method to check status of smb sharing on a share
+  ## used by share_protocol is method to check if smb is enabled
+  def share_exposed_over_smb(pool_name,project_name,share_name)
+    api_instance = IFClient::NasApi.new
+    is_share_exposed_over_smb_param = IFClient::IsShareExposedOverSMBParam.new
+    is_share_exposed_over_smb_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    begin
+      #Returns whether the SMB protocol is enabled for the share
+      result = api_instance.is_share_exposed_over_smb_post(is_share_exposed_over_smb_param)
+      # puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_exposed_over_smb): #{error["message"]}"
+    end
+  end
+
+  ## Method to enable/disable NFS on share
+  ## Used by share_protocol property "=" method 
+  def share_set_nfs_sharing(pool_name,project_name,share_name,enabled)
+    api_instance = IFClient::NasApi.new
+    set_nfs_sharing_on_share_param = IFClient::SetNFSSharingOnShareParam.new
+    set_nfs_sharing_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    set_nfs_sharing_on_share_param.arg1_turn_on = enabled
+    begin
+      #Enable/Disable NFS protocol for a share. If the dataset contains any network ACLs, they will be removed as well.
+      result = api_instance.set_nfs_sharing_on_share_post(set_nfs_sharing_on_share_param)
+      # puts result.inspect
+      if result.value == 0 && enabled == true
+        puts "nfs enabled"
+      elsif result.value == 0 && enabled == false
+        puts "nfs disabled"
+      else
+        fail "Error with TegileApi(share_set_nfs_sharing)"
+      end
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_set_nfs_sharing): #{error["message"]}"
+    end 
+  end
+
+  ## Method to enable/disable SMB on share
+  ## Used by share_protocol property "=" method 
+  def share_set_smb_sharing(pool_name,project_name,share_name,enabled)
+    api_instance = IFClient::NasApi.new
+    set_smb_sharing_on_share_param = IFClient::SetSMBSharingOnShareParam.new
+    set_smb_sharing_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+    set_smb_sharing_on_share_param.arg1_turn_on = enabled
+    set_smb_sharing_on_share_param.arg2_display_name = "#{project_name}-#{share_name}"
+    set_smb_sharing_on_share_param.arg3_enable_guest_mode = false
+    begin
+      #Enable/Disable SMB protocol for a share. If the dataset contains any network ACLs, they will be removed as well.
+      result = api_instance.set_smb_sharing_on_share_post(set_smb_sharing_on_share_param)
+      # puts result.inspect
+      if result.value == 0 && enabled == true
+        puts "smb enabled"
+      elsif result.value == 0 && enabled == false
+        puts "smb disabled"
+      else
+        fail "Error with TegileApi(share_set_smb_sharing)"
+      end
+    rescue IFClient::ApiError => e
+      # error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(share_set_smb_sharing): #{e}"  #rror["message"]
+    end
   end
 
 
@@ -1712,8 +1794,6 @@ class TegileApi
     end
   end
 
-  
-
   def get_lun_size(lun_name,pool_name,project_name)
     api_instance = IFClient::DataApi.new
     get_volume_param = IFClient::GetVolumeParam.new
@@ -1729,7 +1809,22 @@ class TegileApi
     end
   end
 
-  
+  def inherit_property_from_project(pool_name,project_name,vol_name,prop)
+    api_instance = IFClient::DataApi.new
+    inherit_property_from_project_param = IFClient::InheritPropertyFromProjectParam.new
+    inherit_property_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{vol_name}"
+    inherit_property_from_project_param.arg1_prop_name = prop
+    begin
+    #Inherit properties from parent project settings (revert/rollback to parent setting)
+    result = api_instance.inherit_property_from_project_post(inherit_property_from_project_param)
+    puts result.inspect
+    return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(inherit_property_from_project_post): #{error["message"]}"
+    end
+  end
+
 
 
 end

@@ -69,6 +69,55 @@ def project_get(pool_name,project_name)
   end
 end
 
+def project_set(property,property_value,pool_name,project_name)
+  api_instance = IFClient::DataApi.new
+  modify_project = IFClient::Project_V2_1.new
+  case property
+  when "default_volume_size_in_byte"
+    modify_project.default_volume_size_in_byte = property_value
+  when "default_volume_block_size"
+    modify_project.default_volume_block_size = property_value
+  when "primary_cache"
+    modify_project.primary_cache = property_value
+  when "secondary_cache"
+    modify_project.secondary_cache = property_value
+  when "acl_inherit"
+    modify_project.acl_inherit = property_value
+  when "record_size"
+    modify_project.record_size = property_value
+  when "readonly"
+    modify_project.readonly = property_value
+  when "default_thin_provisioning"
+    modify_project.default_thin_provisioning = property_value
+  when "dedup"
+    modify_project.dedup = property_value
+  when "quota"
+    modify_project.quota_in_byte = property_value
+  when "compressed_log"
+    modify_project.compressed_log = property_value
+  when "compression_type"
+    modify_project.compression = property_value
+  when "compression_class"
+    modify_project.compression_class = property_value
+  end
+  modify_project_properties_param = IFClient::ModifyProjectPropertiesParam.new
+  modify_project_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}"
+  modify_project_properties_param.arg1_project = modify_project
+  begin
+    ##Modify value of a subset of Project properties
+    result = api_instance.modify_project_properties_post(modify_project_properties_param)
+    if result.value == 0
+      # puts result.inspect
+      puts "set #{property} to #{property_value}"
+    else
+      fail "Error with TegileApi(project_set)"
+    end
+  rescue IFClient::ApiError => e
+    error = JSON.parse("#{e.response_body}")
+    fail "Exception when calling TegileApi(project_set): #{error["message"]}"
+  end 
+end
+
 def share_create(pool_name,project_name,share_name,block_size)
   #,mount_point)
   api_instance = IFClient::DataApi.new
@@ -206,15 +255,32 @@ def set_nfs_sharing_on_project(pool_name,project_name)
   end
 end
 
+def inherit_property_from_project(pool_name,project_name,vol_name,prop)
+  api_instance = IFClient::DataApi.new
+  inherit_property_from_project_param = IFClient::InheritPropertyFromProjectParam.new
+  inherit_property_from_project_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{vol_name}"
+  inherit_property_from_project_param.arg1_prop_name = prop
+  begin
+  #Inherit properties from parent project settings (revert/rollback to parent setting)
+  result = api_instance.inherit_property_from_project_post(inherit_property_from_project_param)
+  puts result.inspect
+  rescue IFClient::ApiError => e
+    error = JSON.parse("#{e.response_body}")
+    fail "Exception when calling TegileApi(inherit_property_from_project_post): #{error["message"]}"
+  end
+end
+
 # project_create("api-project1","pool-a")
-# project_get("pool-a","vs-proj")
-# project_get("pool-a","gen-proj")
+# project_get("pool-a","puppet2")
+# project_set("default_volume_block_size","4KB","pool-a","puppet2")
 # share_create("pool-a","api-project1","share1","")
-# share_get("pool-a","gen-proj","gen-share")
-# share_get("pool-a","puppet-proj-notp","puppet-share")
-# lun_create("lun1","pool-a","api-project1","iSCSI",119185342464)
+# share_get("pool-a","puppet2","share1")
+# lun_create("lun2","pool-a","puppet2","iSCSI",119185342464)
 # lun_get("pool-a","gen-proj","gen-lun")
-# lun_get("pool-a","puppet-proj-notp","lun1-2")
-set_nfs_network_ac_ls_on_project("pool-a","api-project1")
+# set_nfs_network_ac_ls_on_project("pool-a","api-project1")
 # set_nfs_sharing_on_project("pool-a","api-project1")
+# inherit_property_from_project("pool-a","puppet2","share3","Sharenfs")
+# inherit_property_from_project("pool-a","puppet2","share3","Sharesmb")
+
+share_get("pool-a","puppet2","share3")
 

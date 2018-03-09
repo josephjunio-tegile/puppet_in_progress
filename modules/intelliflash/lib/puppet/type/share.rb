@@ -92,4 +92,13 @@ Puppet::Type.newtype(:share) do
     Puppet.info("##Inside type_property_acl_inherit")
   end
 
+  newproperty(:share_protocol) do
+    Puppet.info("##Inside type_property_share_protocol")
+    ## Upcase so that we can compare
+    munge do |value|
+      upcase = value.upcase
+      return upcase
+    end
+  end
+
  end

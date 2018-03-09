@@ -6,7 +6,7 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def create
     Puppet.info("##Inside provider_share_create")
-    tegile_api_transport.share_create(resource[:pool_name],resource[:project_name],resource[:share_name],resource[:block_size],resource[:mount_point])
+    tegile_api_transport.share_create(resource[:pool_name],resource[:project_name],resource[:share_name],resource[:mount_point])#,resource[:block_size]
     ##check if nfs_network_acls are present and sync them up
     if resource[:nfs_network_acls] != nil
       if resource[:override_project_nfs_network_acls] == "no" or resource[:override_project_nfs_network_acls] == nil
@@ -61,7 +61,10 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
       tegile_api_transport.share_set("logbias",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:share_name])
     end
     if resource[:acl_inherit] != nil
-      tegile_api_transport.share_set("acl_inherit",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:share_name])
+      tegile_api_transport.share_set("acl_inherit",resource[:acl_inherit],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:block_size] != nil
+      tegile_api_transport.share_set("block_size",resource[:block_size],resource[:pool_name],resource[:project_name],resource[:share_name])
     end
   end
 
@@ -263,6 +266,46 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def acl_inherit=(should)
     Puppet.info("##Inside provider_share_acl_inherit_set")
     tegile_api_transport.share_set("acl_inherit",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def share_protocol
+    nfs_on = tegile_api_transport.share_exposed_over_nfs(resource[:pool_name],resource[:project_name],resource[:share_name])
+    smb_on = tegile_api_transport.share_exposed_over_smb(resource[:pool_name],resource[:project_name],resource[:share_name])
+    if nfs_on && smb_on == true
+      puts "nfs & smb enabled"
+      return "SMB+NFS"
+    elsif nfs_on == true
+      puts "nfs is enabled"
+      return "NFS"
+    elsif smb_on == true
+      puts "smb is enabled"
+      return "SMB"
+    else 
+      puts "no sharing enabled"
+      return "NONE"
+    end
+  end
+
+  def share_protocol=(should)
+    if should == "SMB+NFS"
+      #! NEED TO CHECK FOR v3 right here
+      tegile_api_transport.share_set_smb_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],true)
+      tegile_api_transport.share_set_nfs_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],true)
+    elsif should == "NFS"
+      tegile_api_transport.share_set_nfs_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],true)
+      tegile_api_transport.share_set_smb_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],false)
+    elsif should == "SMB"
+      tegile_api_transport.share_set_smb_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],true)
+      tegile_api_transport.share_set_nfs_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],false)
+    elsif should == "NONE"
+      tegile_api_transport.share_set_nfs_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],false)
+      tegile_api_transport.share_set_smb_sharing(resource[:pool_name],resource[:project_name],resource[:share_name],false)
+    elsif should == "INHERIT"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"Sharenfs")
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"Sharesmb")
+    else
+      fail "issue finding share_protocol value to set"
+    end
   end
 
 
