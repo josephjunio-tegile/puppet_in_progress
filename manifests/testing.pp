@@ -55,11 +55,11 @@ node 'tegile-3.7.1.x' {
 
   share { 'TestingResource2':
     ensure                            => present,
-    share_name                        => "share3",
-    project_name                      => "puppet2",
+    share_name                        => "share1",
+    project_name                      => "puppet1",
     pool_name                         => "pool-a",
-    share_protocol                    => "inherit",
-    block_size                        => "4KB",
+    # share_protocol                    => "inherit",
+    # block_size                        => "4KB",
     # mount_point                       => "/export/custom-mounts/p-s3",
     # dedup                             => "on",
     # compression                       => "lz4",
@@ -74,28 +74,28 @@ node 'tegile-3.7.1.x' {
     # nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.5", "rw", false]],
   }
 
-  # project { 'TestingResource3':
-  #   ensure                     => present,
-  #   project_name               => "puppet2",
-  #   pool_name                  => "pool-a",
-  #   # compression_class          => "Optimal Performance",
-  #   # compression_type           => "off",
-  #   # compressed_log             => "off",
-  #   # intended_protocol_list     => ["nfs","smb"],
-  #   share_protocol             => "none", 
-  #   # quota                      => 0,
-  #   # dedup                      => "on",
-  #   # primary_cache              => "all",
-  #   # secondary_cache            => "all",
-  #   # default_lun_block_size     => "8KB",
-  #   # default_share_block_size   => "4KB",
-  #   # default_thin_provisioning  => true,
-  #   # default_lun_size           => 322,
-  #   # acl_inherit                => "off",
-  #   # readonly                   => "off",
-  #   # lun_mappings               => [["initiator-group1", "iscsi-target-group1", -1, false],["initiator-group2", "iscsi-target-group2", -1, false]],
-  #   # nfs_network_acls           => [["IP", "1.1.1.1", "rw", false],["IP", "2.2.2.2", "rw", false]],
-  # }
+  project { 'TestingResource3':
+    ensure                     => present,
+    project_name               => "puppet1",
+    pool_name                  => "pool-a",
+    # compression_class          => "Optimal Performance",
+    # compression_type           => "off",
+    # compressed_log             => "off",
+    # intended_protocol_list     => ["nfs","smb"],
+    # share_protocol             => "none", 
+    # quota                      => 0,
+    # dedup                      => "on",
+    # primary_cache              => "all",
+    # secondary_cache            => "all",
+    # default_lun_block_size     => "8KB",
+    # default_share_block_size   => "4KB",
+    # default_thin_provisioning  => true,
+    # default_lun_size           => 322,
+    # acl_inherit                => "off",
+    # readonly                   => "off",
+    # lun_mappings               => [["initiator-group1", "iscsi-target-group1", -1, false],["initiator-group2", "iscsi-target-group2", -1, false]],
+    # nfs_network_acls           => [["IP", "1.1.1.1", "rw", false],["IP", "2.2.2.2", "rw", false]],
+  }
   
 
 

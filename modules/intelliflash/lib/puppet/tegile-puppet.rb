@@ -1825,6 +1825,19 @@ class TegileApi
     end
   end
 
+  def get_smb_config
+    api_instance = IFClient::NasApi.new
+    begin
+      #Get SMB configuration
+      result = api_instance.get_smb_config_get
+      puts result.inspect
+      return result
+    rescue IFClient::ApiError => e
+      error = JSON.parse("#{e.response_body}")
+      fail "Exception when calling TegileApi(get_smb_config): #{error["message"]}"
+    end
+  end
+
 
 
 end

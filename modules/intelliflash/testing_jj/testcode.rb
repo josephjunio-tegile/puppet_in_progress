@@ -270,6 +270,18 @@ def inherit_property_from_project(pool_name,project_name,vol_name,prop)
   end
 end
 
+def get_smb_config
+  api_instance = IFClient::NasApi.new
+  begin
+    #Get SMB configuration
+    result = api_instance.get_smb_config_get
+    puts result.inspect
+  rescue IFClient::ApiError => e
+    error = JSON.parse("#{e.response_body}")
+    fail "Exception when calling TegileApi(get_smb_config): #{error["message"]}"
+  end
+end
+
 # project_create("api-project1","pool-a")
 # project_get("pool-a","puppet2")
 # project_set("default_volume_block_size","4KB","pool-a","puppet2")
@@ -281,6 +293,7 @@ end
 # set_nfs_sharing_on_project("pool-a","api-project1")
 # inherit_property_from_project("pool-a","puppet2","share3","Sharenfs")
 # inherit_property_from_project("pool-a","puppet2","share3","Sharesmb")
+get_smb_config
 
-share_get("pool-a","puppet2","share3")
+
 
