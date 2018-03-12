@@ -126,6 +126,112 @@ module IFClient
       return data, status_code, headers
     end
 
+    # Add network ACL to SMB Project
+    # 
+    # @param add_smb_network_acl_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def add_smb_network_acl_on_project_post(add_smb_network_acl_on_project_param, opts = {})
+      data, _status_code, _headers = add_smb_network_acl_on_project_post_with_http_info(add_smb_network_acl_on_project_param, opts)
+      return data
+    end
+
+    # Add network ACL to SMB Project
+    # 
+    # @param add_smb_network_acl_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def add_smb_network_acl_on_project_post_with_http_info(add_smb_network_acl_on_project_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.add_smb_network_acl_on_project_post ..."
+      end
+      # verify the required parameter 'add_smb_network_acl_on_project_param' is set
+      if @api_client.config.client_side_validation && add_smb_network_acl_on_project_param.nil?
+        fail ArgumentError, "Missing the required parameter 'add_smb_network_acl_on_project_param' when calling NasApi.add_smb_network_acl_on_project_post"
+      end
+      # resource path
+      local_var_path = "/addSMBNetworkACLOnProject"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(add_smb_network_acl_on_project_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#add_smb_network_acl_on_project_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Add network ACL to SMB share
+    # 
+    # @param add_smb_network_acl_on_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def add_smb_network_acl_on_share_post(add_smb_network_acl_on_param, opts = {})
+      data, _status_code, _headers = add_smb_network_acl_on_share_post_with_http_info(add_smb_network_acl_on_param, opts)
+      return data
+    end
+
+    # Add network ACL to SMB share
+    # 
+    # @param add_smb_network_acl_on_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def add_smb_network_acl_on_share_post_with_http_info(add_smb_network_acl_on_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.add_smb_network_acl_on_share_post ..."
+      end
+      # verify the required parameter 'add_smb_network_acl_on_param' is set
+      if @api_client.config.client_side_validation && add_smb_network_acl_on_param.nil?
+        fail ArgumentError, "Missing the required parameter 'add_smb_network_acl_on_param' when calling NasApi.add_smb_network_acl_on_share_post"
+      end
+      # resource path
+      local_var_path = "/addSMBNetworkACLOnShare"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(add_smb_network_acl_on_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#add_smb_network_acl_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # Returns all the Network ACLs for the NFS Project
     # 
     # @param get_nfs_network_ac_ls_on_project_param 
@@ -228,6 +334,159 @@ module IFClient
         :return_type => 'Array<NetworkACL_V2_1>')
       if @api_client.config.debugging
         @api_client.config.logger.debug "API called: NasApi#get_nfs_network_ac_ls_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Get SMB configuration
+    # 
+    # @param [Hash] opts the optional parameters
+    # @return [SMBConfig_V2_2]
+    def get_smb_config_get(opts = {})
+      data, _status_code, _headers = get_smb_config_get_with_http_info(opts)
+      return data
+    end
+
+    # Get SMB configuration
+    # 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(SMBConfig_V2_2, Fixnum, Hash)>] SMBConfig_V2_2 data, response status code and response headers
+    def get_smb_config_get_with_http_info(opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.get_smb_config_get ..."
+      end
+      # resource path
+      local_var_path = "/getSMBConfig"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = nil
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:GET, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'SMBConfig_V2_2')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#get_smb_config_get\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Returns all the Network ACLs for the SMB Project
+    # 
+    # @param get_smb_network_ac_ls_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<NetworkACL_V2_1>]
+    def get_smb_network_ac_ls_on_project_post(get_smb_network_ac_ls_on_project_param, opts = {})
+      data, _status_code, _headers = get_smb_network_ac_ls_on_project_post_with_http_info(get_smb_network_ac_ls_on_project_param, opts)
+      return data
+    end
+
+    # Returns all the Network ACLs for the SMB Project
+    # 
+    # @param get_smb_network_ac_ls_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(Array<NetworkACL_V2_1>, Fixnum, Hash)>] Array<NetworkACL_V2_1> data, response status code and response headers
+    def get_smb_network_ac_ls_on_project_post_with_http_info(get_smb_network_ac_ls_on_project_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.get_smb_network_ac_ls_on_project_post ..."
+      end
+      # verify the required parameter 'get_smb_network_ac_ls_on_project_param' is set
+      if @api_client.config.client_side_validation && get_smb_network_ac_ls_on_project_param.nil?
+        fail ArgumentError, "Missing the required parameter 'get_smb_network_ac_ls_on_project_param' when calling NasApi.get_smb_network_ac_ls_on_project_post"
+      end
+      # resource path
+      local_var_path = "/getSMBNetworkACLsOnProject"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(get_smb_network_ac_ls_on_project_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'Array<NetworkACL_V2_1>')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#get_smb_network_ac_ls_on_project_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Returns all the Network ACLs for the SMB share
+    # 
+    # @param get_smb_network_ac_ls_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<NetworkACL_V2_1>]
+    def get_smb_network_ac_ls_on_share_post(get_smb_network_ac_ls_on_share_param, opts = {})
+      data, _status_code, _headers = get_smb_network_ac_ls_on_share_post_with_http_info(get_smb_network_ac_ls_on_share_param, opts)
+      return data
+    end
+
+    # Returns all the Network ACLs for the SMB share
+    # 
+    # @param get_smb_network_ac_ls_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(Array<NetworkACL_V2_1>, Fixnum, Hash)>] Array<NetworkACL_V2_1> data, response status code and response headers
+    def get_smb_network_ac_ls_on_share_post_with_http_info(get_smb_network_ac_ls_on_share_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.get_smb_network_ac_ls_on_share_post ..."
+      end
+      # verify the required parameter 'get_smb_network_ac_ls_on_share_param' is set
+      if @api_client.config.client_side_validation && get_smb_network_ac_ls_on_share_param.nil?
+        fail ArgumentError, "Missing the required parameter 'get_smb_network_ac_ls_on_share_param' when calling NasApi.get_smb_network_ac_ls_on_share_post"
+      end
+      # resource path
+      local_var_path = "/getSMBNetworkACLsOnShare"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(get_smb_network_ac_ls_on_share_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'Array<NetworkACL_V2_1>')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#get_smb_network_ac_ls_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
       end
       return data, status_code, headers
     end
@@ -603,6 +862,112 @@ module IFClient
       return data, status_code, headers
     end
 
+    # Remove All network ACLs from SMB Project
+    # 
+    # @param remove_all_smb_network_ac_ls_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def remove_all_smb_network_ac_ls_on_project_post(remove_all_smb_network_ac_ls_on_project_param, opts = {})
+      data, _status_code, _headers = remove_all_smb_network_ac_ls_on_project_post_with_http_info(remove_all_smb_network_ac_ls_on_project_param, opts)
+      return data
+    end
+
+    # Remove All network ACLs from SMB Project
+    # 
+    # @param remove_all_smb_network_ac_ls_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def remove_all_smb_network_ac_ls_on_project_post_with_http_info(remove_all_smb_network_ac_ls_on_project_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.remove_all_smb_network_ac_ls_on_project_post ..."
+      end
+      # verify the required parameter 'remove_all_smb_network_ac_ls_on_project_param' is set
+      if @api_client.config.client_side_validation && remove_all_smb_network_ac_ls_on_project_param.nil?
+        fail ArgumentError, "Missing the required parameter 'remove_all_smb_network_ac_ls_on_project_param' when calling NasApi.remove_all_smb_network_ac_ls_on_project_post"
+      end
+      # resource path
+      local_var_path = "/removeAllSMBNetworkACLsOnProject"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(remove_all_smb_network_ac_ls_on_project_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#remove_all_smb_network_ac_ls_on_project_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Remove All network ACLs from SMB share
+    # 
+    # @param remove_all_smb_network_ac_ls_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def remove_all_smb_network_ac_ls_on_share_post(remove_all_smb_network_ac_ls_on_share_param, opts = {})
+      data, _status_code, _headers = remove_all_smb_network_ac_ls_on_share_post_with_http_info(remove_all_smb_network_ac_ls_on_share_param, opts)
+      return data
+    end
+
+    # Remove All network ACLs from SMB share
+    # 
+    # @param remove_all_smb_network_ac_ls_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def remove_all_smb_network_ac_ls_on_share_post_with_http_info(remove_all_smb_network_ac_ls_on_share_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.remove_all_smb_network_ac_ls_on_share_post ..."
+      end
+      # verify the required parameter 'remove_all_smb_network_ac_ls_on_share_param' is set
+      if @api_client.config.client_side_validation && remove_all_smb_network_ac_ls_on_share_param.nil?
+        fail ArgumentError, "Missing the required parameter 'remove_all_smb_network_ac_ls_on_share_param' when calling NasApi.remove_all_smb_network_ac_ls_on_share_post"
+      end
+      # resource path
+      local_var_path = "/removeAllSMBNetworkACLsOnShare"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(remove_all_smb_network_ac_ls_on_share_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#remove_all_smb_network_ac_ls_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
     # Remove network ACL from NFS Project
     # 
     # @param remove_nfs_network_acl_on_project_param 
@@ -705,6 +1070,112 @@ module IFClient
         :return_type => 'COMMAND_STATUS')
       if @api_client.config.debugging
         @api_client.config.logger.debug "API called: NasApi#remove_nfs_network_acl_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Remove network ACL from SMB Project
+    # 
+    # @param remove_smb_network_acl_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def remove_smb_network_acl_on_project_post(remove_smb_network_acl_on_project_param, opts = {})
+      data, _status_code, _headers = remove_smb_network_acl_on_project_post_with_http_info(remove_smb_network_acl_on_project_param, opts)
+      return data
+    end
+
+    # Remove network ACL from SMB Project
+    # 
+    # @param remove_smb_network_acl_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def remove_smb_network_acl_on_project_post_with_http_info(remove_smb_network_acl_on_project_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.remove_smb_network_acl_on_project_post ..."
+      end
+      # verify the required parameter 'remove_smb_network_acl_on_project_param' is set
+      if @api_client.config.client_side_validation && remove_smb_network_acl_on_project_param.nil?
+        fail ArgumentError, "Missing the required parameter 'remove_smb_network_acl_on_project_param' when calling NasApi.remove_smb_network_acl_on_project_post"
+      end
+      # resource path
+      local_var_path = "/removeSMBNetworkACLOnProject"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(remove_smb_network_acl_on_project_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#remove_smb_network_acl_on_project_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Remove network ACL from SMB share
+    # 
+    # @param remove_smb_network_acl_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def remove_smb_network_acl_on_share_post(remove_smb_network_acl_on_share_param, opts = {})
+      data, _status_code, _headers = remove_smb_network_acl_on_share_post_with_http_info(remove_smb_network_acl_on_share_param, opts)
+      return data
+    end
+
+    # Remove network ACL from SMB share
+    # 
+    # @param remove_smb_network_acl_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def remove_smb_network_acl_on_share_post_with_http_info(remove_smb_network_acl_on_share_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.remove_smb_network_acl_on_share_post ..."
+      end
+      # verify the required parameter 'remove_smb_network_acl_on_share_param' is set
+      if @api_client.config.client_side_validation && remove_smb_network_acl_on_share_param.nil?
+        fail ArgumentError, "Missing the required parameter 'remove_smb_network_acl_on_share_param' when calling NasApi.remove_smb_network_acl_on_share_post"
+      end
+      # resource path
+      local_var_path = "/removeSMBNetworkACLOnShare"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(remove_smb_network_acl_on_share_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#remove_smb_network_acl_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
       end
       return data, status_code, headers
     end
@@ -917,6 +1388,165 @@ module IFClient
         :return_type => 'COMMAND_STATUS')
       if @api_client.config.debugging
         @api_client.config.logger.debug "API called: NasApi#set_nfs_sharing_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Set SMB configuration
+    # 
+    # @param set_smb_config_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def set_smb_config_post(set_smb_config_param, opts = {})
+      data, _status_code, _headers = set_smb_config_post_with_http_info(set_smb_config_param, opts)
+      return data
+    end
+
+    # Set SMB configuration
+    # 
+    # @param set_smb_config_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def set_smb_config_post_with_http_info(set_smb_config_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.set_smb_config_post ..."
+      end
+      # verify the required parameter 'set_smb_config_param' is set
+      if @api_client.config.client_side_validation && set_smb_config_param.nil?
+        fail ArgumentError, "Missing the required parameter 'set_smb_config_param' when calling NasApi.set_smb_config_post"
+      end
+      # resource path
+      local_var_path = "/setSMBConfig"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(set_smb_config_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#set_smb_config_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Set the network ACLS on the SMB Project If the dataset contains any network ACLs, they will be removed as well.
+    # 
+    # @param set_smb_network_ac_ls_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def set_smb_network_ac_ls_on_project_post(set_smb_network_ac_ls_on_project_param, opts = {})
+      data, _status_code, _headers = set_smb_network_ac_ls_on_project_post_with_http_info(set_smb_network_ac_ls_on_project_param, opts)
+      return data
+    end
+
+    # Set the network ACLS on the SMB Project If the dataset contains any network ACLs, they will be removed as well.
+    # 
+    # @param set_smb_network_ac_ls_on_project_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def set_smb_network_ac_ls_on_project_post_with_http_info(set_smb_network_ac_ls_on_project_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.set_smb_network_ac_ls_on_project_post ..."
+      end
+      # verify the required parameter 'set_smb_network_ac_ls_on_project_param' is set
+      if @api_client.config.client_side_validation && set_smb_network_ac_ls_on_project_param.nil?
+        fail ArgumentError, "Missing the required parameter 'set_smb_network_ac_ls_on_project_param' when calling NasApi.set_smb_network_ac_ls_on_project_post"
+      end
+      # resource path
+      local_var_path = "/setSMBNetworkACLsOnProject"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(set_smb_network_ac_ls_on_project_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#set_smb_network_ac_ls_on_project_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
+      end
+      return data, status_code, headers
+    end
+
+    # Set the network ACLS on the SMB share. If the dataset contains any network ACLs, they will be removed as well.
+    # 
+    # @param set_smb_network_ac_ls_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [COMMAND_STATUS]
+    def set_smb_network_ac_ls_on_share_post(set_smb_network_ac_ls_on_share_param, opts = {})
+      data, _status_code, _headers = set_smb_network_ac_ls_on_share_post_with_http_info(set_smb_network_ac_ls_on_share_param, opts)
+      return data
+    end
+
+    # Set the network ACLS on the SMB share. If the dataset contains any network ACLs, they will be removed as well.
+    # 
+    # @param set_smb_network_ac_ls_on_share_param 
+    # @param [Hash] opts the optional parameters
+    # @return [Array<(COMMAND_STATUS, Fixnum, Hash)>] COMMAND_STATUS data, response status code and response headers
+    def set_smb_network_ac_ls_on_share_post_with_http_info(set_smb_network_ac_ls_on_share_param, opts = {})
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "Calling API: NasApi.set_smb_network_ac_ls_on_share_post ..."
+      end
+      # verify the required parameter 'set_smb_network_ac_ls_on_share_param' is set
+      if @api_client.config.client_side_validation && set_smb_network_ac_ls_on_share_param.nil?
+        fail ArgumentError, "Missing the required parameter 'set_smb_network_ac_ls_on_share_param' when calling NasApi.set_smb_network_ac_ls_on_share_post"
+      end
+      # resource path
+      local_var_path = "/setSMBNetworkACLsOnShare"
+
+      # query parameters
+      query_params = {}
+
+      # header parameters
+      header_params = {}
+      # HTTP header 'Accept' (if needed)
+      header_params['Accept'] = @api_client.select_header_accept(['application/json'])
+
+      # form parameters
+      form_params = {}
+
+      # http body (model)
+      post_body = @api_client.object_to_http_body(set_smb_network_ac_ls_on_share_param)
+      auth_names = ['basicAuth']
+      data, status_code, headers = @api_client.call_api(:POST, local_var_path,
+        :header_params => header_params,
+        :query_params => query_params,
+        :form_params => form_params,
+        :body => post_body,
+        :auth_names => auth_names,
+        :return_type => 'COMMAND_STATUS')
+      if @api_client.config.debugging
+        @api_client.config.logger.debug "API called: NasApi#set_smb_network_ac_ls_on_share_post\nData: #{data.inspect}\nStatus code: #{status_code}\nHeaders: #{headers}"
       end
       return data, status_code, headers
     end
