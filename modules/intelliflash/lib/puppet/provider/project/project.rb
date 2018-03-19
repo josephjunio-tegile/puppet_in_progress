@@ -267,7 +267,10 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def share_protocol=(should)
     if should == "SMB+NFS"
-      #! NEED TO CHECK FOR v3 right here
+      smb_status = tegile_api_transport.get_smb_config
+      if smb_status.smb_protocol_mode == "SMB3"
+        fail "SMBv3 enabled, NFS&SMB sharing not supported"
+      end
       tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],true)
       tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],true)
     elsif should == "NFS"

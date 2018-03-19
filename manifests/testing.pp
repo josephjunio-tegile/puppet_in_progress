@@ -8,7 +8,7 @@ node 'tegile-3.7.1.x' {
 
   # initiator { 'TestingResource4':
   #  ensure                    => present,
-  #  initiator_name            => "iqn.2017-07.com.test:puppet-host1",
+  #  initiator_name            => "iqn.2017-07.com.test:puppet-host2",
   # #  initiator_chap_user_name  => "",
   # #  initiator_chap_secret     => "",
   # }
@@ -53,26 +53,26 @@ node 'tegile-3.7.1.x' {
   # #  lun_mappings               => [["initiator-group3", "iscsi-target-group3", 3, false],["puppet-initiator-group1", "puppet-iscsi-target-group1", 4, false]],
   # }
 
-  share { 'TestingResource2':
-    ensure                            => present,
-    share_name                        => "share1",
-    project_name                      => "puppet1",
-    pool_name                         => "pool-a",
-    share_protocol                    => "smb+nfs",
-    # block_size                        => "4KB",
-    # mount_point                       => "/export/custom-mounts/p-s3",
-    # dedup                             => "on",
-    # compression                       => "lz4",
-    # quota                             => 350,
-    # reservation                       => 120,
-    # readonly                          => "off",
-    # logbias                           => "latency",
-    # primary_cache                     => "all",
-    # secondary_cache                   => "all",
-    # acl_inherit                       => "on",
-    # override_project_nfs_network_acls => "yes",
-    # nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.5", "rw", false]],
-  }
+  # share { 'TestingResource2':
+  #   ensure                            => present,
+  #   share_name                        => "share1",
+  #   project_name                      => "puppet1",
+  #   pool_name                         => "pool-a",
+  #   share_protocol                    => "smb+nfs",
+  #   # block_size                        => "4KB",
+  #   # mount_point                       => "/export/custom-mounts/p-s3",
+  #   # dedup                             => "on",
+  #   # compression                       => "gzip",
+  #   # quota                             => 350,
+  #   # reservation                       => 120,
+  #   # readonly                          => "off",
+  #   # logbias                           => "latency",
+  #   # primary_cache                     => "all",
+  #   # secondary_cache                   => "all",
+  #   # acl_inherit                       => "on",
+  #   # override_project_nfs_network_acls => "yes",
+  #   # nfs_network_acls                  => [["IP", "3.3.3.3", "rw", false],["IP", "4.4.4.5", "rw", false]],
+  # }
 
   project { 'TestingResource3':
     ensure                     => present,
