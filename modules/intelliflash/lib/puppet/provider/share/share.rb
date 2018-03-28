@@ -163,13 +163,49 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def dedup
     Puppet.info("##Inside provider_share_dedup_get")
     returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    if resource[:dedup] == "inherit"
+      if returned.override_dedup == false
+        return "inherit"
+      else
+        return returned.dedup
+      end
+    else
+      return returned.dedup
+    end
     # puts returned.dedup
-    returned.dedup
   end
 
   def dedup=(should)
     Puppet.info("##Inside provider_share_dedup_set")
-    tegile_api_transport.share_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"Dedup")
+    else
+      tegile_api_transport.share_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+  end
+
+  def compression_class
+    Puppet.info("##Inside provider_share_compression_class_get")
+    returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.compression_class.inspect
+    if resource[:compression_class] == "inherit"
+      if returned.override_compression == false
+        return "inherit"
+      else
+        return returned.compression_class.value
+      end
+    else
+      return returned.compression_class.value
+    end
+  end
+
+  def compression_class=(should)
+    Puppet.info("##Inside provider_share_compression_class_set")
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"Compression")
+    else
+      tegile_api_transport.share_set("compression_class",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
   end
 
   def compression
@@ -211,25 +247,49 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
   def readonly
     Puppet.info("##Inside provider_share_readonly_get")
     returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
-    # puts returned.readonly
-    returned.readonly
+    # puts returned.readonly    
+    if resource[:readonly] == "inherit"
+      if returned.override_readonly == false
+        return "inherit"
+      else
+        return returned.readonly
+      end
+    else
+      return returned.readonly
+    end
   end
 
   def readonly=(should)
     Puppet.info("##Inside provider_share_readonly_set")
-    tegile_api_transport.share_set("readonly",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"Readonly")
+    else
+      tegile_api_transport.share_set("readonly",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
   end
 
   def logbias
     Puppet.info("##Inside provider_share_logbias_get")
     returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
     # puts returned.logbias
-    returned.logbias
+    if resource[:logbias] == "inherit"
+      if returned.logbias == false
+        return "inherit"
+      else
+        return returned.logbias
+      end
+    else
+      return returned.logbias
+    end
   end
 
   def logbias=(should)
     Puppet.info("##Inside provider_share_logbias_set")
-    tegile_api_transport.share_set("logbias",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"Logbias")
+    else
+      tegile_api_transport.share_set("logbias",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
   end
 
   def primary_cache
@@ -260,29 +320,48 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     Puppet.info("##Inside provider_share_acl_inherit_get")
     returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
     # puts returned.acl_inherit
-    returned.acl_inherit
+    if resource[:acl_inherit] == "inherit"
+      if returned.override_acl_inherit == false
+        return "inherit"
+      else
+        return returned.acl_inherit
+      end
+    else
+      return returned.acl_inherit
+    end
   end
 
   def acl_inherit=(should)
     Puppet.info("##Inside provider_share_acl_inherit_set")
-    tegile_api_transport.share_set("acl_inherit",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"AclInherit")
+    else
+      tegile_api_transport.share_set("acl_inherit",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
   end
 
   def share_protocol
     nfs_on = tegile_api_transport.share_exposed_over_nfs(resource[:pool_name],resource[:project_name],resource[:share_name])
     smb_on = tegile_api_transport.share_exposed_over_smb(resource[:pool_name],resource[:project_name],resource[:share_name])
-    if nfs_on && smb_on == true
-      puts "nfs & smb enabled"
-      return "SMB+NFS"
-    elsif nfs_on == true
-      puts "nfs is enabled"
-      return "NFS"
-    elsif smb_on == true
-      puts "smb is enabled"
-      return "SMB"
-    else 
-      puts "no sharing enabled"
-      return "NONE"
+    returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    inherited = returned.override_sharenfs && returned.override_sharesmb
+    if resource[:share_protocol] == "INHERIT" && inherited == false
+      # puts "inherited"
+      return "INHERIT"
+    else
+      if nfs_on && smb_on == true
+        # puts "nfs & smb enabled"
+        return "SMB+NFS"
+      elsif nfs_on == true
+        # puts "nfs is enabled"
+        return "NFS"
+      elsif smb_on == true
+        # puts "smb is enabled"
+        return "SMB"
+      else 
+        # puts "no sharing enabled"
+        return "NONE"
+      end
     end
   end
 

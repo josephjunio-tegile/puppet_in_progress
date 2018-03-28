@@ -82,6 +82,24 @@ Puppet::Type.newtype(:lun) do
     end
   end
 
+  newproperty(:compression_class) do
+    Puppet.info("##Inside type_property_compression_class")
+    munge do |value|
+      upcase = value.upcase
+      case upcase
+      when "HIGH COMPRESSION"
+        return "High Compression"
+      when "OPTIMAL PERFORMANCE"
+        return "Optimal Performance"
+      when "OFF"
+        return "OFF"
+      when "INHERIT"
+        return "inherit"
+      end
+      # return upcase
+    end
+  end
+
   newproperty(:compression) do
     Puppet.info("##Inside type_property_compression")
   end

@@ -138,6 +138,30 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     returned.compression
   end
 
+  def compression_class
+    Puppet.info("##Inside provider_lun_compression_class_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    # puts returned.compression_class.inspect
+    if resource[:compression_class] == "inherit"
+      if returned.override_compression == false
+        return "inherit"
+      else
+        return returned.compression_class.value
+      end
+    else
+      return returned.compression_class.value
+    end
+  end
+
+  def compression_class=(should)
+    Puppet.info("##Inside provider_lun_compression_class_set")
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:lun_name],"Compression")
+    else
+      tegile_api_transport.lun_set("compression_class",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+    end
+  end
+
   def compression=(should)
     Puppet.info("##Inside provider_lun_compression_set")
     tegile_api_transport.lun_set("compression",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
@@ -159,12 +183,24 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     Puppet.info("##Inside provider_lun_dedup_get")
     returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
     # puts returned.dedup
-    returned.dedup
+    if resource[:dedup] == "inherit"
+      if returned.override_dedup == false
+        return "inherit"
+      else
+        return returned.dedup
+      end
+    else
+      return returned.dedup
+    end
   end
 
   def dedup=(should)
     Puppet.info("##Inside provider_lun_dedup_set")
-    tegile_api_transport.lun_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:lun_name],"Dedup")
+    else
+      tegile_api_transport.lun_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+    end
   end
 
   def primary_cache
@@ -195,12 +231,24 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
     Puppet.info("##Inside provider_lun_readonly_get")
     returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
     # puts returned.readonly
-    returned.readonly
+    if resource[:readonly] == "inherit"
+      if returned.override_readonly == false
+        return "inherit"
+      else
+        return returned.readonly
+      end
+    else
+      return returned.readonly
+    end
   end
 
   def readonly=(should)
     Puppet.info("##Inside provider_lun_readonly_set")
-    tegile_api_transport.lun_set("readonly",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:lun_name],"Readonly")
+    else
+      tegile_api_transport.lun_set("readonly",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+    end
   end
 
   def logbias

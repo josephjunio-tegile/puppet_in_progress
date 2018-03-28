@@ -118,13 +118,13 @@ def project_set(property,property_value,pool_name,project_name)
   end 
 end
 
-def share_create(pool_name,project_name,share_name,block_size)
+def share_create(pool_name,project_name,share_name)
   #,mount_point)
   api_instance = IFClient::DataApi.new
   ##Set share option params
   new_share_options = IFClient::ShareOptions.new
   #new_share_options.block_size = IFClient::BlockSizeEnum::N32_KB
-  new_share_options.block_size = block_size
+  new_share_options.block_size = ""
   # new_share_options.mount_point = mount_point
   new_share_options.quota = -1
   # new_share_options.reservation = -1
@@ -282,18 +282,48 @@ def get_smb_config
   end
 end
 
+def share_set_nfs_sharing(pool_name,project_name,share_name,enabled)
+  api_instance = IFClient::NasApi.new
+  set_nfs_sharing_on_share_param = IFClient::SetNFSSharingOnShareParam.new
+  set_nfs_sharing_on_share_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+  set_nfs_sharing_on_share_param.arg1_turn_on = enabled
+  begin
+    #Enable/Disable NFS protocol for a share. If the dataset contains any network ACLs, they will be removed as well.
+    result = api_instance.set_nfs_sharing_on_share_post(set_nfs_sharing_on_share_param)
+    # puts result.inspect
+    if result.value == 0 && enabled == true
+      puts "nfs enabled"
+    elsif result.value == 0 && enabled == false
+      puts "nfs disabled"
+    else
+      fail "Error with TegileApi(share_set_nfs_sharing)"
+    end
+  rescue IFClient::ApiError => e
+    error = JSON.parse("#{e.response_body}")
+    fail "Exception when calling TegileApi(share_set_nfs_sharing): #{error["message"]}"
+  end 
+end
+
 # project_create("api-project1","pool-a")
 # project_get("pool-a","puppet2")
 # project_set("default_volume_block_size","4KB","pool-a","puppet2")
-# share_create("pool-a","api-project1","share1","")
-# share_get("pool-a","puppet2","share1")
+share_create("pool-a","puppet1","share2")
+# share_get("pool-a","puppet1","share1")
 # lun_create("lun2","pool-a","puppet2","iSCSI",119185342464)
 # lun_get("pool-a","gen-proj","gen-lun")
 # set_nfs_network_ac_ls_on_project("pool-a","api-project1")
 # set_nfs_sharing_on_project("pool-a","api-project1")
-# inherit_property_from_project("pool-a","puppet2","share3","Sharenfs")
-# inherit_property_from_project("pool-a","puppet2","share3","Sharesmb")
-get_smb_config
+# inherit_property_from_project("pool-a","puppet1","share1","Sharesmb")
+# inherit_property_from_project("pool-a","puppet1","share1","Sharesmb")
+# get_smb_config
+# share_set_nfs_sharing("pool-a","puppet1","share1",true)
+
+
+
+
+
+
+
 
 
 

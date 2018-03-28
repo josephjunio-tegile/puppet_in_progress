@@ -851,6 +851,8 @@ class TegileApi
       modify_share.acl_inherit = property_value
     when "block_size"
       modify_share.record_size = property_value
+    when "compression_class"
+      modify_share.compression_class = property_value
     end
     modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
     modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
@@ -916,9 +918,9 @@ class TegileApi
       result = api_instance.set_nfs_sharing_on_share_post(set_nfs_sharing_on_share_param)
       # puts result.inspect
       if result.value == 0 && enabled == true
-        puts "nfs enabled"
+        # puts "nfs enabled"
       elsif result.value == 0 && enabled == false
-        puts "nfs disabled"
+        # puts "nfs disabled"
       else
         fail "Error with TegileApi(share_set_nfs_sharing)"
       end
@@ -942,9 +944,9 @@ class TegileApi
       result = api_instance.set_smb_sharing_on_share_post(set_smb_sharing_on_share_param)
       # puts result.inspect
       if result.value == 0 && enabled == true
-        puts "smb enabled"
+        # puts "smb enabled"
       elsif result.value == 0 && enabled == false
-        puts "smb disabled"
+        # puts "smb disabled"
       else
         fail "Error with TegileApi(share_set_smb_sharing)"
       end
@@ -1201,6 +1203,8 @@ class TegileApi
       modify_lun.logbias = property_value
     when "write_back_cache"
       modify_lun.write_back_cache = property_value
+    when "compression_class"
+      modify_lun.compression_class = property_value
     end
     modify_volume_properties_param = IFClient::ModifyVolumePropertiesParam.new
     modify_volume_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{lun_name}"
@@ -1817,7 +1821,7 @@ class TegileApi
     begin
     #Inherit properties from parent project settings (revert/rollback to parent setting)
     result = api_instance.inherit_property_from_project_post(inherit_property_from_project_param)
-    puts result.inspect
+    # puts result.inspect
     return result
     rescue IFClient::ApiError => e
       error = JSON.parse("#{e.response_body}")
