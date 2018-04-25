@@ -1,6 +1,6 @@
 require "tegile-api"
 
-host = "172.16.8.200"
+host = "172.16.1.200"
 username = "admin"
 password = "t"
 # pool_name = "pool-a"
@@ -13,6 +13,7 @@ IFClient.configure do |config|
   config.password = password
   config.host = host
   config.verify_ssl = false
+  config.verify_ssl_host = false
   #config.debugging = true
 end
 
@@ -33,8 +34,9 @@ def project_create(project_name,pool_name)
   # new_project.acl_inherit = acl_inherit
   # new_project.default_volume_size_in_byte = default_lun_size
   # new_project.default_volume_block_size = default_lun_block_size
-  # new_project.default_thin_provisioning = default_thin_provisioning
+  # new_project.default_thin_provisioning = true
   # new_project.record_size = default_share_block_size
+  # new_project.mount_point = "/export/testmount"
   create_project_param = IFClient::CreateProjectParam.new
   create_project_param.arg0_project = new_project
   begin
@@ -125,7 +127,7 @@ def share_create(pool_name,project_name,share_name)
   new_share_options = IFClient::ShareOptions.new
   #new_share_options.block_size = IFClient::BlockSizeEnum::N32_KB
   new_share_options.block_size = ""
-  # new_share_options.mount_point = mount_point
+  # new_share_options.mount_point = "/export/testmount-share"
   new_share_options.quota = -1
   # new_share_options.reservation = -1
   ##Set share permissions params
@@ -143,6 +145,7 @@ def share_create(pool_name,project_name,share_name)
   create_share_param.arg4_share_permissions = [new_share_permissions] ##Requires []
   begin
     #Creates a share with the specified share options and share permissions
+    # puts new_share_options.inspect
     result = api_instance.create_share_post(create_share_param)
     puts result.inspect
     # if result.value == 0
@@ -304,13 +307,13 @@ def share_set_nfs_sharing(pool_name,project_name,share_name,enabled)
   end 
 end
 
-# project_create("api-project1","pool-a")
+# project_create("api1","pool-a")
 # project_get("pool-a","puppet2")
-# project_set("default_volume_block_size","4KB","pool-a","puppet2")
-share_create("pool-a","puppet1","share2")
-# share_get("pool-a","puppet1","share1")
-# lun_create("lun2","pool-a","puppet2","iSCSI",119185342464)
-# lun_get("pool-a","gen-proj","gen-lun")
+# project_set("default_volume_block_size","4KB","pool-a","puppet1")
+share_create("pool-a","puppet2","share1")
+# share_get("pool-a","puppet3","share2")
+# lun_create("lun1","pool-a","puppet1","iSCSI",119185342464)
+# lun_get("pool-a","puppet1","lun1")
 # set_nfs_network_ac_ls_on_project("pool-a","api-project1")
 # set_nfs_sharing_on_project("pool-a","api-project1")
 # inherit_property_from_project("pool-a","puppet1","share1","Sharesmb")

@@ -6,7 +6,22 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
 
   def create
     Puppet.info("##Inside provider_project_create")
-    tegile_api_transport.project_create(resource[:project_name],resource[:pool_name],resource[:compression_class],resource[:compression_type],resource[:compressed_log],resource[:intended_protocol_list],resource[:quota],resource[:dedup],resource[:primary_cache],resource[:secondary_cache],resource[:acl_inherit],resource[:default_lun_size],resource[:default_lun_block_size],resource[:default_thin_provisioning],resource[:default_share_block_size])
+    tegile_api_transport.project_create(resource[:project_name],resource[:pool_name],resource[:compression_class],resource[:compression_type],resource[:compressed_log],resource[:intended_protocol_list],resource[:quota],resource[:dedup],resource[:primary_cache],resource[:secondary_cache],resource[:acl_inherit],resource[:default_lun_size],resource[:default_lun_block_size],resource[:default_thin_provisioning],resource[:default_share_block_size],resource[:mount_point])
+    if resource[:default_thin_provisioning] == nil
+      tegile_api_transport.project_set("default_thin_provisioning",true,resource[:pool_name],resource[:project_name])
+    end
+    if resource[:read_cache] != nil
+      if resource[:read_cache] == "on"
+        tegile_api_transport.project_set("primary_cache","all",resource[:pool_name],resource[:project_name])
+        tegile_api_transport.project_set("secondary_cache","all",resource[:pool_name],resource[:project_name])
+      elsif 
+        resource[:read_cache] == "off"
+        tegile_api_transport.project_set("primary_cache","metadata",resource[:pool_name],resource[:project_name])
+        tegile_api_transport.project_set("secondary_cache","metadata",resource[:pool_name],resource[:project_name])
+      else
+        fail "invalid read_cache value"
+      end
+    end
     if resource[:intended_protocol_list] != nil
       enabled_protocols = resource[:intended_protocol_list]
       if enabled_protocols.include?("NFS")
@@ -20,7 +35,10 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
     end
     if resource[:share_protocol] != nil
       if resource[:share_protocol] == "SMB+NFS"
-        #! NEED TO CHECK FOR v3 right here
+        smb_status = tegile_api_transport.get_smb_config
+        if smb_status.smb_protocol_mode == "SMB3"
+          fail "SMBv3 enabled, NFS&SMB sharing not supported"
+        end
         tegile_api_transport.project_set_smb_sharing(resource[:project_name],resource[:pool_name],true)
         tegile_api_transport.project_set_nfs_sharing(resource[:project_name],resource[:pool_name],true)
       elsif resource[:share_protocol] == "NFS"
@@ -106,6 +124,34 @@ Puppet::Type.type(:project).provide(:lun,:parent => Puppet::Provider::Tegile) do
     tegile_api_transport.project_set("default_volume_block_size",should,resource[:pool_name],resource[:project_name])
   end
 
+  def read_cache
+    Puppet.info("##Inside provider_project_read_cache_get")
+    returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])
+    primary_cache_status = returned.primary_cache
+    secondary_cache_status = returned.secondary_cache
+    if primary_cache_status == "all" && secondary_cache_status == "all"
+      return "on"
+    elsif primary_cache_status == "metadata" && secondary_cache_status == "metadata"
+      return "off"
+    else
+      fail "invalid read_cache state"
+    end
+  end
+
+  def read_cache=(should)
+    Puppet.info("##Inside provider_project_read_cache_set")
+    if should == "on"
+      tegile_api_transport.project_set("primary_cache","all",resource[:pool_name],resource[:project_name])
+      tegile_api_transport.project_set("secondary_cache","all",resource[:pool_name],resource[:project_name])
+    elsif 
+      should == "off"
+      tegile_api_transport.project_set("primary_cache","metadata",resource[:pool_name],resource[:project_name])
+      tegile_api_transport.project_set("secondary_cache","metadata",resource[:pool_name],resource[:project_name])
+    else
+      fail "invalid read_cache value"
+    end
+  end
+  
   def primary_cache
     Puppet.info("##Inside provider_project_primary_cache_get")
     returned = tegile_api_transport.project_get(resource[:pool_name],resource[:project_name])

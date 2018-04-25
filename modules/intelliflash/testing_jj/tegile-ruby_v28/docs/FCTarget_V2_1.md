@@ -1,0 +1,13 @@
+# IFClient::FCTarget_V2_1
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**target_name** | **String** | Target Name | [optional] 
+**target_status** | **String** | Target Status | [optional] 
+**target_node** | **String** | Node, where the target is active | [optional] 
+**target_group_name** | **String** | Target Group name | [optional] 
+**target_speed** | **String** | Target Speed | [optional] 
+**target_port_type** | **String** | Target port type HBA or NPIV | [optional] 
+
+

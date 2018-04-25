@@ -29,6 +29,10 @@ Puppet::Type.newtype(:lun) do
     end
   end
 
+  validate do
+    raise ArgumentError, "block_size is required" unless self[:block_size]
+  end
+
   newparam(:lun_name) do
     isnamevar
     Puppet.info("##Inside type_param_lun_name")

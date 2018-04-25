@@ -8,6 +8,7 @@ class TegileApi
       config.password = password
       config.host = host
       config.verify_ssl = false
+      config.verify_ssl_host = false
     end
     list_system_properties
     puts "IFClient Configured with #{host} and #{username}"
@@ -43,7 +44,7 @@ class TegileApi
     end 
   end
 
-  def project_create(project_name,pool_name,compression_class,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size)
+  def project_create(project_name,pool_name,compression_class,compression_type,compressed_log,intended_protocol_list,quota,dedup,primary_cache,secondary_cache,acl_inherit,default_lun_size,default_lun_block_size,default_thin_provisioning,default_share_block_size,mount_point)
     api_instance = IFClient::DataApi.new
     compression_class_inst = IFClient::CompressionClass.new
     compression_class_inst.value = compression_class
@@ -63,6 +64,7 @@ class TegileApi
     new_project.default_volume_block_size = default_lun_block_size
     new_project.default_thin_provisioning = default_thin_provisioning
     new_project.record_size = default_share_block_size
+    new_project.mount_point = mount_point
     create_project_param = IFClient::CreateProjectParam.new
     create_project_param.arg0_project = new_project
     begin

@@ -101,6 +101,10 @@ Puppet::Type.newtype(:project) do
     Puppet.info("##Inside type_property_dedup")
   end
 
+  newproperty(:read_cache) do
+    Puppet.info("##Inside type_project_property_read_cache")
+  end
+
   newproperty(:primary_cache) do
     Puppet.info("##Inside type_project_property_primary_cache")
   end
@@ -166,6 +170,10 @@ Puppet::Type.newtype(:project) do
       diff = is_unique + should_unique
       diff.length == 0 ? true : false
     end
+  end
+
+  newparam(:mount_point) do
+    Puppet.info("##Inside type_param_mount_point")
   end
   
 end
