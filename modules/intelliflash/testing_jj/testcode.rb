@@ -307,11 +307,11 @@ def share_set_nfs_sharing(pool_name,project_name,share_name,enabled)
   end 
 end
 
-# project_create("api1","pool-a")
+# project_create("api3","pool-a")
 # project_get("pool-a","puppet2")
 # project_set("default_volume_block_size","4KB","pool-a","puppet1")
-share_create("pool-a","puppet2","share1")
-# share_get("pool-a","puppet3","share2")
+# share_create("pool-a","ui1","apishare2")
+share_get("pool-a","puppet1","share1")
 # lun_create("lun1","pool-a","puppet1","iSCSI",119185342464)
 # lun_get("pool-a","puppet1","lun1")
 # set_nfs_network_ac_ls_on_project("pool-a","api-project1")

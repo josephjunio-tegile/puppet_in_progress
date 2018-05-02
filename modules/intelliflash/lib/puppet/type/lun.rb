@@ -29,6 +29,7 @@ Puppet::Type.newtype(:lun) do
     end
   end
 
+  ##Check to make sure block_size is defined in manifest
   validate do
     raise ArgumentError, "block_size is required" unless self[:block_size]
   end
@@ -114,6 +115,10 @@ Puppet::Type.newtype(:lun) do
 
   newproperty(:dedup) do
     Puppet.info("##Inside type_property_dedup")
+  end
+
+  newproperty(:read_cache) do
+    Puppet.info("##Inside type_lun_property_read_cache")
   end
 
   newproperty(:primary_cache) do

@@ -52,7 +52,19 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
       tegile_api_transport.lun_set("logbias",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:lun_name])
     end
     if resource[:write_back_cache] != nil
-      tegile_api_transport.lun_set("write_back_cache",resource[:logbias],resource[:pool_name],resource[:project_name],resource[:lun_name])
+      tegile_api_transport.lun_set("write_back_cache",resource[:write_back_cache],resource[:pool_name],resource[:project_name],resource[:lun_name])
+    end
+    if resource[:read_cache] != nil
+      if resource[:read_cache] == "on"
+        tegile_api_transport.lun_set("primary_cache","all",resource[:pool_name],resource[:project_name],resource[:lun_name])
+        tegile_api_transport.lun_set("secondary_cache","all",resource[:pool_name],resource[:project_name],resource[:lun_name])
+      elsif resource[:read_cache] == "off"
+        tegile_api_transport.lun_set("primary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:lun_name])
+        tegile_api_transport.lun_set("secondary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:lun_name])
+      elsif resource[:read_cache] == "inherit"
+      else
+        fail "invalid read_cache value"
+      end
     end
   end
 
@@ -200,6 +212,51 @@ Puppet::Type.type(:lun).provide(:lun,:parent => Puppet::Provider::Tegile) do
       tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:lun_name],"Dedup")
     else
       tegile_api_transport.lun_set("dedup",should,resource[:pool_name],resource[:project_name],resource[:lun_name])
+    end
+  end
+
+  def read_cache
+    Puppet.info("##Inside provider_lun_read_cache_get")
+    returned = tegile_api_transport.lun_get(resource[:pool_name],resource[:project_name],resource[:lun_name])
+    primary_cache_status = returned.primary_cache
+    secondary_cache_status = returned.secondary_cache
+    if resource[:read_cache] == "inherit"
+      if returned.override_primary_cache == false && returned.override_secondary_cache == false
+        return "inherit"
+      else
+        if primary_cache_status == "all" && secondary_cache_status == "all"
+          return "on"
+        elsif primary_cache_status == "metadata" && secondary_cache_status == "metadata"
+          return "off"
+        else
+          fail "invalid read_cache state"
+        end
+      end
+    else
+      if primary_cache_status == "all" && secondary_cache_status == "all"
+        return "on"
+      elsif primary_cache_status == "metadata" && secondary_cache_status == "metadata"
+        return "off"
+      else
+        fail "invalid read_cache state"
+      end
+    end
+  end
+
+  def read_cache=(should)
+    Puppet.info("##Inside provider_lun_read_cache_set")
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:lun_name],"PrimaryCache")
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:lun_name],"SecondaryCache")
+    elsif should == "on"
+      tegile_api_transport.lun_set("primary_cache","all",resource[:pool_name],resource[:project_name],resource[:lun_name])
+      tegile_api_transport.lun_set("secondary_cache","all",resource[:pool_name],resource[:project_name],resource[:lun_name])
+    elsif 
+      should == "off"
+      tegile_api_transport.lun_set("primary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:lun_name])
+      tegile_api_transport.lun_set("secondary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:lun_name])
+    else
+      fail "invalid read_cache value"
     end
   end
 

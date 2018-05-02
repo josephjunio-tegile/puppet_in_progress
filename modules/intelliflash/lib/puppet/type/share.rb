@@ -74,6 +74,10 @@ Puppet::Type.newtype(:share) do
     Puppet.info("##Inside type_property_compression")
   end
 
+  newproperty(:read_cache) do
+    Puppet.info("##Inside type_share_property_read_cache")
+  end
+
   newproperty(:primary_cache) do
     Puppet.info("##Inside type_property_primary_cache")
   end

@@ -66,6 +66,17 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     if resource[:block_size] != nil
       tegile_api_transport.share_set("block_size",resource[:block_size],resource[:pool_name],resource[:project_name],resource[:share_name])
     end
+    if resource[:read_cache] != nil
+      if resource[:read_cache] == "on"
+        tegile_api_transport.share_set("primary_cache","all",resource[:pool_name],resource[:project_name],resource[:share_name])
+        tegile_api_transport.share_set("secondary_cache","all",resource[:pool_name],resource[:project_name],resource[:share_name])
+      elsif resource[:read_cache] == "off"
+        tegile_api_transport.share_set("primary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:share_name])
+        tegile_api_transport.share_set("secondary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:share_name])
+      else
+        fail "invalid read_cache value"
+      end
+    end
   end
 
   def destroy
@@ -289,6 +300,51 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
       tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"Logbias")
     else
       tegile_api_transport.share_set("logbias",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+  end
+
+  def read_cache
+    Puppet.info("##Inside provider_share_read_cache_get")
+    returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    primary_cache_status = returned.primary_cache
+    secondary_cache_status = returned.secondary_cache
+    if resource[:read_cache] == "inherit"
+      if returned.override_primary_cache == false && returned.override_secondary_cache == false
+        return "inherit"
+      else
+        if primary_cache_status == "all" && secondary_cache_status == "all"
+          return "on"
+        elsif primary_cache_status == "metadata" && secondary_cache_status == "metadata"
+          return "off"
+        else
+          fail "invalid read_cache state"
+        end
+      end
+    else
+      if primary_cache_status == "all" && secondary_cache_status == "all"
+        return "on"
+      elsif primary_cache_status == "metadata" && secondary_cache_status == "metadata"
+        return "off"
+      else
+        fail "invalid read_cache state"
+      end
+    end
+  end
+
+  def read_cache=(should)
+    Puppet.info("##Inside provider_share_read_cache_set")
+    if should == "inherit"
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"PrimaryCache")
+      tegile_api_transport.inherit_property_from_project(resource[:pool_name],resource[:project_name],resource[:share_name],"SecondaryCache")
+    elsif should == "on"
+      tegile_api_transport.share_set("primary_cache","all",resource[:pool_name],resource[:project_name],resource[:share_name])
+      tegile_api_transport.share_set("secondary_cache","all",resource[:pool_name],resource[:project_name],resource[:share_name])
+    elsif 
+      should == "off"
+      tegile_api_transport.share_set("primary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:share_name])
+      tegile_api_transport.share_set("secondary_cache","metadata",resource[:pool_name],resource[:project_name],resource[:share_name])
+    else
+      fail "invalid read_cache value"
     end
   end
 
