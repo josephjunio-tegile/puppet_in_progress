@@ -114,6 +114,14 @@ Puppet::Type.newtype(:share) do
     Puppet.info("##Inside type_property_acl_inherit")
   end
 
+  newproperty(:access_time) do
+    Puppet.info("##Inside type_property_access_time")
+  end
+
+  newproperty(:nbmand) do
+    Puppet.info("##Inside type_property_nbmand")
+  end
+
   newproperty(:share_protocol) do
     Puppet.info("##Inside type_property_share_protocol")
     ## Upcase so that we can compare

@@ -66,6 +66,12 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     if resource[:block_size] != nil
       tegile_api_transport.share_set("block_size",resource[:block_size],resource[:pool_name],resource[:project_name],resource[:share_name])
     end
+    if resource[:access_time] != nil
+      tegile_api_transport.share_set("access_time",resource[:access_time],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
+    if resource[:nbmand] != nil
+      tegile_api_transport.share_set("nbmand",resource[:nbmand],resource[:pool_name],resource[:project_name],resource[:share_name])
+    end
     if resource[:read_cache] != nil
       if resource[:read_cache] == "on"
         tegile_api_transport.share_set("primary_cache","all",resource[:pool_name],resource[:project_name],resource[:share_name])
@@ -394,6 +400,30 @@ Puppet::Type.type(:share).provide(:lun,:parent => Puppet::Provider::Tegile) do
     else
       tegile_api_transport.share_set("acl_inherit",should,resource[:pool_name],resource[:project_name],resource[:share_name])
     end
+  end
+
+  def access_time
+    Puppet.info("##Inside provider_share_access_time_get")
+    returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.atime
+    return returned.atime
+  end
+
+  def access_time=(should)
+    Puppet.info("##Inside provider_share_access_time_set")
+    tegile_api_transport.share_set("access_time",should,resource[:pool_name],resource[:project_name],resource[:share_name])
+  end
+
+  def nbmand
+    Puppet.info("##Inside provider_share_nbmand_get")
+    returned = tegile_api_transport.share_get(resource[:pool_name],resource[:project_name],resource[:share_name])
+    # puts returned.nbmand
+    return returned.nbmand
+  end
+
+  def nbmand=(should)
+    Puppet.info("##Inside provider_share_nbmand_set")
+    tegile_api_transport.share_set("nbmand",should,resource[:pool_name],resource[:project_name],resource[:share_name])
   end
 
   def share_protocol

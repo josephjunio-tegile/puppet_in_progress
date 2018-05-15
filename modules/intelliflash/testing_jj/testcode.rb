@@ -174,6 +174,24 @@ def share_get(pool_name,project_name,share_name)
   end 
 end
 
+def share_set(pool_name,project_name,share_name)
+  api_instance = IFClient::DataApi.new
+  share_obj = IFClient::Share_V2_1.new
+  share_obj.atime = "on"
+  share_obj.nbmand = "on"
+  modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
+  modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
+  modify_share_properties_param.arg1_share = share_obj
+  begin
+  #Modify value of a subset of project properties
+  result = api_instance.modify_share_properties_post(modify_share_properties_param)
+  p result
+rescue IFClient::ApiError => e
+  error = JSON.parse("#{e.response_body}")
+  fail "Exception when calling TegileApi(share_set): #{error["message"]}"
+end 
+end
+
 def lun_create(lun_name,pool_name,project_name,lun_protocol,lun_size)
   #,block_size)
   #,thin_provision)
@@ -310,8 +328,9 @@ end
 # project_create("api3","pool-a")
 # project_get("pool-a","puppet2")
 # project_set("default_volume_block_size","4KB","pool-a","puppet1")
-# share_create("pool-a","ui1","apishare2")
-share_get("pool-a","puppet1","share1")
+share_create("pool-a","puppet1","apishare1")
+share_get("pool-a","puppet1","apishare1")
+# share_set("pool-a","puppet1","share1")
 # lun_create("lun1","pool-a","puppet1","iSCSI",119185342464)
 # lun_get("pool-a","puppet1","lun1")
 # set_nfs_network_ac_ls_on_project("pool-a","api-project1")

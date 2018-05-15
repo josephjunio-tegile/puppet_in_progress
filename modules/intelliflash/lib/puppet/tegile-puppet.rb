@@ -855,6 +855,10 @@ class TegileApi
       modify_share.record_size = property_value
     when "compression_class"
       modify_share.compression_class = property_value
+    when "access_time"
+      modify_share.atime = property_value
+    when "nbmand"
+      modify_share.nbmand = property_value
     end
     modify_share_properties_param = IFClient::ModifySharePropertiesParam.new
     modify_share_properties_param.arg0_dataset_path = "#{pool_name}/Local/#{project_name}/#{share_name}"
